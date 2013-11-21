@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ng-repeat Benchmarks</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body ng-app="app">
+
+    <section ng-controller="mainCtrl">
+      <div>
+        <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
+        <h3>Started: {{ started }}</h3>
+        <h3>Last Digest: {{ lastDigestRan }}</h3>
+        <h3>Difference: {{ lastDigestRan - started }}</h3>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <tbody>
+            <tr ng-repeat="rows in data">
+              <td ng-repeat="row in rows">
+                {{row}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <script src="http://code.angularjs.org/1.2.1/angular.js"></script>
+    <script>
+      angular.module('app', [])
+        .config(['$provide', function($provide) {
+          $provide.decorator('$rootScope', ['$delegate', function($delegate) {
+            var oldDigest = $delegate.$digest;
+            $delegate.$digest = function() {
+              $delegate.lastDigestRan = (new Date()).getTime();
+              return oldDigest.apply($delegate, arguments);
+            };
+
+            return $delegate;
+          }]);
+        }])
+        .controller('mainCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {
+          $scope.data = [];
+
+          $scope.newData = function() {
+
+            $scope.started = (new Date()).getTime();
+
+            $scope.data = [];
+
+            for(var i = 0; i < 5; ++i) {
+              $scope.data[i] = [];
+              for(var j = 0; j < 5; ++j) {
+                $scope.data[i][j] = Math.random();
+              }
+            }
+          }
+
+          $scope.newData();
+        }]);
+    </script>
+  </body>
+</html>
