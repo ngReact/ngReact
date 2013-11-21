@@ -1,0 +1,8 @@
+{
+  "name": "ng-repeat-tests",
+  "version": "0.0.1",
+  "dependencies": {
+    "angular-bindonce": "*",
+    "quick-ng-repeat": "https://github.com/allaud/quick-ng-repeat.git"
+  }
+}
