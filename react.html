@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html class="no-js">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Ng-repeat Benchmarks</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body ng-app="app">
+
+    <section ng-controller="mainCtrl">
+      <div>
+        <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
+      </div>
+      <div class="table-responsive">
+        <table ng-react-repeat="data"></table>
+
+        <!--
+          <table class="table">
+            <tbody>
+              <tr ng-react-repeat="data">
+                <td>{{row.0}}</td>
+                <td>{{row.1}}</td>
+                <td>{{row.2}}</td>
+                <td>{{row.3}}</td>
+                <td>{{row.4}}</td>
+              </tr>
+            </tbody>
+          </table>
+        -->
+      </div>
+    </section>
+
+    <script src="http://code.angularjs.org/1.2.1/angular.js"></script>
+    <script src="bower_components/quick-ng-repeat/quick-ng-repeat.js"></script>
+    <script src="bower_components/react/react.min.js"></script>
+    <script src="bower_components/react/JSXTransformer.js"></script>
+    <script type="text/jsx">
+      /** @jsx React.DOM */
+      window.reactRepeat = React.createClass({
+        render: function() {
+          var rows = [];
+          for (var i = 0; i < this.props.scope.data; ++i) {
+            var clickHandler = this.props.scope.$apply.bind(this.props.scope, this.props.scope.toggle.bind(null, i));
+            rows.push(
+              <tr onClick={clickHandler}>
+                <td>{this.props.scope.data[i]['0']}</td>
+                <td>{this.props.scope.data[i]['1']}</td>
+                <td>{this.props.scope.data[i]['2']}</td>
+                <td>{this.props.scope.data[i]['3']}</td>
+                <td>{this.props.scope.data[i]['4']}</td>
+              </tr>
+            );
+          }
+          return
+            <table class="table">
+              <tbody>
+                {rows}
+              </tbody>
+            </table>;
+        }
+      });
+    </script>
+    <script>
+      angular.module('app', ['QuickList'])
+        .controller('mainCtrl', ['$scope', function($scope) {
+          $scope.data = [];
+
+          $scope.newData = function() {
+
+            $scope.data = [];
+
+            for(var i = 0; i < 500; ++i) {
+              $scope.data[i] = {};
+              for(var j = 0; j < 5; ++j) {
+                $scope.data[i][j+''] = Math.random();
+              }
+            }
+          };
+
+          $scope.newData();
+        }])
+      .directive('ngReactRepeat', function () {
+        return {
+          restrict: 'A',
+          replace: true,
+          scope: {
+            rows: '=data',
+          },
+          link: function (scope, elem, attrs) {
+            scope.toggle = function(index) {
+              if (scope.readonly && scope.readonly === 'true') {
+                return;
+              }
+              scope.ratingValue = index + 1;
+              scope.onRatingSelected({rating: index + 1});
+            };
+
+            scope.$watch('rows', function() {
+              React.renderComponent(window.reactRepeat({scope: scope}), elem[0]);
+            }, true);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
