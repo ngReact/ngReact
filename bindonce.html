@@ -17,9 +17,12 @@
       <div class="table-responsive">
         <table class="table">
           <tbody>
-            <tr bindonce ng-repeat="rows in data">
-              <td bindonce ng-repeat="row in rows" bo-text="row">
-              </td>
+            <tr bindonce ng-repeat="row in data">
+              <td bo-text="row.0"></td>
+              <td bo-text="row.1"></td>
+              <td bo-text="row.2"></td>
+              <td bo-text="row.3"></td>
+              <td bo-text="row.4"></td>
             </tr>
           </tbody>
         </table>
@@ -37,13 +40,13 @@
 
             $scope.data = [];
 
-            for(var i = 0; i < 5; ++i) {
-              $scope.data[i] = [];
+            for(var i = 0; i < 500; ++i) {
+              $scope.data[i] = {};
               for(var j = 0; j < 5; ++j) {
-                $scope.data[i][j] = Math.random();
+                $scope.data[i][j+''] = Math.random();
               }
             }
-          }
+          };
 
           $scope.newData();
         }]);
