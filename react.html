@@ -11,26 +11,17 @@
   <body ng-app="app">
 
     <section ng-controller="mainCtrl">
-      <div>
-        <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
-      </div>
-      <div class="table-responsive">
-        <table ng-react-repeat="data"></table>
 
-        <!--
-          <table class="table">
-            <tbody>
-              <tr ng-react-repeat="data">
-                <td>{{row.0}}</td>
-                <td>{{row.1}}</td>
-                <td>{{row.2}}</td>
-                <td>{{row.3}}</td>
-                <td>{{row.4}}</td>
-              </tr>
-            </tbody>
-          </table>
-        -->
-      </div>
+      <button ng-click="started = true" ng-hide="started" class="btn btn-primary">Start</button>
+
+      <section ng-if="started">
+        <div>
+          <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table" ng-react-repeat data="data"></table>
+        </div>
+      </section>
     </section>
 
     <script src="http://code.angularjs.org/1.2.1/angular.js"></script>
@@ -42,7 +33,7 @@
       window.reactRepeat = React.createClass({
         render: function() {
           var rows = [];
-          for (var i = 0; i < this.props.scope.data; ++i) {
+          for (var i = 0; i < this.props.scope.data.length; ++i) {
             var clickHandler = this.props.scope.$apply.bind(this.props.scope, this.props.scope.toggle.bind(null, i));
             rows.push(
               <tr onClick={clickHandler}>
@@ -54,12 +45,7 @@
               </tr>
             );
           }
-          return
-            <table class="table">
-              <tbody>
-                {rows}
-              </tbody>
-            </table>;
+          return <tbody>{rows}</tbody>;
         }
       });
     </script>
@@ -82,24 +68,21 @@
 
           $scope.newData();
         }])
-      .directive('ngReactRepeat', function () {
+      .directive('ngReactRepeat', function ($timeout) {
         return {
           restrict: 'A',
-          replace: true,
           scope: {
-            rows: '=data',
+            data: '=',
           },
           link: function (scope, elem, attrs) {
             scope.toggle = function(index) {
-              if (scope.readonly && scope.readonly === 'true') {
-                return;
-              }
-              scope.ratingValue = index + 1;
-              scope.onRatingSelected({rating: index + 1});
+              alert(index);
             };
 
-            scope.$watch('rows', function() {
-              React.renderComponent(window.reactRepeat({scope: scope}), elem[0]);
+            scope.$watch('data', function() {
+              $timeout(function() {
+                React.renderComponent(window.reactRepeat({scope: scope}), elem[0]);
+              });
             }, true);
           }
         }

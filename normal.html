@@ -11,22 +11,27 @@
   <body ng-app="app">
 
     <section ng-controller="mainCtrl">
-      <div>
-        <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
-      </div>
-      <div class="table-responsive">
-        <table class="table">
-          <tbody>
-            <tr ng-repeat="row in data">
-              <td>{{row.0}}</td>
-              <td>{{row.1}}</td>
-              <td>{{row.2}}</td>
-              <td>{{row.3}}</td>
-              <td>{{row.4}}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+      <button ng-click="started = true" ng-hide="started" class="btn btn-primary">Start</button>
+
+      <section ng-if="started">
+        <div>
+          <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
+        </div>
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              <tr ng-repeat="row in data">
+                <td>{{row.0}}</td>
+                <td>{{row.1}}</td>
+                <td>{{row.2}}</td>
+                <td>{{row.3}}</td>
+                <td>{{row.4}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
     </section>
 
     <script src="http://code.angularjs.org/1.2.1/angular.js"></script>
