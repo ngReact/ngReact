@@ -20,13 +20,13 @@
         </div>
         <div class="table-responsive">
           <table class="table">
-            <tbody>
-              <tr ng-react-repeat data="data" alias="row" ng-click="clickHandler(row)">
-                <td ng-bind="row.0"></td>
-                <td ng-bind="row.1"></td>
-                <td ng-bind="row.2"></td>
-                <td ng-bind="row.3"></td>
-                <td ng-bind="row.4"></td>
+            <tbody class="tbody-class" id="awesome-tbody">
+              <tr class="tr-class" ng-react-repeat data="data" alias="row" ng-click="clickHandler(row)">
+                <td class="td-zero" ng-bind="row.0"></td>
+                <td class="td-one" ng-bind="row.1"></td>
+                <td class="td-two" ng-bind="row.2"></td>
+                <td class="td-three" ng-bind="row.3"></td>
+                <td class="td-four" ng-bind="row.4"></td>
               </tr>
             </tbody>
           </table>
@@ -39,8 +39,38 @@
     <script src="bower_components/react/react.js"></script>
     <script src="//cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.2/underscore-min.js"></script>
     <script src="bower_components/react/JSXTransformer.js"></script>
-    <script type="text/jsx">
-      /** @jsx React.DOM */
+    <script>
+      var propertiesToKeep = [
+        {
+          attrName : 'class',
+          propName : 'className'
+        }, {
+          attrName : 'ng-click',
+          propName : 'onClick'
+        }, {
+          name : 'id'
+        }, {
+          name : 'ng-bind'
+        }
+      ];
+
+      var getAttributes = function(el) {
+        var toReturn = {};
+
+        console.log('getAttributes el', el.attributes);
+
+        _.each(propertiesToKeep, function(property) {
+          var attr = _.findWhere(_.values(el.attributes), {localName : property.attrName || property.name});
+          if (attr) {
+            toReturn[property.propName || property.name] = attr.value;
+          }
+        });
+
+        console.log('return', toReturn);
+
+        return toReturn;
+      };
+
       window.reactRepeatUnit = React.createClass({
         render: function() {
           console.log('running reactRepeatUnit render');
@@ -57,7 +87,9 @@
             return React.DOM[domEl.el].apply(null, [domEl.props].concat([data[val]]));
           });
 
-          return React.DOM.tr.apply(null, [{ onClick : clickHandler }].concat(rowTranscluded));
+          //should be the element that has the ng-react-repeat directive on it.
+          // return React.DOM[this.props.rootUnit.localName].apply(null, [{ onClick : clickHandler }].concat(rowTranscluded));
+          return React.DOM[this.props.rootUnit.localName].apply(null, [getAttributes(this.props.rootUnit)].concat(rowTranscluded));
         }
       });
 
@@ -67,26 +99,27 @@
 
           var transcludedDom = _.compact(_.map(this.props.transcluded, function(node) {
             if (node.localName) {
-              var properties = {};
-
-              _.each(node.attributes, function(attr) {
-                properties[attr.localName] = attr.value;
-              });
 
               return {
                 el: node.localName,
-                props: properties
+                props: getAttributes(node)
               };
             }
           }));
 
-          var scope = this.props.scope;
-          rows = _.map(this.props.scope.data, function(datum) {
-            return reactRepeatUnit({scope: scope, data: datum, transcludedDom: transcludedDom});
-          });
+          var scope = this.props.scope,
+            rootUnit = this.props.rootUnit,
+            rows = _.map(this.props.scope.data, function(datum) {
+              return reactRepeatUnit({
+                scope          : scope,
+                data           : datum,
+                transcludedDom : transcludedDom,
+                rootUnit       : rootUnit
+              });
+            });
 
-          var tr = React.DOM.tbody.apply(null, rows);
-          return tr;
+          //here, rootUnit.parentElement.localName is the tbody, rootUnit.localName is the tr
+          return React.DOM[this.props.rootUnit.parentElement.localName].apply(null, [getAttributes(this.props.rootUnit.parentElement)].concat(rows));
         }
       });
     </script>
@@ -121,35 +154,24 @@
             restrict: 'A',
             transclude: true,
             replace: true,
-            //todo: Remove this isolate scope and get the watchers to work instead for one way data binding
-            scope: {
-              data: '=',
-              alias: '@'
-            },
             controller: ['$scope', '$element', '$attrs', '$transclude', function ($scope, $element, $attrs, $transclude) {
 
-              // $scope.alias = $attrs.alias;
-
-              $scope.clickHandler = function(index) {
-                console.log(index);
-              };
+              $scope.alias = $attrs.alias;
 
               console.log('el', $element[0]);
 
               var parentReference = $element[0].offsetParent;
 
               $transclude(function(clone) {
-                $scope.$watch('data', function(val) {
+                $scope.$watch($attrs.data, function(val) {
 
                   console.error('watcher firing, about to kick off React.renderComponent');
-                  console.log('$el', $element);
-                  console.log('parent', parentReference);
 
                   $timeout(function() {
 
                     React.renderComponent(
                       window.reactRepeat({
-                        scope       : $scope, //_.extend($scope, { data: val }),
+                        scope       : $scope,
                         transcluded : clone,
                         rootUnit    : $element[0]
                       }),
