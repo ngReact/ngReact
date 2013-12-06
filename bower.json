@@ -4,6 +4,7 @@
   "dependencies": {
     "angular-bindonce": "*",
     "quick-ng-repeat": "https://github.com/allaud/quick-ng-repeat.git",
-    "react": "*"
+    "react": "*",
+    "underscore": "~1.5.2"
   }
 }
