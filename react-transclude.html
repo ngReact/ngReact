@@ -34,7 +34,7 @@
       </section>
     </section>
 
-    <script src="http://code.angularjs.org/1.2.1/angular.js"></script>
+    <script src="angular.js"></script>
     <script src="bower_components/quick-ng-repeat/quick-ng-repeat.js"></script>
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
@@ -46,7 +46,27 @@
           propName : 'className'
         }, {
           attrName : 'ng-click',
-          propName : 'onClick'
+          propName : 'onClick',
+          convert : function(attrs, scope, data) {
+
+            if (!attrs.onClick) {
+              return;
+            }
+
+            var onclickFunctionName = _.first(attrs.onClick.match(/\w+/g)),
+              onClickFunctionVars = _.first(attrs.onClick.match(/\(.*\)/g));
+            onClickFunctionVars = onClickFunctionVars.substring(1, onClickFunctionVars.length - 1);
+
+            var defineHandler = 'var {0} = {1}; var handler = scope.$apply.bind(scope, scope.{2}.bind(null, {3}));'.format(
+              scope.alias,
+              JSON.stringify(data),
+              onclickFunctionName,
+              onClickFunctionVars
+            );
+
+            eval(defineHandler);
+            attrs.onClick = handler;
+          }
         }, {
           name : 'id'
         }, {
@@ -90,6 +110,10 @@
         };
       }
 
+      /**
+       * ReactRepeatUnit is a React component that represents a single repeated unit, a single run of the for loop
+       * iterating over a collection.
+       */
       window.reactRepeatUnit = React.createClass({
         render: function() {
           console.log('running reactRepeatUnit render');
@@ -111,25 +135,16 @@
           });
 
           var attrs = getAttributes(this.props.rootUnit);
-
-          var onclickFunctionName = _.first(attrs.onClick.match(/\w+/g)),
-            onClickFunctionVars = _.first(attrs.onClick.match(/\(.*\)/g));
-          onClickFunctionVars = onClickFunctionVars.substring(1, onClickFunctionVars.length - 1);
-
-          var defineHandler = 'var {0} = {1}; var handler = scope.$apply.bind(scope, scope.{2}.bind(null, {3}));'.format(
-            scope.alias,
-            JSON.stringify(data),
-            onclickFunctionName,
-            onClickFunctionVars
-          );
-
-          eval(defineHandler);
-          attrs.onClick = handler;
+          _.findWhere(propertiesToKeep, {propName: 'onClick'}).convert(attrs, scope, data);
 
           return React.DOM[this.props.rootUnit.localName].apply(null, [attrs].concat(rowTranscluded));
         }
       });
 
+      /**
+       * ReactRepeat is a React component that will create and append to itself multiple rows of ReactRepeatUnit per data.
+       * It is basically the container for everything that will be repeated.
+       */
       window.reactRepeat = React.createClass({
         render: function() {
           console.log('running reactRepeat render');
@@ -146,17 +161,17 @@
 
           var scope = this.props.scope,
             rootUnit = this.props.rootUnit,
-            rows = _.map(this.props.scope.data, function(datum) {
+            rows = _.map(scope.data, function(datum) {
               return reactRepeatUnit({
                 scope          : scope,
-                data           : datum,
-                transcludedDom : transcludedDom,
-                rootUnit       : rootUnit
+                data           : datum,          //datum to render on the HTML unit
+                transcludedDom : transcludedDom, //HTML unit (all children) that needs to be repeated
+                rootUnit       : rootUnit        //HTML unit (parent, that had the ng-react-repeat directive)
               });
             });
 
           //here, rootUnit.parentElement.localName is the tbody, rootUnit.localName is the tr
-          return React.DOM[this.props.rootUnit.parentElement.localName].apply(null, [getAttributes(this.props.rootUnit.parentElement)].concat(rows));
+          return React.DOM[rootUnit.parentElement.localName].apply(null, [getAttributes(rootUnit.parentElement)].concat(rows));
         }
       });
     </script>
