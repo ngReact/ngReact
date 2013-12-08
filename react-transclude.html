@@ -60,10 +60,12 @@
       var propertiesToKeep = [
         {
           attrName : 'class',
-          propName : 'className'
+          propName : 'className',
+          name     : 'className'
         }, {
           attrName         : 'ng-click',
           propName         : 'onClick',
+          name             : 'onClick',
           convertAttribute : function(attrs, scope, data) {
 
             if (!attrs.onClick) {
@@ -90,6 +92,18 @@
           name         : 'ng-bind',
           convertValue : function(attrs, scope, data) {
 
+            if (!attrs['ng-bind']) {
+              return;
+            }
+
+            var defineValue = _.format('var {0} = {1}; var value = {2};', [
+              scope.alias,
+              JSON.stringify(data),
+              _.changeToBracketNotation(attrs['ng-bind'])
+            ]);
+
+            eval(defineValue);
+            return value;
           }
         }
       ];
@@ -117,8 +131,8 @@
       };
 
       var convertValues = function(attrs, scope, data) {
-        return _.filter(_.map(attrs, function(value, key) {
-          var property = _.findWhere(propertiesToKeep, {propName: key});
+        return _.compact(_.map(attrs, function(value, key) {
+          var property = _.findWhere(propertiesToKeep, {name: key});
           if (property && property.convertValue) {
             return property.convertValue(attrs, scope, data);
           }
@@ -138,15 +152,18 @@
 
           var rowTranscluded = _.map(this.props.transcludedDom, function(domEl) {
 
-            var defineValue = _.format('var {0} = {1}; var value = {2};', [
-              scope.alias,
-              JSON.stringify(data),
-              _.changeToBracketNotation(domEl.props['ng-bind'])
-            ]);
+            if (!domEl.localName) {
+              return; //domEl;
+            }
+            var attrs = getAttributes(domEl);
+            convertAttributes(attrs, scope, data);
 
-            eval(defineValue);
-
-            return React.DOM[domEl.el].apply(null, [domEl.props].concat([value]));
+            return React.DOM[domEl.localName].apply(
+              null,
+              [attrs].concat(
+                convertValues(attrs, scope, data)
+              )
+            );
           });
 
           var attrs = getAttributes(this.props.rootUnit);
@@ -155,7 +172,7 @@
           return React.DOM[this.props.rootUnit.localName].apply(
             null,
             [attrs].concat(
-              // convertValues(attrs, scope, data),
+              convertValues(attrs, scope, data),
               rowTranscluded
             )
           );
@@ -170,18 +187,9 @@
         render: function() {
           console.log('running reactRepeat render');
 
-          var transcludedDom = _.compact(_.map(this.props.transcluded, function(node) {
-            if (node.localName) {
-
-              return {
-                el: node.localName,
-                props: getAttributes(node)
-              };
-            }
-          }));
-
           var scope = this.props.scope,
             rootUnit = this.props.rootUnit,
+            transcludedDom = this.props.transcluded,
             rows = _.map(scope.data, function(datum) {
               return reactRepeatUnit({
                 scope          : scope,
