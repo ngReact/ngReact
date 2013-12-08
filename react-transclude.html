@@ -40,14 +40,31 @@
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="bower_components/react/JSXTransformer.js"></script>
     <script>
+
+      _.mixin({
+        format: function(template, data) {
+          return template.replace(/{(\d+)}/g, function(match, number) {
+            return typeof data[number] != 'undefined'
+              ? data[number]
+              : match
+            ;
+          });
+        },
+        changeToBracketNotation: function(string) {
+          return string.replace(/\.(\w+)/g, function(match) {
+            return _.format('[\'{0}\']', [match.substring(1)]);
+          });
+        }
+      });
+
       var propertiesToKeep = [
         {
           attrName : 'class',
           propName : 'className'
         }, {
-          attrName : 'ng-click',
-          propName : 'onClick',
-          convert : function(attrs, scope, data) {
+          attrName         : 'ng-click',
+          propName         : 'onClick',
+          convertAttribute : function(attrs, scope, data) {
 
             if (!attrs.onClick) {
               return;
@@ -57,12 +74,12 @@
               onClickFunctionVars = _.first(attrs.onClick.match(/\(.*\)/g));
             onClickFunctionVars = onClickFunctionVars.substring(1, onClickFunctionVars.length - 1);
 
-            var defineHandler = 'var {0} = {1}; var handler = scope.$apply.bind(scope, scope.{2}.bind(null, {3}));'.format(
+            var defineHandler = _.format('var {0} = {1}; var handler = scope.$apply.bind(scope, scope.{2}.bind(null, {3}));', [
               scope.alias,
               JSON.stringify(data),
               onclickFunctionName,
               onClickFunctionVars
-            );
+            ]);
 
             eval(defineHandler);
             attrs.onClick = handler;
@@ -70,7 +87,10 @@
         }, {
           name : 'id'
         }, {
-          name : 'ng-bind'
+          name         : 'ng-bind',
+          convertValue : function(attrs, scope, data) {
+
+          }
         }
       ];
 
@@ -84,31 +104,26 @@
           }
         });
 
-        console.log('return', toReturn);
-
         return toReturn;
       };
 
-      // First, checks if it isn't implemented yet.
-      if (!String.prototype.format) {
-        String.prototype.format = function() {
-          var args = arguments;
-          return this.replace(/{(\d+)}/g, function(match, number) {
-            return typeof args[number] != 'undefined'
-              ? args[number]
-              : match
-            ;
-          });
-        };
-      }
+      var convertAttributes = function(attrs, scope, data) {
+        _.each(attrs, function(value, key) {
+          var property = _.findWhere(propertiesToKeep, {propName: key});
+          if (property && property.convertAttribute) {
+            property.convertAttribute(attrs, scope, data);
+          }
+        });
+      };
 
-      if (!String.prototype.changeToBracketNotation) {
-        String.prototype.changeToBracketNotation = function() {
-          return this.replace(/\.(\w+)/g, function(match) {
-            return '[\'{0}\']'.format(match.substring(1));
-          });
-        };
-      }
+      var convertValues = function(attrs, scope, data) {
+        return _.filter(_.map(attrs, function(value, key) {
+          var property = _.findWhere(propertiesToKeep, {propName: key});
+          if (property && property.convertValue) {
+            return property.convertValue(attrs, scope, data);
+          }
+        }));
+      };
 
       /**
        * ReactRepeatUnit is a React component that represents a single repeated unit, a single run of the for loop
@@ -123,11 +138,11 @@
 
           var rowTranscluded = _.map(this.props.transcludedDom, function(domEl) {
 
-            var defineValue = 'var {0} = {1}; var value = {2};'.format(
+            var defineValue = _.format('var {0} = {1}; var value = {2};', [
               scope.alias,
               JSON.stringify(data),
-              domEl.props['ng-bind'].changeToBracketNotation()
-            );
+              _.changeToBracketNotation(domEl.props['ng-bind'])
+            ]);
 
             eval(defineValue);
 
@@ -135,9 +150,15 @@
           });
 
           var attrs = getAttributes(this.props.rootUnit);
-          _.findWhere(propertiesToKeep, {propName: 'onClick'}).convert(attrs, scope, data);
+          convertAttributes(attrs, scope, data);
 
-          return React.DOM[this.props.rootUnit.localName].apply(null, [attrs].concat(rowTranscluded));
+          return React.DOM[this.props.rootUnit.localName].apply(
+            null,
+            [attrs].concat(
+              // convertValues(attrs, scope, data),
+              rowTranscluded
+            )
+          );
         }
       });
 
