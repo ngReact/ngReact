@@ -7,6 +7,10 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      .green-bg { background-color: green; }
+      .red { color: red; }
+    </style>
   </head>
   <body ng-app="app">
 
@@ -18,16 +22,21 @@
         <div>
           <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
         </div>
-
         <div class="table-responsive">
           <table class="table">
-            <tbody>
-              <tr ng-react-repeat="row in data" ng-click="clickHandler(row)">
-                <td ng-bind="row.0"></td>
-                <td ng-bind="row.1"></td>
-                <td ng-bind="row.2"></td>
-                <td ng-bind="row.3"></td>
-                <td ng-bind="row.4"></td>
+            <tbody class="tbody-class" id="awesome-tbody">
+              <tr class="tr-class" ng-react-repeat="row in data" ng-click="clickHandler(row)">
+                <td class="td-zero">
+                  <span class="green-bg red" ng-bind="row.0"></span>
+                </td>
+                <td class="td-one" ng-bind="row.1"></td>
+                <td class="td-two">
+                  Text not in an element
+                  <span>And text in a span</span>
+                  <span class="green-bg red" ng-bind="row.0"></span>
+                </td>
+                <td class="td-three" ng-bind="row.3"></td>
+                <td class="td-four" ng-bind="row.4"></td>
               </tr>
             </tbody>
           </table>
