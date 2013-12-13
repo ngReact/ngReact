@@ -88,36 +88,33 @@ var convertAttributes = function(attrs, scope, data) {
       property.convertAttribute(attrs, scope, data);
     }
   });
+
+  console.log('convertAttributes returning', attrs);
 };
 
 var convertValues = function(attrs, scope, data) {
-  var x = _.compact(_.map(attrs, function(value, key) {
+  return _.compact(_.map(attrs, function(value, key) {
     var property = _.findWhere(propertiesToKeep, {name: key});
     if (property && property.convertValue) {
       return property.convertValue(attrs, scope, data);
     }
   }));
-
-  console.log('attrs', attrs);
-  console.log('convertValues', x);
-  return x;
 };
 
 window.reactUnit = React.createClass({
   render: function() {
-    console.log('running reactUnit render');
-    console.log('this.props.domEl', this.props.domEl);
+    console.warn('running reactUnit render');
 
     var data = this.props.data,
       scope = this.props.scope,
       domEl = this.props.domEl;
 
     if (!domEl.localName) {
-      console.log('domEl', domEl);
       return React.DOM.span(null, domEl.nodeValue);
     }
 
     var childrenNodes = _.compact(_.map(domEl.children, function(child) {
+      //everything needs to be in an element or it will be ignored!
       if (!child.localName) return;
 
       return reactUnit({
@@ -130,10 +127,15 @@ window.reactUnit = React.createClass({
     var attrs = getAttributes(domEl);
     convertAttributes(attrs, scope, data);
 
+    var vals = convertValues(attrs, scope, data);
+    if (!(vals.length && domEl.localName)) {
+      // vals = [ domEl.innerHTML ];
+    }
+
     return React.DOM[domEl.localName].apply(
       null,
       [attrs].concat(
-        convertValues(attrs, scope, data),
+        vals,
         childrenNodes
       )
     );
@@ -146,20 +148,21 @@ window.reactUnit = React.createClass({
 */
 window.reactRepeatUnit = React.createClass({
   render: function() {
-    console.log('running reactRepeatUnit render');
+    console.error('running reactRepeatUnit render');
 
     var data = this.props.data,
       scope = this.props.scope;
 
     var rowTranscluded = _.compact(_.map(this.props.transcludedDom, function(domEl) {
-
+      //everything needs to be in an element or it will be ignored!
       if (!domEl.localName) return;
 
-      return reactUnit({
+      var unitFn = reactUnit({
         scope : scope,
         data  : data,
         domEl : domEl
       });
+      return unitFn;
     }));
 
     var attrs = getAttributes(this.props.rootUnit);
@@ -200,69 +203,47 @@ window.reactRepeat = React.createClass({
   }
 });
 
-angular.module('app', ['QuickList'])
-  .controller('mainCtrl', ['$scope', function($scope) {
-    $scope.data = [];
-    $scope.started = true;
 
-    $scope.newData = function() {
 
-      $scope.data = [];
-
-      for(var i = 0; i < 1; ++i) {
-        $scope.data[i] = {};
-        for(var j = 0; j < 5; ++j) {
-          $scope.data[i][j] = Math.random();
-        }
-      }
-
-      console.log('first row: ', $scope.data[0]);
-    };
-
-    $scope.clickHandler = function(obj) {
-      console.log(obj);
-    };
-
-    $scope.newData();
-  }])
+angular.module('ngReact', [])
   .directive('ngReactRepeat', function ($timeout) {
     return {
       restrict: 'A',
       transclude: true,
       replace: true,
-      controller: ['$scope', '$element', '$attrs', '$transclude', function ($scope, $element, $attrs, $transclude) {
+      controller: [
+        '$scope', '$element', '$attrs', '$transclude',
+        function ($scope, $element, $attrs, $transclude) {
 
-        console.log('y', $attrs['ngReactRepeat']);
-        var pieces = $attrs['ngReactRepeat'].split(' in ');
-        if (pieces.length !== 2) {
-          console.error('ngReactRepeat expected "alias in collection" format');
+          var pieces = $attrs['ngReactRepeat'].split(' in ');
+          if (pieces.length !== 2) {
+            console.error('ngReactRepeat expected "alias in collection" format');
+          }
+
+          $scope.alias = pieces[0];
+
+          var parentReference = $element[0].offsetParent;
+
+          $transclude(function(clone) {
+            $scope.$watch(pieces[1], function(val) {
+
+              console.error('watcher firing, about to kick off React.renderComponent', $scope);
+
+              $timeout(function() {
+
+                React.renderComponent(
+                  window.reactRepeat({
+                    scope       : $scope,
+                    transcluded : clone,
+                    rootUnit    : $element[0]
+                  }),
+                  parentReference
+                );
+
+              });
+            }, true);
+          });
         }
-
-        $scope.alias = pieces[0];
-
-        console.log('el', $element[0]);
-
-        var parentReference = $element[0].offsetParent;
-
-        $transclude(function(clone) {
-          $scope.$watch(pieces[1], function(val) {
-
-            console.error('watcher firing, about to kick off React.renderComponent', $scope);
-
-            $timeout(function() {
-
-              React.renderComponent(
-                window.reactRepeat({
-                  scope       : $scope,
-                  transcluded : clone,
-                  rootUnit    : $element[0]
-                }),
-                parentReference
-              );
-
-            });
-          }, true);
-        });
-      }]
-    }
+      ]
+    };
   });

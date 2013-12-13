@@ -8,13 +8,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+      .green { color: green; }
       .green-bg { background-color: green; }
+      .red-bg { background-color: red; }
       .red { color: red; }
     </style>
   </head>
-  <body ng-app="app">
+  <body ng-app="ngReactDemo">
 
-    <section ng-controller="mainCtrl">
+    <section ng-controller="DemoCtrl">
 
       <button ng-click="started = true" ng-hide="started" class="btn btn-primary">Start</button>
 
@@ -33,7 +35,7 @@
                 <td class="td-two">
                   Text not in an element
                   <span>And text in a span</span>
-                  <span class="green-bg red" ng-bind="row.0"></span>
+                  <span class="red-bg green" ng-bind="row.2"></span>
                 </td>
                 <td class="td-three" ng-bind="row.3"></td>
                 <td class="td-four" ng-bind="row.4"></td>
@@ -49,5 +51,6 @@
     <script src="bower_components/react/react.js"></script>
     <script src="bower_components/underscore/underscore-min.js"></script>
     <script src="scripts/ngReact.js"></script>
+    <script src="scripts/demo.js"></script>
   </body>
 </html>
