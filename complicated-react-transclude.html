@@ -12,6 +12,7 @@
       .green-bg { background-color: green; }
       .red-bg { background-color: red; }
       .red { color: red; }
+      .bold { font-weight: bold; }
     </style>
   </head>
   <body ng-app="ngReactDemo">
@@ -34,7 +35,7 @@
                 <td class="td-one" ng-bind="row.1"></td>
                 <td class="td-two">
                   Text not in an element
-                  <span>And text in a span</span>
+                  <span class="bold">And text in a span</span>
                   <span class="red-bg green" ng-bind="row.2"></span>
                 </td>
                 <td class="td-three" ng-bind="row.3"></td>
