@@ -147,7 +147,9 @@ var NgReact = (function() {
   };
 
   var NgReactClasses = {
-    // **reactUnit**: A React class meant to be called on a single DOM element and able to recurse through its
+    // reactUnit
+    // ---------
+    // A React class meant to be called on a single DOM element and able to recurse through its
     // children. It will return a React DOM node. It expects the following properties:
     // - data - The data available to the Angular scope
     // - scope - The Angular Scope
@@ -197,7 +199,9 @@ var NgReact = (function() {
         );
       }
     }),
-    // **reactRepeatUnit**: A React class repesenting a single "row" in or iteration of a repeat.
+    // reactRepeatUnit
+    // ---------------
+    // A React class repesenting a single "row" in or iteration of a repeat.
     // It will return a React DOM node. It expects the following properties:
     // - data - The data available to the Angular scope
     // - scope - The Angular Scope
@@ -232,7 +236,9 @@ var NgReact = (function() {
         );
       }
     }),
-    // **reactRepeat**: React component that will create a root container element and append into itself multiple
+    // reactRepeat
+    // -----------
+    // React component that will create a root container element and append into itself multiple
     // ReactRepeatUnit components, each representing an iteration of data in the collection passed.
     // It will return a React DOM node. It expects the following properties:
     // - data - The data available to the Angular scope
@@ -319,4 +325,34 @@ angular.module('ngReact', [])
         }
       ]
     };
+  })
+  .directive('ngReactComponent', function ($timeout) {
+    return {
+      restrict: 'A',
+      link: function (scope, elem, attrs) {
+
+        if (!attrs.ngReactComponent) {
+          console.error('ngReactComponent expected attribute to be the name of a react component');
+        }
+
+        var renderComponent = function() {
+          $timeout(function() {
+            React.renderComponent(
+              // For now, expect the React Component to be globally available on window
+              window[attrs.ngReactComponent]({
+                scope: scope
+              }),
+              elem[0]
+            );
+          });
+        };
+
+        // attrs.data is optional
+        if (attrs.data) {
+          scope.$watch(attrs.data, renderComponent, true);
+        } else {
+          renderComponent();
+        }
+      }
+    }
   });
