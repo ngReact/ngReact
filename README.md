@@ -16,6 +16,7 @@ Set Up
 &lt;script src="bower_components/underscore/underscore-min.js">&lt;/script&gt;
 &lt;script src="bower_components/react/react.js"&gt;&lt;/script&gt;
 &lt;script src="bower_components/react/JSXTransformer.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/ngReact/ngReact.min.js"&gt;&lt;/script&gt;
 ```
 
 Declare ngReact as a dependency of your Angular module:
