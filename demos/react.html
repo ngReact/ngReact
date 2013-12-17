@@ -19,7 +19,7 @@
           <button ng-click="newData()" class="btn btn-primary">Reload table data</button>
         </div>
         <div class="table-responsive">
-          <table class="table" ng-react-component="Repeater" data="data"></table>
+          <table class="table" ng-react-component="Iterator" data="data"></table>
         </div>
       </section>
     </section>
@@ -30,7 +30,7 @@
     <script src="../bower_components/react/JSXTransformer.js"></script>
     <script type="text/jsx">
       /** @jsx React.DOM */
-      window.Repeater = React.createClass({
+      window.Iterator = React.createClass({
         render: function() {
 
           var scope = this.props.scope;

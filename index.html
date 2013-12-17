@@ -1,0 +1,153 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>NgReact.js - React Components in Angular</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+
+    <style>
+      html, body {
+        margin: 20px;
+      }
+      body {
+        background: #fafafa;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #333;
+      }
+      header {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        background-color: white;
+        padding: 25px 35px;
+        border-bottom: 1px solid #CCC;
+      }
+      ul {
+        list-style-type: none;
+        margin-bottom: 5px;
+        padding-right: 10px;
+        padding-left: 0px;
+      }
+      ul li {
+        display: inline-block;
+        padding-right: 10px;
+      }
+      #pageContainer {
+        margin-top: 90px;
+        max-width: 720px;
+      }
+    </style>
+</head>
+  <body>
+
+    <header>
+
+      <section>
+        <ul>
+          <li><a href='/'>Home</a></li>
+          <li><a href='docs/ngReact.html'>Documentation</a></li>
+          <li><a target="_blank" href='https://github.com/davidchang/ngReact'>Github Repo</a></li>
+          <li><a target="_blank" href="http://davidandsuzi.com">Me</a></li>
+        </ul>
+      </section>
+    </header>
+
+    <div id='pageContainer'>
+      <h1>NgReact.js</h1>
+
+      <h3>Intro</h3>
+      <section>
+        Facebook's React library is designed to be used as a view component atop other JavaScript frameworks. NgReact is a pair of proof of concept directives that show how React can cooperate with Angular, resulting in performance gains nearly up to 70% (or, well, losses up to 450%).
+      </section>
+
+      <h3>Installation</h3>
+      <section>
+        <pre>bower install ngReact</pre>
+      </section>
+
+      <h3>Set Up</h3>
+      <section>
+        <p>In your HTML:</p>
+        <pre>
+&lt;script src="bower_components/angular/angular.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/underscore/underscore-min.js">&lt;/script&gt;
+&lt;script src="bower_components/react/react.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/react/JSXTransformer.js"&gt;&lt;/script&gt;</pre>
+
+        <p>Declare ngReact as a dependency of your Angular module:</p>
+        <pre>
+angular.module('ngReactDemo', ['ngReact']);</pre>
+      </section>
+
+      <h3>ngReactComponent Directive</h3>
+      <section>
+        <p>Render a user-defined React component via Angular. This got up to nearly 70% faster performance.</p>
+        <p>You'll have to create a globally available React component, like this iterator example (but it could be anything):</p>
+        <pre>
+&lt;script type=&quot;text/jsx&quot;&gt;
+  /** @jsx React.DOM */
+  window.Repeater = React.createClass({
+    render: function() {
+
+      var scope = this.props.scope;
+
+      var rows = _.map(scope.data, function(datum) {
+        var clickHandler = scope.$apply.bind(
+          scope,
+          scope.clickHandler.bind(null, datum)
+        );
+
+        return (
+          &lt;tr onClick={clickHandler}&gt;
+            &lt;td&gt;{datum['0']}&lt;/td&gt;
+            &lt;td&gt;{datum['1']}&lt;/td&gt;
+            &lt;td&gt;{datum['2']}&lt;/td&gt;
+            &lt;td&gt;{datum['3']}&lt;/td&gt;
+            &lt;td&gt;{datum['4']}&lt;/td&gt;
+          &lt;/tr&gt;
+        );
+      });
+
+      return (
+        &lt;tbody&gt;
+          {rows}
+        &lt;/tbody&gt;
+      );
+    }
+  });
+&lt;/script&gt;</pre>
+        <p>And then invoke it using the ng-react-component directive:</p>
+        <pre>&lt;table class=&quot;table&quot; ng-react-component=&quot;Repeater&quot; data=&quot;data&quot;&gt;&lt;/table&gt;</pre>
+      </section>
+
+      <h3>ngReactRepeat Directive</h3>
+      <section>
+        <p>Render a unit of HTML for each entry in a collection just like you use ng-repeat. This got up to 450% slower performance.</p>
+        <p>You'll use this directive just like you use ng-repeat. Your HTML will look like this:</p>
+        <pre>
+&lt;table class=&quot;table&quot;&gt;
+  &lt;tbody&gt;
+    &lt;tr ng-react-repeat=&quot;row in data&quot; ng-click=&quot;clickHandler(row)&quot;&gt;
+      &lt;td ng-bind=&quot;row.0&quot;&gt;&lt;/td&gt;
+      &lt;td ng-bind=&quot;row.1&quot;&gt;&lt;/td&gt;
+      &lt;td ng-bind=&quot;row.2&quot;&gt;&lt;/td&gt;
+      &lt;td ng-bind=&quot;row.3&quot;&gt;&lt;/td&gt;
+      &lt;td ng-bind=&quot;row.4&quot;&gt;&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;</pre>
+        <p>And that's it - just make sure $scope.data exists. Please note that this only supports the ng-bind and ng-click directives and the class and id attributes.</p>
+        <p>With this code in particular, I would love any help I could get in figuring out how my performance is so bad.</p>
+      </section>
+
+    </div>
+
+</body>
+</html>

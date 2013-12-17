@@ -294,7 +294,7 @@ angular.module('ngReact', [])
           // Expect the form ```<tr ng-react-repeat="row in data">```
           var pieces = $attrs['ngReactRepeat'].split(' in ');
           if (pieces.length !== 2) {
-            console.error('ngReactRepeat expected "alias in collection" format');
+            throw new Error('ngReactRepeat expected "alias in collection" format');
           }
 
           $scope.alias = pieces[0];
@@ -332,7 +332,7 @@ angular.module('ngReact', [])
       link: function (scope, elem, attrs) {
 
         if (!attrs.ngReactComponent) {
-          console.error('ngReactComponent expected attribute to be the name of a react component');
+          throw new Error('ngReactComponent expected attribute to be the name of a react component');
         }
 
         var renderComponent = function() {
