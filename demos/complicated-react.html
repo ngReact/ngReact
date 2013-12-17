@@ -3,10 +3,17 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Ng-repeat Benchmarks</title>
+    <title>Complicated React | Ng-repeat Benchmarks</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      .green { color: green; }
+      .green-bg { background-color: green; }
+      .red-bg { background-color: red; }
+      .red { color: red; }
+      .bold { font-weight: bold; }
+    </style>
   </head>
   <body ng-app="ngReactDemo">
 
@@ -25,9 +32,9 @@
     </section>
 
     <script src="angular.js"></script>
-    <script src="bower_components/underscore/underscore-min.js"></script>
-    <script src="bower_components/react/react.js"></script>
-    <script src="bower_components/react/JSXTransformer.js"></script>
+    <script src="../bower_components/underscore/underscore-min.js"></script>
+    <script src="../bower_components/react/react.js"></script>
+    <script src="../bower_components/react/JSXTransformer.js"></script>
     <script type="text/jsx">
       /** @jsx React.DOM */
       window.Repeater = React.createClass({
@@ -42,25 +49,37 @@
             );
 
             return (
-              <tr onClick={clickHandler}>
-                <td>{datum['0']}</td>
-                <td>{datum['1']}</td>
-                <td>{datum['2']}</td>
-                <td>{datum['3']}</td>
-                <td>{datum['4']}</td>
+              <tr className="tr-class" onClick={clickHandler}>
+                <td className="td-zero">
+                  <span className="green-bg red">
+                    {datum['0']}
+                  </span>
+                </td>
+                <td className="td-one">{datum['1']}</td>
+                <td className="td-two">
+                  {'Text not in an element'}
+                  <span className="bold">
+                    {'And text in a span'}
+                  </span>
+                  <span className="red-bg green">
+                    {datum['2']}
+                  </span>
+                </td>
+                <td className="td-three">{datum['3']}</td>
+                <td className="td-four">{datum['4']}</td>
               </tr>
             );
           });
 
           return (
-            <tbody>
+            <tbody className="tbody-class" id="awesome-tbody">
               {rows}
             </tbody>
           );
         }
       });
     </script>
-    <script src="scripts/ngReact.js"></script>
-    <script src="scripts/demo.js"></script>
+    <script src="../ngReact.min.js"></script>
+    <script src="demo.js"></script>
   </body>
 </html>

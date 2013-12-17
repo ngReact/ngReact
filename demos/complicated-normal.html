@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>Ng-repeat Benchmarks</title>
+    <title>Complicated Normal | Ng-repeat Benchmarks</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.2/css/bootstrap.min.css" rel="stylesheet">
@@ -28,13 +28,28 @@
                 <td>{{row.4}}</td>
               </tr>
             </tbody>
+            <tbody class="tbody-class" id="awesome-tbody">
+              <tr class="tr-class" ng-react-repeat="row in data" ng-click="clickHandler(row)">
+                <td class="td-zero">
+                  <span class="green-bg red">{{row.0}}</span>
+                </td>
+                <td class="td-one">{{row.1}}</td>
+                <td class="td-two">
+                  Text not in an element
+                  <span class="bold">And text in a span</span>
+                  <span class="red-bg green">{{row.2}}</span>
+                </td>
+                <td class="td-three">{{row.3}}</td>
+                <td class="td-four">{{row.4}}</td>
+              </tr>
+            </tbody>
           </table>
         </div>
       </section>
 
     </section>
 
-    <script src="http://code.angularjs.org/1.2.1/angular.js"></script>
+    <script src="angular.js"></script>
     <script>
       angular.module('app', [])
         .controller('mainCtrl', ['$scope', '$rootScope', function($scope, $rootScope) {

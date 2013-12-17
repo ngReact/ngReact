@@ -282,7 +282,7 @@ var NgReact = (function() {
 // The Angular module that will hold directives that will make use of our NgReact utils.
 angular.module('ngReact', [])
   // **The ngReactRepeat directive**
-  .directive('ngReactRepeat', function ($timeout) {
+  .directive('ngReactRepeat', ['$timeout', function ($timeout) {
     return {
       restrict: 'A',
       transclude: true,
@@ -325,8 +325,8 @@ angular.module('ngReact', [])
         }
       ]
     };
-  })
-  .directive('ngReactComponent', function ($timeout) {
+  }])
+  .directive('ngReactComponent', ['$timeout', function ($timeout) {
     return {
       restrict: 'A',
       link: function (scope, elem, attrs) {
@@ -355,4 +355,4 @@ angular.module('ngReact', [])
         }
       }
     }
-  });
+  }]);

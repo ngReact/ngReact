@@ -410,7 +410,20 @@ For example, something like <code>&lt;div ng-bind=&quot;person.name&quot;&gt;&lt
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-19">&#182;</a>
               </div>
-              <p><strong>reactUnit</strong>: A React class meant to be called on a single DOM element and able to recurse through its
+              <h2 id="reactunit">reactUnit</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-20">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-20">&#182;</a>
+              </div>
+              <p>A React class meant to be called on a single DOM element and able to recurse through its
 children. It will return a React DOM node. It expects the following properties:</p>
 <ul>
 <li>data - The data available to the Angular scope</li>
@@ -430,11 +443,11 @@ children. It will return a React DOM node. It expects the following properties:<
         </li>
         
         
-        <li id="section-20">
+        <li id="section-21">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
+                <a class="pilcrow" href="#section-21">&#182;</a>
               </div>
               <p>Recurse through the children.</p>
 
@@ -445,11 +458,11 @@ children. It will return a React DOM node. It expects the following properties:<
         </li>
         
         
-        <li id="section-21">
+        <li id="section-22">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
+                <a class="pilcrow" href="#section-22">&#182;</a>
               </div>
               <p>Everything needs to be in an element or it will be ignored!</p>
 
@@ -472,11 +485,11 @@ children. It will return a React DOM node. It expects the following properties:<
         </li>
         
         
-        <li id="section-22">
+        <li id="section-23">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
+                <a class="pilcrow" href="#section-23">&#182;</a>
               </div>
               <p>If there was <code>&lt;span ng-bind=&quot;person.name&quot;&gt;Person.name will be here&lt;/span&gt;</code>,
 the ng-bind will take precedence and the inner text will not be rendered</p>
@@ -488,11 +501,11 @@ the ng-bind will take precedence and the inner text will not be rendered</p>
         </li>
         
         
-        <li id="section-23">
+        <li id="section-24">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
+                <a class="pilcrow" href="#section-24">&#182;</a>
               </div>
               <p>Basically look only for text that is a direct descendant of domEl
 but doesn&#39;t exist in a tag (which will be caught recursively later)</p>
@@ -504,11 +517,11 @@ but doesn&#39;t exist in a tag (which will be caught recursively later)</p>
         </li>
         
         
-        <li id="section-24">
+        <li id="section-25">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
+                <a class="pilcrow" href="#section-25">&#182;</a>
               </div>
               <p>Only matching for text and whitespace</p>
 
@@ -533,13 +546,26 @@ but doesn&#39;t exist in a tag (which will be caught recursively later)</p>
         </li>
         
         
-        <li id="section-25">
+        <li id="section-26">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
+                <a class="pilcrow" href="#section-26">&#182;</a>
               </div>
-              <p><strong>reactRepeatUnit</strong>: A React class repesenting a single &quot;row&quot; in or iteration of a repeat.
+              <h2 id="reactrepeatunit">reactRepeatUnit</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-27">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-27">&#182;</a>
+              </div>
+              <p>A React class repesenting a single &quot;row&quot; in or iteration of a repeat.
 It will return a React DOM node. It expects the following properties:</p>
 <ul>
 <li>data - The data available to the Angular scope</li>
@@ -560,11 +586,11 @@ It will return a React DOM node. It expects the following properties:</p>
         </li>
         
         
-        <li id="section-26">
+        <li id="section-28">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
+                <a class="pilcrow" href="#section-28">&#182;</a>
               </div>
               <p>Everything needs to be in an element or it will be ignored!</p>
 
@@ -596,13 +622,26 @@ It will return a React DOM node. It expects the following properties:</p>
         </li>
         
         
-        <li id="section-27">
+        <li id="section-29">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
+                <a class="pilcrow" href="#section-29">&#182;</a>
               </div>
-              <p><strong>reactRepeat</strong>: React component that will create a root container element and append into itself multiple
+              <h2 id="reactrepeat">reactRepeat</h2>
+
+            </div>
+            
+        </li>
+        
+        
+        <li id="section-30">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-30">&#182;</a>
+              </div>
+              <p>React component that will create a root container element and append into itself multiple
 ReactRepeatUnit components, each representing an iteration of data in the collection passed.
 It will return a React DOM node. It expects the following properties:</p>
 <ul>
@@ -626,11 +665,11 @@ is everything contained in the rootUnit</li>
         </li>
         
         
-        <li id="section-28">
+        <li id="section-31">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
+                <a class="pilcrow" href="#section-31">&#182;</a>
               </div>
               <p>For each row, generate a ReactRepeatUnit component</p>
 
@@ -647,11 +686,11 @@ is everything contained in the rootUnit</li>
         </li>
         
         
-        <li id="section-29">
+        <li id="section-32">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
+                <a class="pilcrow" href="#section-32">&#182;</a>
               </div>
               <p>Here, rootUnit.parentElement.localName is the rootUnit&#39;s parent (like a tbody),
 and rootUnit.localName is the rootUnit (like a tr)</p>
@@ -673,11 +712,11 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         </li>
         
         
-        <li id="section-30">
+        <li id="section-33">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
+                <a class="pilcrow" href="#section-33">&#182;</a>
               </div>
               <h2 id="ngreact-angular-module">NgReact Angular Module</h2>
 
@@ -686,11 +725,11 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         </li>
         
         
-        <li id="section-31">
+        <li id="section-34">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
+                <a class="pilcrow" href="#section-34">&#182;</a>
               </div>
               <p>The Angular module that will hold directives that will make use of our NgReact utils.</p>
 
@@ -701,11 +740,11 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         </li>
         
         
-        <li id="section-32">
+        <li id="section-35">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
+                <a class="pilcrow" href="#section-35">&#182;</a>
               </div>
               <p><strong>The ngReactRepeat directive</strong></p>
 
@@ -723,11 +762,11 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         </li>
         
         
-        <li id="section-33">
+        <li id="section-36">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
+                <a class="pilcrow" href="#section-36">&#182;</a>
               </div>
               <p>Expect the form <code>&lt;tr ng-react-repeat=&quot;row in data&quot;&gt;</code></p>
 
@@ -743,11 +782,11 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         </li>
         
         
-        <li id="section-34">
+        <li id="section-37">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
+                <a class="pilcrow" href="#section-37">&#182;</a>
               </div>
               <p>Remember the parent reference, as this is the mount node for the ReactRepeat component we&#39;re creating</p>
 
@@ -760,11 +799,11 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         </li>
         
         
-        <li id="section-35">
+        <li id="section-38">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
+                <a class="pilcrow" href="#section-38">&#182;</a>
               </div>
               <p>Keep an eye on the data object so that if it changes, we can re-render the React component.</p>
 
@@ -777,11 +816,11 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         </li>
         
         
-        <li id="section-36">
+        <li id="section-39">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
+                <a class="pilcrow" href="#section-39">&#182;</a>
               </div>
               <p>Render the React Component, passing in the scope, transcluded DOM, and the root unit
 (not readily available from the transcluded DOM)</p>
@@ -803,6 +842,61 @@ and rootUnit.localName is the rootUnit (like a tr)</p>
         }
       ]
     };
+  })
+  .directive(<span class="string">'ngReactComponent'</span>, <span class="function"><span class="keyword">function</span> <span class="params">($timeout)</span> {</span>
+    <span class="keyword">return</span> {
+      restrict: <span class="string">'A'</span>,
+      link: <span class="function"><span class="keyword">function</span> <span class="params">(scope, elem, attrs)</span> {</span>
+
+        <span class="keyword">if</span> (!attrs.ngReactComponent) {
+          console.error(<span class="string">'ngReactComponent expected attribute to be the name of a react component'</span>);
+        }
+
+        <span class="keyword">var</span> renderComponent = <span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
+          $timeout(<span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
+            React.renderComponent(</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-40">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-40">&#182;</a>
+              </div>
+              <p>For now, expect the React Component to be globally available on window</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>              window[attrs.ngReactComponent]({
+                scope: scope
+              }),
+              elem[<span class="number">0</span>]
+            );
+          });
+        };</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-41">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-41">&#182;</a>
+              </div>
+              <p>attrs.data is optional</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (attrs.data) {
+          scope.$watch(attrs.data, renderComponent, <span class="literal">true</span>);
+        } <span class="keyword">else</span> {
+          renderComponent();
+        }
+      }
+    }
   });</pre></div></div>
             
         </li>
