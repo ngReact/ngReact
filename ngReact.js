@@ -304,7 +304,7 @@ angular.module('ngReact', [])
 
           $transclude(function(transcludedDom) {
             // Keep an eye on the data object so that if it changes, we can re-render the React component.
-            $scope.$watch(pieces[1], function(val) {
+            $scope.$watchCollection(pieces[1], function() {
 
               $timeout(function() {
 
@@ -349,7 +349,7 @@ angular.module('ngReact', [])
 
         // attrs.data is optional
         if (attrs.data) {
-          scope.$watch(attrs.data, renderComponent, true);
+          scope.$watchCollection(attrs.data, renderComponent, true);
         } else {
           renderComponent();
         }

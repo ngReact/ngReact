@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "dependencies": {
     "angular": "~1.2.*-build",
-    "react": "*",
+    "react": "0.9.*",
     "underscore": "~1.5.2"
   },
   "main" : [
