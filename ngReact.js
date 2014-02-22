@@ -27,7 +27,7 @@ var NgReact = (function() {
       name             : 'onClick',
       // - If we need to figure out how to handle an attribute, the convertAttribute function needs to be
       // implemented. It should have the signature (attrs, scope, data)
-      convertAttribute : function(attrs, data) {
+      convertAttribute : function(attrs, scope, data) {
 
         if (!attrs.onClick) {
           return;
@@ -39,7 +39,6 @@ var NgReact = (function() {
         // Remove opening and closing parentheses from the parameters
         fnParams = fnParams.substring(1, fnParams.length - 1);
 
-        var scope = $scopeEl.scope();
         attrs.onClick = function() {
           scope.$apply(function() {
             scope[fnName](scope.$eval(fnParams, { row: data }));
@@ -53,13 +52,13 @@ var NgReact = (function() {
       // - If we need to convert to a value (not an attribute), as is the case of ng-bind where we want
       // to render some text, the convertValue function needs to be implemented. It should have the signature
       // (attrs, scope, data) to match convertAttribute.
-      convertValue : function(attrs, data) {
+      convertValue : function(attrs, scope, data) {
 
         if (!attrs['ng-bind']) {
           return;
         }
 
-        return $scopeEl.scope().$eval(attrs['ng-bind'], { row : data });
+        return scope.$eval(attrs['ng-bind'], { row : data });
       }
     }
   ];
@@ -84,11 +83,11 @@ var NgReact = (function() {
   // For example, something like ```<div ng-click="function()"></div>``` will have an attrs of
   // ```{ onClick: "function()"}``` before and an ```{ onClick: function() { scope.apply.bind(...); }}```
   // afterwards.
-  var convertAttributes = function(attrs, data) {
+  var convertAttributes = function(attrs, scope, data) {
     _.each(attrs, function(value, key) {
       var property = _.findWhere(propertiesToKeep, {propName: key});
       if (property && property.convertAttribute) {
-        property.convertAttribute(attrs, data);
+        property.convertAttribute(attrs, scope, data);
       }
     });
   };
@@ -98,11 +97,11 @@ var NgReact = (function() {
   // proper value.
   // For example, something like ```<div ng-bind="person.name"></div>``` will have an attrs of
   // ```{ ng-bind: "person.name"}``` before and translate to something like ```["fred"]``` afterwards.
-  var convertValues = function(attrs, data) {
+  var convertValues = function(attrs, scope, data) {
     return _.compact(_.map(attrs, function(value, key) {
       var property = _.findWhere(propertiesToKeep, {name: key});
       if (property && property.convertValue) {
-        return property.convertValue(attrs, data);
+        return property.convertValue(attrs, scope, data);
       }
     }));
   };
@@ -119,6 +118,7 @@ var NgReact = (function() {
       render: function() {
 
         var data = this.props.data,
+          scope = this.props.scope,
           domEl = this.props.domEl;
 
         // Recurse through the children.
@@ -128,14 +128,15 @@ var NgReact = (function() {
 
           return NgReactClasses.reactUnit({
             data  : data,
+            scope : scope,
             domEl : child
           });
         }));
 
         var attrs = getAttributes(domEl);
-        convertAttributes(attrs, data);
+        convertAttributes(attrs, scope, data);
 
-        var vals = convertValues(attrs, data);
+        var vals = convertValues(attrs, scope, data);
         // If there was ```<span ng-bind="person.name">Person.name will be here</span>```,
         // the ng-bind will take precedence and the inner text will not be rendered
         if (!(vals.length && domEl.localName)) {
@@ -168,7 +169,8 @@ var NgReact = (function() {
     reactRepeatUnit : React.createClass({
       render: function() {
 
-        var data = this.props.data;
+        var data = this.props.data,
+          scope = this.props.scope;
 
         var rowTranscluded = _.compact(_.map(this.props.transcludedDom, function(domEl) {
           // Everything needs to be in an element or it will be ignored!
@@ -176,18 +178,19 @@ var NgReact = (function() {
 
           var unitFn = NgReactClasses.reactUnit({
             data  : data,
+            scope : scope,
             domEl : domEl
           });
           return unitFn;
         }));
 
         var attrs = getAttributes(this.props.rootUnit);
-        convertAttributes(attrs, data);
+        convertAttributes(attrs, scope, data);
 
         return React.DOM[this.props.rootUnit.localName].apply(
           null,
           [attrs].concat(
-            convertValues(attrs, data),
+            convertValues(attrs, scope, data),
             rowTranscluded
           )
         );
@@ -207,11 +210,13 @@ var NgReact = (function() {
       render: function() {
 
         var rootUnit = this.props.rootUnit,
+          scope = this.props.scope,
           transcludedDom = this.props.transcluded,
-          rows = _.map(this.props.data, function(datum) {
+          rows = _.map(scope.data, function(datum) {
             // For each row, generate a ReactRepeatUnit component
             return NgReactClasses.reactRepeatUnit({
               data           : datum,
+              scope          : scope,
               transcludedDom : transcludedDom,
               rootUnit       : rootUnit
             });
@@ -230,10 +235,6 @@ var NgReact = (function() {
   return NgReactClasses;
 
 })();
-
-var idForScope = '#scope';
-var $scopeEl = $('#scope');
-var alias = '';
 
 
 // NgReact Angular Module
@@ -256,7 +257,7 @@ angular.module('ngReact', [])
             throw new Error('ngReactRepeat expected "alias in collection" format');
           }
 
-          alias = pieces[0];
+          $scope.alias = pieces[0];
 
           // Remember the parent reference, as this is the mount node for the ReactRepeat component we're creating
           var parentReference = $element[0].offsetParent;
@@ -271,7 +272,7 @@ angular.module('ngReact', [])
                 // (not readily available from the transcluded DOM)
                 React.renderComponent(
                   NgReact.reactRepeat({
-                    data        : $scope.data,
+                    scope       : $scope,
                     transcluded : transcludedDom,
                     rootUnit    : $element[0]
                   }),
