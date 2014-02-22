@@ -10,24 +10,6 @@ var NgReact = (function() {
     overlySimplifiedHTMLMatcher = /(<[^>]*>.*<\/[^>]*>)/g,
     textAndWhitespaceRegex = /^[\w\s]+$/;
 
-  // **Underscore Mixins**: Gotta set up some Underscore mixins for general purpose utilities.
-  _.mixin({
-    // - Formatting because we need to construct JS code in strings to eval.
-    ngReactFormat: function(template, data) {
-      return template.replace(formatParamsMatcher, function(match, number) {
-        return typeof data[number] != 'undefined'
-          ? data[number]
-          : match;
-      });
-    },
-    // - We need to change object dot notation to bracket notation for our eval to work.
-    ngReactBracketNotation: function(string) {
-      return string.replace(stringPropertyMatcher, function(match) {
-        return _.ngReactFormat('[\'{0}\']', [match.substring(1)]);
-      });
-    }
-  });
-
   // **Properties To Keep**: Here lies the properties that we'll retain and pass into our React templates.
   // Right now, this is a very limited list. It retains class and id, which are pretty simple to pass
   // through to React. Ng-click and ng-bind are more complicated directives to support, and they are the only
@@ -45,7 +27,7 @@ var NgReact = (function() {
       name             : 'onClick',
       // - If we need to figure out how to handle an attribute, the convertAttribute function needs to be
       // implemented. It should have the signature (attrs, scope, data)
-      convertAttribute : function(attrs, scope, data) {
+      convertAttribute : function(attrs, data) {
 
         if (!attrs.onClick) {
           return;
@@ -57,21 +39,12 @@ var NgReact = (function() {
         // Remove opening and closing parentheses from the parameters
         fnParams = fnParams.substring(1, fnParams.length - 1);
 
-        // Create a String that we can evaluate. Here, the function must be wrapped in a scope.$apply
-        // to trigger an Angular digest cycle appropriately.
-        var defineHandler = _.ngReactFormat(
-          'var {0} = {1}; var handler = scope.$apply.bind(scope, scope.{2}.bind(null, {3}));',
-          [
-            scope.alias,
-            JSON.stringify(data),
-            fnName,
-            fnParams
-          ]
-        );
-
-        // Evaluate and set the onClick parameter to our defined "handler" variable
-        eval(defineHandler);
-        attrs.onClick = handler;
+        var scope = $scopeEl.scope();
+        attrs.onClick = function() {
+          scope.$apply(function() {
+            scope[fnName](scope.$eval(fnParams, { row: data }));
+          });
+        };
       }
     }, {
       name : 'id'
@@ -80,25 +53,13 @@ var NgReact = (function() {
       // - If we need to convert to a value (not an attribute), as is the case of ng-bind where we want
       // to render some text, the convertValue function needs to be implemented. It should have the signature
       // (attrs, scope, data) to match convertAttribute.
-      convertValue : function(attrs, scope, data) {
+      convertValue : function(attrs, data) {
 
         if (!attrs['ng-bind']) {
           return;
         }
 
-        // Create a String that we can evaluate to arrive at the true value.
-        var defineValue = _.ngReactFormat(
-          'var {0} = {1}; var value = {2};',
-          [
-            scope.alias,
-            JSON.stringify(data),
-            _.ngReactBracketNotation(attrs['ng-bind'])
-          ]
-        );
-
-        // Evaluate and return the "value" parameter, set within the defineValue String above.
-        eval(defineValue);
-        return value;
+        return $scopeEl.scope().$eval(attrs['ng-bind'], { row : data });
       }
     }
   ];
@@ -123,11 +84,11 @@ var NgReact = (function() {
   // For example, something like ```<div ng-click="function()"></div>``` will have an attrs of
   // ```{ onClick: "function()"}``` before and an ```{ onClick: function() { scope.apply.bind(...); }}```
   // afterwards.
-  var convertAttributes = function(attrs, scope, data) {
+  var convertAttributes = function(attrs, data) {
     _.each(attrs, function(value, key) {
       var property = _.findWhere(propertiesToKeep, {propName: key});
       if (property && property.convertAttribute) {
-        property.convertAttribute(attrs, scope, data);
+        property.convertAttribute(attrs, data);
       }
     });
   };
@@ -137,11 +98,11 @@ var NgReact = (function() {
   // proper value.
   // For example, something like ```<div ng-bind="person.name"></div>``` will have an attrs of
   // ```{ ng-bind: "person.name"}``` before and translate to something like ```["fred"]``` afterwards.
-  var convertValues = function(attrs, scope, data) {
+  var convertValues = function(attrs, data) {
     return _.compact(_.map(attrs, function(value, key) {
       var property = _.findWhere(propertiesToKeep, {name: key});
       if (property && property.convertValue) {
-        return property.convertValue(attrs, scope, data);
+        return property.convertValue(attrs, data);
       }
     }));
   };
@@ -158,7 +119,6 @@ var NgReact = (function() {
       render: function() {
 
         var data = this.props.data,
-          scope = this.props.scope,
           domEl = this.props.domEl;
 
         // Recurse through the children.
@@ -167,16 +127,15 @@ var NgReact = (function() {
           if (!child.localName) return;
 
           return NgReactClasses.reactUnit({
-            scope : scope,
             data  : data,
             domEl : child
           });
         }));
 
         var attrs = getAttributes(domEl);
-        convertAttributes(attrs, scope, data);
+        convertAttributes(attrs, data);
 
-        var vals = convertValues(attrs, scope, data);
+        var vals = convertValues(attrs, data);
         // If there was ```<span ng-bind="person.name">Person.name will be here</span>```,
         // the ng-bind will take precedence and the inner text will not be rendered
         if (!(vals.length && domEl.localName)) {
@@ -209,15 +168,13 @@ var NgReact = (function() {
     reactRepeatUnit : React.createClass({
       render: function() {
 
-        var data = this.props.data,
-          scope = this.props.scope;
+        var data = this.props.data;
 
         var rowTranscluded = _.compact(_.map(this.props.transcludedDom, function(domEl) {
           // Everything needs to be in an element or it will be ignored!
           if (!domEl.localName) return;
 
           var unitFn = NgReactClasses.reactUnit({
-            scope : scope,
             data  : data,
             domEl : domEl
           });
@@ -225,12 +182,12 @@ var NgReact = (function() {
         }));
 
         var attrs = getAttributes(this.props.rootUnit);
-        convertAttributes(attrs, scope, data);
+        convertAttributes(attrs, data);
 
         return React.DOM[this.props.rootUnit.localName].apply(
           null,
           [attrs].concat(
-            convertValues(attrs, scope, data),
+            convertValues(attrs, data),
             rowTranscluded
           )
         );
@@ -249,13 +206,11 @@ var NgReact = (function() {
     reactRepeat : React.createClass({
       render: function() {
 
-        var scope = this.props.scope,
-          rootUnit = this.props.rootUnit,
+        var rootUnit = this.props.rootUnit,
           transcludedDom = this.props.transcluded,
-          rows = _.map(scope.data, function(datum) {
+          rows = _.map(this.props.data, function(datum) {
             // For each row, generate a ReactRepeatUnit component
             return NgReactClasses.reactRepeatUnit({
-              scope          : scope,
               data           : datum,
               transcludedDom : transcludedDom,
               rootUnit       : rootUnit
@@ -275,6 +230,10 @@ var NgReact = (function() {
   return NgReactClasses;
 
 })();
+
+var idForScope = '#scope';
+var $scopeEl = $('#scope');
+var alias = '';
 
 
 // NgReact Angular Module
@@ -297,7 +256,7 @@ angular.module('ngReact', [])
             throw new Error('ngReactRepeat expected "alias in collection" format');
           }
 
-          $scope.alias = pieces[0];
+          alias = pieces[0];
 
           // Remember the parent reference, as this is the mount node for the ReactRepeat component we're creating
           var parentReference = $element[0].offsetParent;
@@ -312,7 +271,7 @@ angular.module('ngReact', [])
                 // (not readily available from the transcluded DOM)
                 React.renderComponent(
                   NgReact.reactRepeat({
-                    scope       : $scope,
+                    data        : $scope.data,
                     transcluded : transcludedDom,
                     rootUnit    : $element[0]
                   }),

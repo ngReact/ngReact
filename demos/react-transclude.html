@@ -10,7 +10,7 @@
   </head>
   <body ng-app="ngReactDemo">
 
-    <section ng-controller="DemoCtrl">
+    <section id="scope" ng-controller="DemoCtrl">
 
       <button ng-click="started = true" ng-hide="started" class="btn btn-primary">Start</button>
 
@@ -35,6 +35,7 @@
       </section>
     </section>
 
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
     <script src="../bower_components/angular/angular.js"></script>
     <script src="../bower_components/underscore/underscore-min.js"></script>
     <script src="../bower_components/react/react.min.js"></script>

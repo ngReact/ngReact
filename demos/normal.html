@@ -20,7 +20,7 @@
         <div class="table-responsive">
           <table class="table">
             <tbody>
-              <tr ng-repeat="row in data">
+              <tr ng-repeat="row in data track by $index">
                 <td>{{row.0}}</td>
                 <td>{{row.1}}</td>
                 <td>{{row.2}}</td>
