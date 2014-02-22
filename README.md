@@ -12,11 +12,11 @@ Installation
 Set Up
 ------
 ```
-&lt;script src="bower_components/angular/angular.js"&gt;&lt;/script&gt;
-&lt;script src="bower_components/underscore/underscore-min.js">&lt;/script&gt;
-&lt;script src="bower_components/react/react.js"&gt;&lt;/script&gt;
-&lt;script src="bower_components/react/JSXTransformer.js"&gt;&lt;/script&gt;
-&lt;script src="bower_components/ngReact/ngReact.min.js"&gt;&lt;/script&gt;
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/underscore/underscore-min.js"></script>
+<script src="bower_components/react/react.js"></script>
+<script src="bower_components/react/JSXTransformer.js"></script>
+<script src="bower_components/ngReact/ngReact.min.js"></script>
 ```
 
 Declare ngReact as a dependency of your Angular module:
