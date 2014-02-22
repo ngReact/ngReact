@@ -5,8 +5,6 @@ var NgReact = (function() {
 
   var onClickNameRegex = /\w+/g,
     onClickVarsRegex = /\(.*\)/g,
-    formatParamsMatcher = /{(\d+)}/g,
-    stringPropertyMatcher = /\.(\w+)/g,
     overlySimplifiedHTMLMatcher = /(<[^>]*>.*<\/[^>]*>)/g,
     textAndWhitespaceRegex = /^[\w\s]+$/;
 
@@ -37,11 +35,15 @@ var NgReact = (function() {
           fnParams = _.first(attrs.onClick.match(onClickVarsRegex));
 
         // Remove opening and closing parentheses from the parameters
+        // TODO : Right now, this will throw an error if fnParams is more than one parameter
+        // Solution is to handle each parameter and call fnName with .bind
         fnParams = fnParams.substring(1, fnParams.length - 1);
 
         attrs.onClick = function() {
           scope.$apply(function() {
-            scope[fnName](scope.$eval(fnParams, { row: data }));
+            var params = {};
+            params[scope.alias] = data;
+            scope[fnName](scope.$eval(fnParams, params));
           });
         };
       }
@@ -58,7 +60,9 @@ var NgReact = (function() {
           return;
         }
 
-        return scope.$eval(attrs['ng-bind'], { row : data });
+        var params = {};
+        params[scope.alias] = data;
+        return scope.$eval(attrs['ng-bind'], params);
       }
     }
   ];
