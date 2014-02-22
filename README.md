@@ -3,7 +3,7 @@ NgReact.js
 
 Intro
 -----
-Facebook's React library is designed to be used as a view component atop other JavaScript frameworks. NgReact is a pair of proof of concept directives that show how React can cooperate with Angular, resulting in performance gains nearly up to 70% (or, well, losses up to 450%).
+Facebook's React library is designed to be used as a view component atop other JavaScript frameworks. NgReact is a pair of proof of concept directives that show how React can cooperate with Angular, resulting in performance gains nearly up to 78% (or, well, losses up to 23%).
 
 Installation
 ------------

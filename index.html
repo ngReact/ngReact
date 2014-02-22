@@ -64,7 +64,7 @@
 
       <h3>Intro</h3>
       <section>
-        Facebook's React library is designed to be used as a view component atop other JavaScript frameworks. NgReact is a pair of proof of concept directives that show how React can cooperate with Angular, resulting in performance gains nearly up to 70% (or, well, losses up to 450%).
+        Facebook's React library is designed to be used as a view component atop other JavaScript frameworks. NgReact is a pair of proof of concept directives that show how React can cooperate with Angular, resulting in performance gains nearly up to 78% (or, well, losses up to 23%).
       </section>
 
       <h3>Installation</h3>
@@ -89,7 +89,7 @@ angular.module('ngReactDemo', ['ngReact']);</pre>
 
       <h3>ngReactComponent Directive</h3>
       <section>
-        <p>Render a user-defined React component via Angular. This got up to nearly 70% faster performance.</p>
+        <p>Render a user-defined React component via Angular. This got up to nearly 78% faster performance against a native, naive ng-repeat.</p>
         <p>You'll have to create a globally available React component, like this iterator example (but it could be anything):</p>
         <pre>
 &lt;script type=&quot;text/jsx&quot;&gt;
@@ -130,7 +130,7 @@ angular.module('ngReactDemo', ['ngReact']);</pre>
 
       <h3>ngReactRepeat Directive</h3>
       <section>
-        <p>Render a unit of HTML for each entry in a collection just like you use ng-repeat. This got up to 450% slower performance.</p>
+        <p>Render a unit of HTML for each entry in a collection just like you use ng-repeat. This was about 23% slower performance.</p>
         <p>You'll use this directive just like you use ng-repeat. Your HTML will look like this:</p>
         <pre>
 &lt;table class=&quot;table&quot;&gt;
