@@ -317,6 +317,10 @@ angular.module('ngReact', [])
         } else {
           renderComponent();
         }
+
+        scope.$on('$destroy', function () {
+          React.unmountComponentAtNode(elem[0]);
+        });
       }
     }
   }]);
