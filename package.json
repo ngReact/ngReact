@@ -1,5 +1,6 @@
 {
-  "name": "ngReact",
+  "name": "angular-react",
+  "repository" : "https://github.com/kasperp/angular-react.git",
   "version": "0.0.1",
   "dependencies": {},
   "devDependencies": {

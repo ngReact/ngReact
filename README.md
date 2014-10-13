@@ -1,26 +1,93 @@
-NgReact.js
-==========
+#angular-react
 
-Intro
------
-Facebook's React library is designed to be used as a view component atop other JavaScript frameworks. NgReact is a pair of proof of concept directives that show how React can cooperate with Angular, resulting in performance gains nearly up to 78% (or, well, losses up to 23%).
+The [React.js](http://facebook.github.io/react/) library can be used as a view component in web applications. Based on [NgReact](https://github.com/davidchang/ngReact) angular-react is a angular directive (called `react-component`) and an service (called `reactDirective`) that allows React Components to be used in [AngularJS](https://angularjs.org/) applications.
 
-Installation
-------------
-```bower install ngReact```
+**angular-react** can be used in existing angular applications, to replace areas of views with react components.
 
-Set Up
-------
-```
-<script src="bower_components/angular/angular.js"></script>
-<script src="bower_components/underscore/underscore-min.js"></script>
-<script src="bower_components/react/react.js"></script>
-<script src="bower_components/react/JSXTransformer.js"></script>
-<script src="bower_components/ngReact/ngReact.min.js"></script>
+## reactComponent directive
+The reactComponent directive allows you to add React Components to your angular views.
+
+With an angular app and controller declaration like this:
+
+```javascript
+var app = angular.module( 'app', ['angular-react'] );
+
+app.controller( 'helloController', function( $scope ) {
+  $scope.person = { fname: 'Clark', lname: 'Kent' };
+} );
 ```
 
-Declare ngReact as a dependency of your Angular module:
+And a React Component like this
 
-```angular.module('ngReactDemo', ['ngReact']);```
+```javascript
+/** @jsx React.DOM */
+app.value( "Hello", React.createClass( {
+  propTypes: {
+    fname: React.PropTypes.string.isRequired,
+    lname: React.PropTypes.string.isRequired
+  },
+  render: function() {
+    return <span>Hello {this.props.fname} {this.props.lname}</span>;
+  }
+} ) );
+```
+The component can be used in an angular view using react-component like this.
 
-See more at [http://davidchang.github.io/ngReact](http://davidchang.github.io/ngReact).
+```html
+<body ng-app="app">
+  <h1 ng-controller="helloController">
+    <react-component name="Hello" props="person"/>
+  </h1>
+</body>
+```
+
+## reactDirective service
+With the `reactDirective` service you can create named directives backed by React components. The service takes the name of the React component as argument.
+
+```javascript
+app.directive( 'hello', function( reactDirective ) {
+  return reactDirective( 'Hello' );
+} );
+```
+
+This creates a directive that can be used like this.
+
+```html
+<body ng-app="app">
+  <h1 ng-controller="helloController">
+    <hello fname="person.fname" lname="person.lname"/>
+  </h1>
+</body>
+```
+
+## Reusing angular services
+In an existing angular application you'll often have existing services or filters that you wish to use from your React component. You can use angular's dependency injector to get hold of those.
+
+```javascript
+app.filter( 'hero', function() {
+  return function( person ) {
+    if ( person.fname === 'Clark' && person.lname === 'Kent' ) {
+      return 'Superman';
+    }
+    return person.fname + ' ' + person.lname;
+  };
+} );
+
+/** @jsx React.DOM */
+app.factory( "Hello", function( $filter ) {
+  return React.createClass( {
+    propTypes: {
+      person: React.PropTypes.object.isRequired,
+    },
+    render: function() {
+      return <span>Hello $filter( 'hero' )( this.props.person )</span>;
+    }
+  } );
+} );
+```
+
+
+
+
+
+
