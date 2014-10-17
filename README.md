@@ -2,6 +2,39 @@
 
 The [React.js](http://facebook.github.io/react/) library can be used as a view component in web applications. ngReact is an Angular module that allows React Components to be used in [AngularJS](https://angularjs.org/) applications.
 
+# Usage
+
+Install via Bower:
+
+```
+bower install ngReact
+```
+
+or via npm:
+
+```
+npm install ngreact
+```
+
+Then, just make sure Angular, React, and ngReact are on the page,
+```
+<script src="bower_components/angular/angular.js"></script>
+<script src="bower_components/react/react.js"></script>
+<script src="bower_components/ngReact/ngReact.min.js"></script>
+```
+
+and include the 'react' Angular module as a dependency for your new app
+
+```
+<script>
+    angular.module('app', ['react']);
+</script>
+```
+
+and you're good to go.
+
+# Features
+
 Specifically, ngReact is composed of:
 
 - `react-component`, an Angular directive that delegates off to a React Component
