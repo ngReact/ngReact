@@ -3,10 +3,10 @@ module.exports = function(grunt) {
   grunt.initConfig({
     watch : {
       files: ['ngReact.js'],
-      tasks: ['build'],
+      tasks: ['uglify'],
     },
     uglify: {
-      'build-minify' : {
+      build : {
         options: {
           mangle: {
             except: ['angular', 'React']
@@ -18,12 +18,20 @@ module.exports = function(grunt) {
           'ngReact.min.js' : 'ngReact.js'
         }
       }
+    },
+    docco: {
+      build : {
+        src: ['ngReact.js'],
+        options: {
+          output: 'docs/'
+        }
+      }
     }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-docco');
 
-  grunt.registerTask('default', ['build']);
-  grunt.registerTask('build', ['uglify']);
+  grunt.registerTask('default', ['uglify', 'docco']);
 };

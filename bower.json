@@ -1,12 +1,12 @@
 {
   "name": "ngReact",
-  "version": "0.0.2",
+  "repository": "https://github.com/davidchang/ngReact.git",
+  "version": "0.1.0",
   "dependencies": {
-    "angular": "~1.2.*-build",
-    "react": "0.9.*",
-    "underscore": "~1.5.2"
+    "angular": "~1.2.20",
+    "react": "~0.11.2"
   },
-  "main" : [
+  "main": [
     "ngReact.js"
   ]
 }
