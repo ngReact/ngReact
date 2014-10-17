@@ -1,13 +1,14 @@
 {
-  "name": "angular-react",
-  "repository" : "https://github.com/kasperp/angular-react.git",
-  "version": "0.0.1",
+  "name": "ngReact",
+  "repository": "https://github.com/davidchang/ngReact.git",
+  "version": "0.1.0",
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-watch": "~0.5.3",
-    "load-grunt-tasks": "~0.1.0"
+    "load-grunt-tasks": "~0.1.0",
+    "grunt-docco": "^0.3.3"
   },
   "engines": {
     "node": ">=0.8.0"

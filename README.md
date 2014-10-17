@@ -1,93 +1,117 @@
-#angular-react
+# ngReact
 
-The [React.js](http://facebook.github.io/react/) library can be used as a view component in web applications. Based on [NgReact](https://github.com/davidchang/ngReact) angular-react is a angular directive (called `react-component`) and an service (called `reactDirective`) that allows React Components to be used in [AngularJS](https://angularjs.org/) applications.
+The [React.js](http://facebook.github.io/react/) library can be used as a view component in web applications. ngReact is an Angular module that allows React Components to be used in [AngularJS](https://angularjs.org/) applications.
 
-**angular-react** can be used in existing angular applications, to replace areas of views with react components.
+Specifically, ngReact is composed of:
 
-## reactComponent directive
+- `react-component`, an Angular directive that delegates off to a React Component
+- `reactDirective`, a service for converting React components into the `react-component` Angular directive
+
+**ngReact** can be used in existing angular applications, to replace areas of views with react components.
+
+## The react-component directive
+
 The reactComponent directive allows you to add React Components to your angular views.
 
-With an angular app and controller declaration like this:
+With an Angular app and controller declaration like this:
 
 ```javascript
-var app = angular.module( 'app', ['angular-react'] );
-
-app.controller( 'helloController', function( $scope ) {
-  $scope.person = { fname: 'Clark', lname: 'Kent' };
-} );
+angular.module('app', ['react'])
+  .controller('helloController', function($scope) {
+    $scope.person = { fname: 'Clark', lname: 'Kent' };
+  });
 ```
 
 And a React Component like this
 
 ```javascript
 /** @jsx React.DOM */
-app.value( "Hello", React.createClass( {
+app.value('HelloComponent', React.createClass({
   propTypes: {
-    fname: React.PropTypes.string.isRequired,
-    lname: React.PropTypes.string.isRequired
+    fname : React.PropTypes.string.isRequired,
+    lname : React.PropTypes.string.isRequired
   },
   render: function() {
     return <span>Hello {this.props.fname} {this.props.lname}</span>;
   }
-} ) );
+}));
 ```
-The component can be used in an angular view using react-component like this.
+
+The component can be used in an Angular view using the react-component directive like so, where:
+
+- the name attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name, and
+- the props attribute indicates what scope properties should be exposed to the React component
 
 ```html
 <body ng-app="app">
-  <h1 ng-controller="helloController">
-    <react-component name="Hello" props="person"/>
-  </h1>
+  <div ng-controller="helloController">
+    <react-component name="HelloComponent" props="person" />
+  </div>
 </body>
 ```
 
-## reactDirective service
-With the `reactDirective` service you can create named directives backed by React components. The service takes the name of the React component as argument.
+## The reactDirective service
+
+With the `reactDirective` service you can create named directives backed by React components. The service takes the name of the React component as the argument.
 
 ```javascript
-app.directive( 'hello', function( reactDirective ) {
-  return reactDirective( 'Hello' );
+app.directive('hello', function(reactDirective) {
+  return reactDirective('Hello');
 } );
 ```
 
-This creates a directive that can be used like this.
+This creates a directive that can be used like this:
 
 ```html
 <body ng-app="app">
-  <h1 ng-controller="helloController">
+  <div ng-controller="helloController">
     <hello fname="person.fname" lname="person.lname"/>
-  </h1>
+  </div>
 </body>
 ```
 
-## Reusing angular services
-In an existing angular application you'll often have existing services or filters that you wish to use from your React component. You can use angular's dependency injector to get hold of those.
+## Reusing Angular injectables
+
+In an existing Angular application, you'll often have existing services or filters that you wish to access from your React component. These can be retrieved using Angular's dependency injection. The React component will still be render-able as aforementioned, using the react-component directive.
 
 ```javascript
-app.filter( 'hero', function() {
-  return function( person ) {
-    if ( person.fname === 'Clark' && person.lname === 'Kent' ) {
+app.filter('hero', function() {
+  return function(person) {
+    if (person.fname === 'Clark' && person.lname === 'Kent') {
       return 'Superman';
     }
     return person.fname + ' ' + person.lname;
   };
-} );
+});
 
 /** @jsx React.DOM */
-app.factory( "Hello", function( $filter ) {
-  return React.createClass( {
+app.factory('HelloComponent', function($filter) {
+  return React.createClass({
     propTypes: {
       person: React.PropTypes.object.isRequired,
     },
     render: function() {
-      return <span>Hello $filter( 'hero' )( this.props.person )</span>;
+      return <span>Hello $filter('hero')(this.props.person)</span>;
     }
-  } );
-} );
+  });
+});
 ```
 
+```html
+<body ng-app="app">
+  <div ng-controller="helloController">
+    <react-component name="HelloComponent" props="person" />
+  </div>
+</body>
+```
 
+# Community
 
+## Maintainers
 
+- Kasper Bøgebjerg Pedersen (@kasperp)
+- David Chang (@davidchang)
 
+## Contributors
 
+- Tihomir Kit (@pootzko)

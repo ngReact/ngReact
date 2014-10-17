@@ -2,7 +2,7 @@
 
 <html>
 <head>
-  <title>ngReact.js</title>
+  <title>ngReact</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
   <link rel="stylesheet" media="all" href="docco.css" />
@@ -13,12 +13,6 @@
     
     <ul class="sections">
         
-          <li id="title">
-              <div class="annotation">
-                  <h1>ngReact.js</h1>
-              </div>
-          </li>
-        
         
         
         <li id="section-1">
@@ -27,9 +21,19 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-1">&#182;</a>
               </div>
-              <h2 id="ngreact">NgReact</h2>
+              <h1 id="ngreact">ngReact</h1>
+<h3 id="use-react-components-inside-of-your-angular-applications">Use React Components inside of your Angular applications</h3>
+<p>Composed of</p>
+<ul>
+<li>reactComponent (generic directive for delegating off to React Components)</li>
+<li>reactDirective (factory for creating specific directives that correspond to reactComponent directives)</li>
+</ul>
 
             </div>
+            
+            <div class="content"><div class='highlight'><pre>
+(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(React, angular)</span> </span>{
+<span class="hljs-pi">  'use strict'</span>;</pre></div></div>
             
         </li>
         
@@ -40,18 +44,29 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-2">&#182;</a>
               </div>
-              <p>The container for all of our utilities and React Components</p>
-
+              <h1 id="reactcomponent">reactComponent</h1>
+<p>Directive that allows React components to be used in Angular templates.</p>
+<p>Usage:
+    <react-component name="Hello" props="name"/></p>
+<p>This requires that there exists an injectable or globally available ‘Hello’ React component.
+The ‘props’ attribute is optional and is passed to the component.</p>
+<p>The following would would create and register the component:</p>
+<pre><code><span class="hljs-comment">/** @jsx React.DOM */</span>
+<span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = angular.module(<span class="hljs-string">'ace.react.components'</span>);
+<span class="hljs-built_in">module</span>.value(<span class="hljs-string">'Hello'</span>, React.createClass({
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>Hello {this.props.name}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
+    }
+}));
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre><span class="keyword">var</span> NgReact = (<span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
-
-  <span class="keyword">var</span> onClickNameRegex = <span class="regexp">/\w+/g</span>,
-    onClickVarsRegex = <span class="regexp">/\(.*\)/g</span>,
-    formatParamsMatcher = <span class="regexp">/{(\d+)}/g</span>,
-    stringPropertyMatcher = <span class="regexp">/\.(\w+)/g</span>,
-    overlySimplifiedHTMLMatcher = <span class="regexp">/(&lt;[^&gt;]*&gt;.*&lt;\/[^&gt;]*&gt;)/g</span>,
-    textAndWhitespaceRegex = <span class="regexp">/^[\w\s]+$/</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> reactComponent = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($timeout, $injector)</span> </span>{
+    <span class="hljs-keyword">return</span> {
+      restrict: <span class="hljs-string">'E'</span>,
+      replace: <span class="hljs-literal">true</span>,
+      link: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( scope, elem, attrs )</span> </span>{
+        <span class="hljs-keyword">var</span> reactComponentName = attrs.name;</pre></div></div>
             
         </li>
         
@@ -62,11 +77,13 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p><strong>Underscore Mixins</strong>: Gotta set up some Underscore mixins for general purpose utilities.</p>
+              <p>a React component name must be specified</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  _.mixin({</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">if</span> (!reactComponentName) {
+          <span class="hljs-keyword">throw</span> <span class="hljs-keyword">new</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'ReactComponent name attribute must be specified'</span>);
+        }</pre></div></div>
             
         </li>
         
@@ -77,19 +94,14 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-4">&#182;</a>
               </div>
-              <ul>
-<li>Formatting because we need to construct JS code in strings to eval.</li>
-</ul>
+              <p>ensure the specified React component is accessible, and fail fast if it’s not</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    ngReactFormat: <span class="function"><span class="keyword">function</span><span class="params">(template, data)</span> {</span>
-      <span class="keyword">return</span> template.replace(formatParamsMatcher, <span class="function"><span class="keyword">function</span><span class="params">(match, number)</span> {</span>
-        <span class="keyword">return</span> <span class="keyword">typeof</span> data[number] != <span class="string">'undefined'</span>
-          ? data[number]
-          : match;
-      });
-    },</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> reactComponent = $injector.get(reactComponentName) || <span class="hljs-built_in">window</span>[reactComponentName];
+        <span class="hljs-keyword">if</span> (!reactComponent) {
+          <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Cannot find react component '</span> + reactComponentName);
+        }</pre></div></div>
             
         </li>
         
@@ -100,18 +112,16 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-5">&#182;</a>
               </div>
-              <ul>
-<li>We need to change object dot notation to bracket notation for our eval to work.</li>
-</ul>
+              <p>wraps a function with scope.$apply</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    ngReactBracketNotation: <span class="function"><span class="keyword">function</span><span class="params">(string)</span> {</span>
-      <span class="keyword">return</span> string.replace(stringPropertyMatcher, <span class="function"><span class="keyword">function</span><span class="params">(match)</span> {</span>
-        <span class="keyword">return</span> _.ngReactFormat(<span class="string">'[\'{0}\']'</span>, [match.substring(<span class="number">1</span>)]);
-      });
-    }
-  });</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> applied = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(fn)</span> </span>{
+          <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">var</span> args = <span class="hljs-built_in">arguments</span>;
+            scope.$apply(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{ fn.apply( <span class="hljs-literal">null</span>, args ); });
+          };
+        };</pre></div></div>
             
         </li>
         
@@ -122,19 +132,16 @@
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-6">&#182;</a>
               </div>
-              <p><strong>Properties To Keep</strong>: Here lies the properties that we&#39;ll retain and pass into our React templates.
-Right now, this is a very limited list. It retains class and id, which are pretty simple to pass
-through to React. Ng-click and ng-bind are more complicated directives to support, and they are the only
-Angular directives supported at the moment (unless you contribute, that is!).</p>
+              <p>render React component, with scope[attrs.props] being passed in as the component props</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> propertiesToKeep = [
-    {
-      attrName : <span class="string">'class'</span>,
-      propName : <span class="string">'className'</span>,
-      name     : <span class="string">'className'</span>
-    }, {</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> renderComponent = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+          <span class="hljs-keyword">var</span> scopeProps = scope[attrs.props] || {};
+
+          <span class="hljs-keyword">var</span> props = {};
+          <span class="hljs-built_in">Object</span>.keys(scopeProps).forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(key)</span> </span>{
+            <span class="hljs-keyword">var</span> value = scopeProps[key];</pre></div></div>
             
         </li>
         
@@ -145,13 +152,19 @@ Angular directives supported at the moment (unless you contribute, that is!).</p
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-7">&#182;</a>
               </div>
-              <ul>
-<li>Name of the attribute in normal DOM</li>
-</ul>
+              <p>wrap functions in a function that ensures they are scope.$applied
+ensures that when function is called from a React component
+the Angular digest cycle is run</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      attrName         : <span class="string">'ng-click'</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>            props[key] = angular.isFunction(value) ? applied(value) : value;
+          });
+
+          $timeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+            React.renderComponent(reactComponent(props), elem[<span class="hljs-number">0</span>]);
+          });
+        };</pre></div></div>
             
         </li>
         
@@ -162,14 +175,13 @@ Angular directives supported at the moment (unless you contribute, that is!).</p
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
-              <ul>
-<li>Name of the attribute that React is expecting</li>
-</ul>
+              <p>If there are props, re-render when they change</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      propName         : <span class="string">'onClick'</span>,
-      name             : <span class="string">'onClick'</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        attrs.props ?
+          scope.$watch(attrs.props, renderComponent, <span class="hljs-literal">true</span>) :
+          renderComponent();</pre></div></div>
             
         </li>
         
@@ -180,21 +192,16 @@ Angular directives supported at the moment (unless you contribute, that is!).</p
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
-              <ul>
-<li>If we need to figure out how to handle an attribute, the convertAttribute function needs to be
-implemented. It should have the signature (attrs, scope, data)</li>
-</ul>
+              <p>cleanup when scope is destroyed</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      convertAttribute : <span class="function"><span class="keyword">function</span><span class="params">(attrs, scope, data)</span> {</span>
-
-        <span class="keyword">if</span> (!attrs.onClick) {
-          <span class="keyword">return</span>;
-        }
-
-        <span class="keyword">var</span> fnName = _.first(attrs.onClick.match(onClickNameRegex)),
-          fnParams = _.first(attrs.onClick.match(onClickVarsRegex));</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        scope.$on(<span class="hljs-string">'$destroy'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+          React.unmountComponentAtNode(elem[<span class="hljs-number">0</span>]);
+        });
+      }
+    };
+  };</pre></div></div>
             
         </li>
         
@@ -205,11 +212,34 @@ implemented. It should have the signature (attrs, scope, data)</li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
-              <p>Remove opening and closing parentheses from the parameters</p>
-
+              <h1 id="reactdirective">reactDirective</h1>
+<p>Factory function to create directives for React components.</p>
+<p>With a component like this:</p>
+<pre><code><span class="hljs-comment">/** @jsx React.DOM */</span>
+<span class="hljs-keyword">var</span> <span class="hljs-built_in">module</span> = angular.module(<span class="hljs-string">'ace.react.components'</span>);
+<span class="hljs-built_in">module</span>.value(<span class="hljs-string">'Hello'</span>, React.createClass({
+    render: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+        <span class="hljs-keyword">return</span> <span class="xml"><span class="hljs-tag">&lt;<span class="hljs-title">div</span>&gt;</span>Hello {this.props.name}<span class="hljs-tag">&lt;/<span class="hljs-title">div</span>&gt;</span>;</span>
+    }
+}));
+</code></pre><p>A directive can be created and registered with:</p>
+<pre><code><span class="hljs-built_in">module</span>.directive(<span class="hljs-string">'hello'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(reactDirective)</span> </span>{
+    <span class="hljs-keyword">return</span> reactDirective(<span class="hljs-string">'Hello'</span>, [<span class="hljs-string">'name'</span>]);
+});
+</code></pre><p>Where the first argument is the injectable or globally accessible name of the React component
+and the second argument is an array of property names to be watched and passed to the React component
+as props.</p>
+<p>This directive can then be used like this:</p>
+<pre><code>&lt;hello name=<span class="hljs-string">"name"</span>/&gt;
+</code></pre>
             </div>
             
-            <div class="content"><div class='highlight'><pre>        fnParams = fnParams.substring(<span class="number">1</span>, fnParams.length - <span class="number">1</span>);</pre></div></div>
+            <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> reactDirective = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($injector)</span> </span>{
+    <span class="hljs-keyword">return</span> <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(reactComponentName, propNames)</span> </span>{
+      <span class="hljs-keyword">return</span> {
+        restrict: <span class="hljs-string">'E'</span>,
+        replace: <span class="hljs-literal">true</span>,
+        link: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(scope, elm, attrs)</span> </span>{</pre></div></div>
             
         </li>
         
@@ -220,20 +250,14 @@ implemented. It should have the signature (attrs, scope, data)</li>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-11">&#182;</a>
               </div>
-              <p>Create a String that we can evaluate. Here, the function must be wrapped in a scope.$apply
-to trigger an Angular digest cycle appropriately.</p>
+              <p>ensure the specified React component is accessible, and fail fast if it’s not</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> defineHandler = _.ngReactFormat(
-          <span class="string">'var {0} = {1}; var handler = scope.$apply.bind(scope, scope.{2}.bind(null, {3}));'</span>,
-          [
-            scope.alias,
-            JSON.stringify(data),
-            fnName,
-            fnParams
-          ]
-        );</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> reactComponent = $injector.get(reactComponentName) || <span class="hljs-built_in">window</span>[reactComponentName];
+          <span class="hljs-keyword">if</span> (!reactComponent) {
+            <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Cannot find react component '</span> + reactComponentName);
+          }</pre></div></div>
             
         </li>
         
@@ -244,17 +268,11 @@ to trigger an Angular digest cycle appropriately.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-12">&#182;</a>
               </div>
-              <p>Evaluate and set the onClick parameter to our defined &quot;handler&quot; variable</p>
+              <p>if propNames is not defined, fall back to use the React component’s propTypes if present</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        eval(defineHandler);
-        attrs.onClick = handler;
-      }
-    }, {
-      name : <span class="string">'id'</span>
-    }, {
-      name         : <span class="string">'ng-bind'</span>,</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          propNames = propNames || <span class="hljs-built_in">Object</span>.keys(reactComponent.propTypes || {});</pre></div></div>
             
         </li>
         
@@ -265,19 +283,18 @@ to trigger an Angular digest cycle appropriately.</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-13">&#182;</a>
               </div>
-              <ul>
-<li>If we need to convert to a value (not an attribute), as is the case of ng-bind where we want
-to render some text, the convertValue function needs to be implemented. It should have the signature
-(attrs, scope, data) to match convertAttribute.</li>
-</ul>
+              <p>for each of the properties, get their scope value and set it to scope.props</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>      convertValue : <span class="function"><span class="keyword">function</span><span class="params">(attrs, scope, data)</span> {</span>
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> updateProps = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
+            <span class="hljs-keyword">var</span> props = {};
+            propNames.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(propName)</span> </span>{
+              props[propName] = scope.$<span class="hljs-built_in">eval</span>(attrs[propName]);
+            });
 
-        <span class="keyword">if</span> (!attrs[<span class="string">'ng-bind'</span>]) {
-          <span class="keyword">return</span>;
-        }</pre></div></div>
+            scope.props = props;
+          };</pre></div></div>
             
         </li>
         
@@ -288,18 +305,21 @@ to render some text, the convertValue function needs to be implemented. It shoul
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-14">&#182;</a>
               </div>
-              <p>Create a String that we can evaluate to arrive at the true value.</p>
+              <p>watch each property name and trigger an update whenever something changes,
+to update scope.props with new values</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> defineValue = _.ngReactFormat(
-          <span class="string">'var {0} = {1}; var value = {2};'</span>,
-          [
-            scope.alias,
-            JSON.stringify(data),
-            _.ngReactBracketNotation(attrs[<span class="string">'ng-bind'</span>])
-          ]
-        );</pre></div></div>
+            <div class="content"><div class='highlight'><pre>          propNames.forEach(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(k)</span> </span>{
+            scope.$watch(attrs[k], updateProps, <span class="hljs-literal">true</span>);
+          });
+
+          updateProps();
+        },
+        template: <span class="hljs-string">'&lt;react-component name="'</span> + reactComponentName + <span class="hljs-string">'" props="props"&gt;&lt;/react-component&gt;'</span>
+      };
+    };
+  };</pre></div></div>
             
         </li>
         
@@ -310,594 +330,15 @@ to render some text, the convertValue function needs to be implemented. It shoul
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-15">&#182;</a>
               </div>
-              <p>Evaluate and return the &quot;value&quot; parameter, set within the defineValue String above.</p>
+              <p>create the end module without any dependencies, including reactComponent and reactDirective</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        eval(defineValue);
-        <span class="keyword">return</span> value;
-      }
-    }
-  ];</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-16">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-16">&#182;</a>
-              </div>
-              <p><strong>getAttributes</strong>: Extracts all of the supported attributes off of the document object and returns them
-in an object.</p>
+            <div class="content"><div class='highlight'><pre>  angular.module(<span class="hljs-string">'react'</span>, [])
+    .directive(<span class="hljs-string">'reactComponent'</span>, [<span class="hljs-string">'$timeout'</span>, <span class="hljs-string">'$injector'</span>, reactComponent])
+    .factory(<span class="hljs-string">'reactDirective'</span>, [<span class="hljs-string">'$injector'</span>, reactDirective]);
 
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> getAttributes = <span class="function"><span class="keyword">function</span><span class="params">(el)</span> {</span>
-    <span class="keyword">var</span> toReturn = {};
-
-    _.each(propertiesToKeep, <span class="function"><span class="keyword">function</span><span class="params">(property)</span> {</span>
-      <span class="keyword">var</span> attr = _.findWhere(_.values(el.attributes), {localName : property.attrName || property.name});
-      <span class="keyword">if</span> (attr) {
-        toReturn[property.propName || property.name] = attr.value;
-      }
-    });
-
-    <span class="keyword">return</span> toReturn;
-  };</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-17">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-17">&#182;</a>
-              </div>
-              <p><strong>convertAttributes</strong>: Iterates through all of the entries in propertiesToKeep and calls their
-convertAttribute function (if implemented), which will transform the attribute into what it should be.
-For example, something like <code>&lt;div ng-click=&quot;function()&quot;&gt;&lt;/div&gt;</code> will have an attrs of
-<code>{ onClick: &quot;function()&quot;}</code> before and an <code>{ onClick: function() { scope.apply.bind(...); }}</code>
-afterwards.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> convertAttributes = <span class="function"><span class="keyword">function</span><span class="params">(attrs, scope, data)</span> {</span>
-    _.each(attrs, <span class="function"><span class="keyword">function</span><span class="params">(value, key)</span> {</span>
-      <span class="keyword">var</span> property = _.findWhere(propertiesToKeep, {propName: key});
-      <span class="keyword">if</span> (property &amp;&amp; property.convertAttribute) {
-        property.convertAttribute(attrs, scope, data);
-      }
-    });
-  };</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-18">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-18">&#182;</a>
-              </div>
-              <p><strong>convertValues</strong>: Iterates through all of the entries in propertiesToKeep and calls their
-convertValue function (if implemented), which will transform what was stored as an attribute into its
-proper value.
-For example, something like <code>&lt;div ng-bind=&quot;person.name&quot;&gt;&lt;/div&gt;</code> will have an attrs of
-<code>{ ng-bind: &quot;person.name&quot;}</code> before and translate to something like <code>[&quot;fred&quot;]</code> afterwards.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  <span class="keyword">var</span> convertValues = <span class="function"><span class="keyword">function</span><span class="params">(attrs, scope, data)</span> {</span>
-    <span class="keyword">return</span> _.compact(_.map(attrs, <span class="function"><span class="keyword">function</span><span class="params">(value, key)</span> {</span>
-      <span class="keyword">var</span> property = _.findWhere(propertiesToKeep, {name: key});
-      <span class="keyword">if</span> (property &amp;&amp; property.convertValue) {
-        <span class="keyword">return</span> property.convertValue(attrs, scope, data);
-      }
-    }));
-  };
-
-  <span class="keyword">var</span> NgReactClasses = {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-19">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-19">&#182;</a>
-              </div>
-              <h2 id="reactunit">reactUnit</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-20">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-20">&#182;</a>
-              </div>
-              <p>A React class meant to be called on a single DOM element and able to recurse through its
-children. It will return a React DOM node. It expects the following properties:</p>
-<ul>
-<li>data - The data available to the Angular scope</li>
-<li>scope - The Angular Scope</li>
-<li>domEl - The DOM element it is transforming</li>
-</ul>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    reactUnit : React.createClass({
-      render: <span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
-
-        <span class="keyword">var</span> data = <span class="keyword">this</span>.props.data,
-          scope = <span class="keyword">this</span>.props.scope,
-          domEl = <span class="keyword">this</span>.props.domEl;</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-21">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-21">&#182;</a>
-              </div>
-              <p>Recurse through the children.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">var</span> childrenNodes = _.compact(_.map(domEl.children, <span class="function"><span class="keyword">function</span><span class="params">(child)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-22">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-22">&#182;</a>
-              </div>
-              <p>Everything needs to be in an element or it will be ignored!</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          <span class="keyword">if</span> (!child.localName) <span class="keyword">return</span>;
-
-          <span class="keyword">return</span> NgReactClasses.reactUnit({
-            scope : scope,
-            data  : data,
-            domEl : child
-          });
-        }));
-
-        <span class="keyword">var</span> attrs = getAttributes(domEl);
-        convertAttributes(attrs, scope, data);
-
-        <span class="keyword">var</span> vals = convertValues(attrs, scope, data);</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-23">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-23">&#182;</a>
-              </div>
-              <p>If there was <code>&lt;span ng-bind=&quot;person.name&quot;&gt;Person.name will be here&lt;/span&gt;</code>,
-the ng-bind will take precedence and the inner text will not be rendered</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (!(vals.length &amp;&amp; domEl.localName)) {</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-24">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-24">&#182;</a>
-              </div>
-              <p>Basically look only for text that is a direct descendant of domEl
-but doesn&#39;t exist in a tag (which will be caught recursively later)</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          _.each(domEl.innerHTML.split(overlySimplifiedHTMLMatcher), <span class="function"><span class="keyword">function</span><span class="params">(text)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-25">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-25">&#182;</a>
-              </div>
-              <p>Only matching for text and whitespace</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="keyword">if</span> (text.match(textAndWhitespaceRegex)) {
-              vals.push(text);
-            }
-          });
-        }
-
-        <span class="keyword">return</span> React.DOM[domEl.localName].apply(
-          <span class="literal">null</span>,
-          [attrs].concat(
-            vals,
-            childrenNodes
-          )
-        );
-      }
-    }),</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-26">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-26">&#182;</a>
-              </div>
-              <h2 id="reactrepeatunit">reactRepeatUnit</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-27">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-27">&#182;</a>
-              </div>
-              <p>A React class repesenting a single &quot;row&quot; in or iteration of a repeat.
-It will return a React DOM node. It expects the following properties:</p>
-<ul>
-<li>data - The data available to the Angular scope</li>
-<li>scope - The Angular Scope</li>
-<li>domEl - The DOM element it is transforming</li>
-</ul>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    reactRepeatUnit : React.createClass({
-      render: <span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
-
-        <span class="keyword">var</span> data = <span class="keyword">this</span>.props.data,
-          scope = <span class="keyword">this</span>.props.scope;
-
-        <span class="keyword">var</span> rowTranscluded = _.compact(_.map(<span class="keyword">this</span>.props.transcludedDom, <span class="function"><span class="keyword">function</span><span class="params">(domEl)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-28">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-28">&#182;</a>
-              </div>
-              <p>Everything needs to be in an element or it will be ignored!</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          <span class="keyword">if</span> (!domEl.localName) <span class="keyword">return</span>;
-
-          <span class="keyword">var</span> unitFn = NgReactClasses.reactUnit({
-            scope : scope,
-            data  : data,
-            domEl : domEl
-          });
-          <span class="keyword">return</span> unitFn;
-        }));
-
-        <span class="keyword">var</span> attrs = getAttributes(<span class="keyword">this</span>.props.rootUnit);
-        convertAttributes(attrs, scope, data);
-
-        <span class="keyword">return</span> React.DOM[<span class="keyword">this</span>.props.rootUnit.localName].apply(
-          <span class="literal">null</span>,
-          [attrs].concat(
-            convertValues(attrs, scope, data),
-            rowTranscluded
-          )
-        );
-      }
-    }),</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-29">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-29">&#182;</a>
-              </div>
-              <h2 id="reactrepeat">reactRepeat</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-30">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-30">&#182;</a>
-              </div>
-              <p>React component that will create a root container element and append into itself multiple
-ReactRepeatUnit components, each representing an iteration of data in the collection passed.
-It will return a React DOM node. It expects the following properties:</p>
-<ul>
-<li>data - The data available to the Angular scope</li>
-<li>scope - The Angular Scope</li>
-<li>rootUnit - The root element on which the ngReactRepeat directive is placed</li>
-<li>transcluded - The transcluded DOM; basically, the DOM that will be represented by ReactRepeatUnit; this
-is everything contained in the rootUnit</li>
-</ul>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>    reactRepeat : React.createClass({
-      render: <span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
-
-        <span class="keyword">var</span> scope = <span class="keyword">this</span>.props.scope,
-          rootUnit = <span class="keyword">this</span>.props.rootUnit,
-          transcludedDom = <span class="keyword">this</span>.props.transcluded,
-          rows = _.map(scope.data, <span class="function"><span class="keyword">function</span><span class="params">(datum)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-31">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-31">&#182;</a>
-              </div>
-              <p>For each row, generate a ReactRepeatUnit component</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            <span class="keyword">return</span> NgReactClasses.reactRepeatUnit({
-              scope          : scope,
-              data           : datum,
-              transcludedDom : transcludedDom,
-              rootUnit       : rootUnit
-            });
-          });</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-32">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-32">&#182;</a>
-              </div>
-              <p>Here, rootUnit.parentElement.localName is the rootUnit&#39;s parent (like a tbody),
-and rootUnit.localName is the rootUnit (like a tr)</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">return</span> React.DOM[rootUnit.parentElement.localName].apply(
-          <span class="literal">null</span>,
-          [getAttributes(rootUnit.parentElement)].concat(rows)
-        );
-      }
-    })
-  };
-
-  <span class="keyword">return</span> NgReactClasses;
-
-})();</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-33">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-33">&#182;</a>
-              </div>
-              <h2 id="ngreact-angular-module">NgReact Angular Module</h2>
-
-            </div>
-            
-        </li>
-        
-        
-        <li id="section-34">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-34">&#182;</a>
-              </div>
-              <p>The Angular module that will hold directives that will make use of our NgReact utils.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>angular.module(<span class="string">'ngReact'</span>, [])</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-35">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-35">&#182;</a>
-              </div>
-              <p><strong>The ngReactRepeat directive</strong></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>  .directive(<span class="string">'ngReactRepeat'</span>, <span class="function"><span class="keyword">function</span> <span class="params">($timeout)</span> {</span>
-    <span class="keyword">return</span> {
-      restrict: <span class="string">'A'</span>,
-      transclude: <span class="literal">true</span>,
-      replace: <span class="literal">true</span>,
-      controller: [
-        <span class="string">'$scope'</span>, <span class="string">'$element'</span>, <span class="string">'$attrs'</span>, <span class="string">'$transclude'</span>,
-        <span class="function"><span class="keyword">function</span> <span class="params">($scope, $element, $attrs, $transclude)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-36">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-36">&#182;</a>
-              </div>
-              <p>Expect the form <code>&lt;tr ng-react-repeat=&quot;row in data&quot;&gt;</code></p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          <span class="keyword">var</span> pieces = $attrs[<span class="string">'ngReactRepeat'</span>].split(<span class="string">' in '</span>);
-          <span class="keyword">if</span> (pieces.length !== <span class="number">2</span>) {
-            console.error(<span class="string">'ngReactRepeat expected "alias in collection" format'</span>);
-          }
-
-          $scope.alias = pieces[<span class="number">0</span>];</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-37">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-37">&#182;</a>
-              </div>
-              <p>Remember the parent reference, as this is the mount node for the ReactRepeat component we&#39;re creating</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>          <span class="keyword">var</span> parentReference = $element[<span class="number">0</span>].offsetParent;
-
-          $transclude(<span class="function"><span class="keyword">function</span><span class="params">(transcludedDom)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-38">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-38">&#182;</a>
-              </div>
-              <p>Keep an eye on the data object so that if it changes, we can re-render the React component.</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>            $scope.$watch(pieces[<span class="number">1</span>], <span class="function"><span class="keyword">function</span><span class="params">(val)</span> {</span>
-
-              $timeout(<span class="function"><span class="keyword">function</span><span class="params">()</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-39">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-39">&#182;</a>
-              </div>
-              <p>Render the React Component, passing in the scope, transcluded DOM, and the root unit
-(not readily available from the transcluded DOM)</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>                React.renderComponent(
-                  NgReact.reactRepeat({
-                    scope       : $scope,
-                    transcluded : transcludedDom,
-                    rootUnit    : $element[<span class="number">0</span>]
-                  }),
-                  parentReference
-                );
-
-              });
-            }, <span class="literal">true</span>);
-          });
-        }
-      ]
-    };
-  })
-  .directive(<span class="string">'ngReactComponent'</span>, <span class="function"><span class="keyword">function</span> <span class="params">($timeout)</span> {</span>
-    <span class="keyword">return</span> {
-      restrict: <span class="string">'A'</span>,
-      link: <span class="function"><span class="keyword">function</span> <span class="params">(scope, elem, attrs)</span> {</span>
-
-        <span class="keyword">if</span> (!attrs.ngReactComponent) {
-          console.error(<span class="string">'ngReactComponent expected attribute to be the name of a react component'</span>);
-        }
-
-        <span class="keyword">var</span> renderComponent = <span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
-          $timeout(<span class="function"><span class="keyword">function</span><span class="params">()</span> {</span>
-            React.renderComponent(</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-40">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-40">&#182;</a>
-              </div>
-              <p>For now, expect the React Component to be globally available on window</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>              window[attrs.ngReactComponent]({
-                scope: scope
-              }),
-              elem[<span class="number">0</span>]
-            );
-          });
-        };</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-41">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-41">&#182;</a>
-              </div>
-              <p>attrs.data is optional</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>        <span class="keyword">if</span> (attrs.data) {
-          scope.$watch(attrs.data, renderComponent, <span class="literal">true</span>);
-        } <span class="keyword">else</span> {
-          renderComponent();
-        }
-      }
-    }
-  });</pre></div></div>
+})(<span class="hljs-built_in">window</span>.React, <span class="hljs-built_in">window</span>.angular);</pre></div></div>
             
         </li>
         
