@@ -2,7 +2,17 @@
 
 The [React.js](http://facebook.github.io/react/) library can be used as a view component in web applications. ngReact is an Angular module that allows React Components to be used in [AngularJS](https://angularjs.org/) applications.
 
-# Usage
+Motivation for this could be any of the following:
+
+- You need greater performance than Angular can offer (two way data binding, Object.observe, too many scope watchers on the page) and React is typically more performant due to the Virtual DOM and other optimizations it can make
+
+- React offers an easier way to think about the state of your UI; instead of data flowing both ways between controller and view as in two way data binding, React typically eschews this for a more unidirectional/reactive paradigm
+
+- Someone in the React community released a component that you would like to try out
+
+- You're already deep into an Angular application and can't move away, but would like to experiment with React
+
+# Installation
 
 Install via Bower:
 
@@ -15,6 +25,8 @@ or via npm:
 ```
 npm install ngreact
 ```
+
+# Usage
 
 Then, just make sure Angular, React, and ngReact are on the page,
 ```
@@ -40,11 +52,11 @@ Specifically, ngReact is composed of:
 - `react-component`, an Angular directive that delegates off to a React Component
 - `reactDirective`, a service for converting React components into the `react-component` Angular directive
 
-**ngReact** can be used in existing angular applications, to replace areas of views with react components.
+**ngReact** can be used in existing angular applications, to replace entire or partial views with react components.
 
 ## The react-component directive
 
-The reactComponent directive allows you to add React Components to your angular views.
+The reactComponent directive is a generic wrapper for embedding your React components.
 
 With an Angular app and controller declaration like this:
 
@@ -85,7 +97,11 @@ The component can be used in an Angular view using the react-component directive
 
 ## The reactDirective service
 
-With the `reactDirective` service you can create named directives backed by React components. The service takes the name of the React component as the argument.
+The reactDirective factory, in contrast to the reactComponent directive, is meant to create specific directives corresponding to React components. In the background, this actually creates and and sets up reactComponent directives specifically bound to the specified React component.
+
+If, for example, you wanted to use the same React component in multiple places, you'd have to specify &lt;react-component name="yourComponent" props="props" /&gt; repeatedly, but if you used reactDirective factory, you could create a yourComponent directive and simply use that everywhere.
+
+The service takes the name of the React component as the argument.
 
 ```javascript
 app.directive('hello', function(reactDirective) {
@@ -103,7 +119,7 @@ This creates a directive that can be used like this:
 </body>
 ```
 
-## Reusing Angular injectables
+## Reusing Angular Injectables
 
 In an existing Angular application, you'll often have existing services or filters that you wish to access from your React component. These can be retrieved using Angular's dependency injection. The React component will still be render-able as aforementioned, using the react-component directive.
 

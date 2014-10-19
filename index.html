@@ -1,0 +1,236 @@
+<!doctype html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>NgReact - React Components in Angular</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css">
+
+    <style>
+      html, body {
+        margin: 20px;
+      }
+      body {
+        background: #fafafa;
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: #333;
+      }
+      header {
+        position: fixed;
+        top: 0px;
+        left: 0px;
+        width: 100%;
+        background-color: white;
+        padding: 25px 35px;
+        border-bottom: 1px solid #CCC;
+      }
+      ul.none {
+        list-style-type: none;
+        margin-bottom: 5px;
+        padding-right: 10px;
+        padding-left: 0px;
+      }
+      ul.none li {
+        display: inline-block;
+        padding-right: 10px;
+      }
+      #pageContainer {
+        margin-top: 90px;
+        max-width: 720px;
+      }
+      h1 {
+        margin-top: 50px;
+      }
+    </style>
+</head>
+  <body>
+
+    <header>
+
+      <section>
+        <ul class="none">
+          <li><a href='/index.html'><strong>ngReact</strong></a></li>
+          <li><a href='/index.html#examples'>Examples</a></li>
+          <li><a href='docs/ngReact.html'>Documentation</a></li>
+          <li><a target="_blank" href='https://github.com/davidchang/ngReact'>Github Repo</a></li>
+        </ul>
+      </section>
+    </header>
+
+    <div id='pageContainer'>
+      <h1>NgReact</h1>
+
+      <h3>Intro</h3>
+      <section>
+        <p>Facebook's React library is designed to be used as a view component atop other JavaScript frameworks. NgReact is a small library providing helpers and showing examples of achieving interoperability between React and Angular.</p>
+        <p>Motivation for this could be any of the following:
+          <ul>
+            <li>You need greater performance than Angular can offer (two way data binding, Object.observe, too many scope watchers on the page) and React is typically more performant due to the Virtual DOM and other optimizations it can make</li>
+            <li>React offers an easier way to think about the state of your UI; instead of data flowing both ways between controller and view as in two way data binding, React typically eschews this for a more unidirectional/reactive paradigm</li>
+            <li>Someone in the React community released a component that you would like to try out</li>
+            <li>You're already deep into an Angular application and can't move away, but would like to experiment with React</li>
+          </ul>
+        </p>
+      </section>
+
+      <h3>Installation</h3>
+      <section>
+        <p>Via Bower:</p>
+        <pre>bower install ngReact</pre>
+        <p>Or via npm:</p>
+        <pre>npm install ngreact</pre>
+      </section>
+
+      <h3>Usage</h3>
+      <section>
+        <p>In your HTML:</p>
+        <pre>
+&lt;script src="bower_components/angular/angular.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/react/react.js"&gt;&lt;/script&gt;
+&lt;script src="bower_components/ngReact/ngReact.min.js"&gt;&lt;/script&gt;</pre>
+
+        <p>Declare 'react' as a dependency of your Angular module:</p>
+        <pre>
+angular.module('app', ['react']);</pre>
+      </section>
+
+      <h3 id="examples">Examples</h3>
+      <section>
+        <ul>
+          <li><a href="examples/hello">Simple "Hello World"</a></li>
+          <li><a href="examples/table">Intermediate Large Table</a></li>
+          <li><a href="examples/use-filter">Using injectables like filters inside of React components</a></li>
+        </ul>
+      </section>
+
+      <h1>Features</h1>
+
+      <h3>reactComponent Directive</h3>
+      <section>
+        <p>The reactComponent directive is a generic wrapper for embedding your React components.</p>
+
+        <p>With an Angular app and controller declaration like this:</p>
+
+        <pre>
+angular.module('app', ['react'])
+  .controller('helloController', function($scope) {
+    $scope.person = { fname: 'Clark', lname: 'Kent' };
+  });
+        </pre>
+
+        <p>And a React Component like this</p>
+
+        <pre>
+/** @jsx React.DOM */
+app.value('HelloComponent', React.createClass({
+  propTypes: {
+    fname : React.PropTypes.string.isRequired,
+    lname : React.PropTypes.string.isRequired
+  },
+  render: function() {
+    return <span>Hello {this.props.fname} {this.props.lname}</span>;
+  }
+}));
+        </pre>
+
+        <p>The component can be used in an Angular view using the react-component directive like so, where:</p>
+
+        <ul>
+          <li>the name attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name, and</li>
+          <li>the props attribute indicates what scope properties should be exposed to the React component</li>
+        </ul>
+
+        <pre>
+&lt;body ng-app="app"&gt;
+  &lt;div ng-controller="helloController"&gt;
+    &lt;react-component name="HelloComponent" props="person" /&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+        </pre>
+      </section>
+
+      <h3>reactDirective Factory</h3>
+      <section>
+        <p>The reactDirective factory, in contrast to the reactComponent directive, is meant to create specific directives corresponding to React components. In the background, this actually creates and and sets up reactComponent directives specifically bound to the specified React component.</p>
+
+        <p>If, for example, you wanted to use the same React component in multiple places, you'd have to specify &lt;react-component name="yourComponent" props="props" /&gt; repeatedly, but if you used reactDirective factory, you could create a yourComponent directive and simply use that everywhere.</p>
+
+        <p>The service takes the name of the React component as the argument.</p>
+
+        <pre>
+app.directive('hello', function(reactDirective) {
+  return reactDirective('Hello');
+} );
+        </pre>
+
+This creates a directive that can be used like this:
+
+        <pre>
+&lt;body ng-app="app"&gt;
+  &lt;div ng-controller="helloController"&gt;
+    &lt;hello fname="person.fname" lname="person.lname"/&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+        </pre>
+
+      </section>
+
+      <h3>Reusing Angular Injectables</h3>
+      <section>
+        <p>In an existing Angular application, you'll often have existing services or filters that you wish to access from your React component. These can be retrieved using Angular's dependency injection. The React component will still be render-able as aforementioned, using the react-component directive.</p>
+
+        <pre>
+app.filter('hero', function() {
+  return function(person) {
+    if (person.fname === 'Clark' && person.lname === 'Kent') {
+      return 'Superman';
+    }
+    return person.fname + ' ' + person.lname;
+  };
+});
+
+/** @jsx React.DOM */
+app.factory('HelloComponent', function($filter) {
+  return React.createClass({
+    propTypes: {
+      person: React.PropTypes.object.isRequired,
+    },
+    render: function() {
+      return <span>Hello $filter('hero')(this.props.person)</span>;
+    }
+  });
+});
+        </pre>
+
+        <pre>
+&lt;body ng-app="app"&gt;
+  &lt;div ng-controller="helloController"&gt;
+    &lt;react-component name="HelloComponent" props="person" /&gt;
+  &lt;/div&gt;
+&lt;/body&gt;
+        </pre>
+      </section>
+
+      <h1>Community</h1>
+
+      <h3>Maintainers</h3>
+      <ul>
+        <li>Kasper Bøgebjerg Pedersen (<a href="https://github.com/kasperp">@kasperp</a>)</li>
+        <li>David Chang (<a href="https://github.com/davidchang">@davidchang</a>)</li>
+      </ul>
+
+      <h3>Contributors</h3>
+
+      <ul>
+        <li>Tihomir Kit (<a href="https://github.com/pootzko">@pootzko</a>)</li>
+      </ul>
+
+    </div>
+
+</body>
+</html>
