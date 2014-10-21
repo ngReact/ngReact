@@ -40,10 +40,12 @@
         }
 
         // ensure the specified React component is accessible, and fail fast if it's not
-        var reactComponent = $injector.get(reactComponentName) || window[reactComponentName];
-        if (!reactComponent) {
-          throw Error('Cannot find react component ' + reactComponentName);
-        }
+        var reactComponent;
+        try {
+          reactComponent = $injector.get(reactComponentName);
+        } catch( e ) { }
+
+        reactComponent = reactComponent || window[reactComponentName];
 
         // wraps a function with scope.$apply
         var applied = function(fn) {
@@ -119,7 +121,13 @@
         link: function(scope, elm, attrs) {
 
           // ensure the specified React component is accessible, and fail fast if it's not
-          var reactComponent = $injector.get(reactComponentName) || window[reactComponentName];
+          var reactComponent;
+          try {
+            reactComponent = $injector.get(reactComponentName);
+          } catch( e ) { }
+
+          reactComponent = reactComponent || window[reactComponentName];
+
           if (!reactComponent) {
             throw Error('Cannot find react component ' + reactComponentName);
           }
