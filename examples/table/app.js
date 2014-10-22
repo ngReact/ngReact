@@ -55,6 +55,6 @@ app.value( "MyTable", React.createClass( {
   }
 } ) );
 
-app.directive( 'myTable', function( reactDirective ) {
-  return reactDirective( 'MyTable' );
+app.directive( 'myTable', function( reactDirective, MyTable ) {
+  return reactDirective( MyTable );
 } );
