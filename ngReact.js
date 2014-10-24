@@ -114,6 +114,11 @@
   var reactDirective = function($timeout) {
     return function(reactComponent, propNames) {
 
+      // The first argument must be present
+      if (!reactComponent) {
+        throw new Error('ReactComponent attribute must be specified');
+      }
+
       // Gather properties that will be watched for changes in the directive
       // and bind them to the isolated scope.
       var propNames = propNames || Object.keys(reactComponent.propTypes || {});
