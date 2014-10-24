@@ -16,17 +16,18 @@ app.filter( 'hero', function() {
 app.factory( "Hello", function( $filter ) {
   return React.createClass( {
     propTypes: {
-      person: React.PropTypes.object.isRequired,
+      fname: React.PropTypes.string.isRequired,
+      lname: React.PropTypes.string.isRequired
     },
 
     render: function() {
       return React.DOM.span( null,
-        'Hello ' + $filter( 'hero' )( this.props.person )
+        'Hello ' + $filter( 'hero' )( this.props )
       );
     }
   } );
 } );
 
-app.directive( 'hello', function( reactDirective ) {
-  return reactDirective( 'Hello' );
+app.directive( 'hello', function( reactDirective, Hello ) {
+  return reactDirective( Hello );
 } );

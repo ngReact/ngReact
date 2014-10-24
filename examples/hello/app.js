@@ -17,6 +17,6 @@ app.value( "Hello", React.createClass( {
   }
 } ) );
 
-app.directive( 'hello', function( reactDirective ) {
-  return reactDirective( 'Hello' );
+app.directive( 'hello', function( reactDirective, Hello ) {
+  return reactDirective( Hello );
 } );
