@@ -30,8 +30,10 @@
   var reactComponent = function($timeout, $injector) {
     return {
       restrict: 'E',
-      replace: true,
-      link: function(scope, elem, attrs) {
+      scope: {
+        props: '='
+      },
+      compile: function (elem, attrs) {
         var reactComponentName = attrs.name;
 
         // a React component name must be specified
@@ -45,41 +47,26 @@
           throw Error('Cannot find react component ' + reactComponentName);
         }
 
-        // wraps a function with scope.$apply
-        var applied = function(fn) {
-          return function() {
-            var args = arguments;
-            scope.$apply(function() { fn.apply( null, args ); });
+        return function(scope, elem, attrs) {
+          // render React component, with props
+          var renderComponent = function() {
+            $timeout(function() {
+              React.renderComponent(reactComponent(scope.props), elem[0]);
+            });
           };
-        };
 
-        // render React component, with scope[attrs.props] being passed in as the component props
-        var renderComponent = function() {
-          var scopeProps = scope[attrs.props] || {};
+          // If there are props, re-render when they change
+          if (attrs.props) {
+            scope.$watch('props', renderComponent, true);
+          } else {
+            renderComponent();
+          }
 
-          var props = {};
-          Object.keys(scopeProps).forEach(function(key) {
-            var value = scopeProps[key];
-            // wrap functions in a function that ensures they are scope.$applied
-            // ensures that when function is called from a React component
-            // the Angular digest cycle is run
-            props[key] = angular.isFunction(value) ? applied(value) : value;
-          });
-
-          $timeout(function() {
-            React.renderComponent(reactComponent(props), elem[0]);
+          // cleanup when scope is destroyed
+          scope.$on('$destroy', function() {
+            React.unmountComponentAtNode(elem[0]);
           });
         };
-
-        // If there are props, re-render when they change
-        attrs.props ?
-          scope.$watch(attrs.props, renderComponent, true) :
-          renderComponent();
-
-        // cleanup when scope is destroyed
-        scope.$on('$destroy', function() {
-          React.unmountComponentAtNode(elem[0]);
-        });
       }
     };
   };
