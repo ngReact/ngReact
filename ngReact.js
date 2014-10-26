@@ -8,6 +8,64 @@
 (function(React, angular) {
   'use strict';
 
+  // get a react component from name (components can be an angular injectable e.g. value, factory or
+  // available on window
+  function getReactComponent( name, $injector ) {
+    var reactComponentName = name;
+
+    // a React component name must be specified
+    if (!reactComponentName) {
+      throw new Error('ReactComponent name attribute must be specified');
+    }
+
+    // ensure the specified React component is accessible, and fail fast if it's not
+    var reactComponent;
+    try {
+      reactComponent = $injector.get(reactComponentName);
+    } catch( e ) { }
+
+    reactComponent = reactComponent || window[name];
+
+    if (!reactComponent) {
+      throw Error('Cannot find react component ' + reactComponentName);
+    }
+
+    return reactComponent;
+  }
+
+  // wraps a function with scope.$apply, if already applied just return
+  function applied(fn, scope) {
+    if ( fn.applied ) {
+      return fn;
+    }
+    return function() {
+      var args = arguments;
+      scope.$apply(function() {
+        fn.applied = true;
+        fn.apply( null, args );
+      });
+    };
+  }
+
+  // wraps all functions on obj in scope.$apply
+  function applyFunctions(obj, scope) {
+    return Object.keys(obj || {}).reduce(function(prev,key) {
+      var value = obj[key];
+      // wrap functions in a function that ensures they are scope.$applied
+      // ensures that when function is called from a React component
+      // the Angular digest cycle is run
+      prev[key] = angular.isFunction(value) ? applied(value, scope) : value;
+      return prev;
+    }, {});
+  }
+
+  // render React component, with scope[attrs.props] being passed in as the component props
+  function renderComponent(component, props, $timeout, elem) {
+    $timeout(function() {
+      React.renderComponent(component(props), elem[0]);
+    });
+  }
+
   // # reactComponent
   // Directive that allows React components to be used in Angular templates.
   //
@@ -32,51 +90,19 @@
       restrict: 'E',
       replace: true,
       link: function(scope, elem, attrs) {
-        var reactComponentName = attrs.name;
+        var reactComponent = getReactComponent(attrs.name, $injector);
 
-        // a React component name must be specified
-        if (!reactComponentName) {
-          throw new Error('ReactComponent name attribute must be specified');
-        }
+        var renderMyComponent = function() {
+          var scopeProps = scope[attrs.props];
+          var props = applyFunctions(scopeProps, scope);
 
-        // ensure the specified React component is accessible, and fail fast if it's not
-        var reactComponent;
-        try {
-          reactComponent = $injector.get(reactComponentName);
-        } catch( e ) { }
-
-        reactComponent = reactComponent || window[reactComponentName];
-
-        // wraps a function with scope.$apply
-        var applied = function(fn) {
-          return function() {
-            var args = arguments;
-            scope.$apply(function() { fn.apply( null, args ); });
-          };
-        };
-
-        // render React component, with scope[attrs.props] being passed in as the component props
-        var renderComponent = function() {
-          var scopeProps = scope[attrs.props] || {};
-
-          var props = {};
-          Object.keys(scopeProps).forEach(function(key) {
-            var value = scopeProps[key];
-            // wrap functions in a function that ensures they are scope.$applied
-            // ensures that when function is called from a React component
-            // the Angular digest cycle is run
-            props[key] = angular.isFunction(value) ? applied(value) : value;
-          });
-
-          $timeout(function() {
-            React.renderComponent(reactComponent(props), elem[0]);
-          });
+          renderComponent(reactComponent, props, $timeout, elem);
         };
 
         // If there are props, re-render when they change
         attrs.props ?
-          scope.$watch(attrs.props, renderComponent, true) :
-          renderComponent();
+          scope.$watch(attrs.props, renderMyComponent, true) :
+          renderMyComponent();
 
         // cleanup when scope is destroyed
         scope.$on('$destroy', function() {
@@ -113,47 +139,39 @@
   //
   //     <hello name="name"/>
   //
-  var reactDirective = function($injector) {
+  var reactDirective = function($timeout, $injector) {
     return function(reactComponentName, propNames) {
       return {
         restrict: 'E',
         replace: true,
-        link: function(scope, elm, attrs) {
-
-          // ensure the specified React component is accessible, and fail fast if it's not
-          var reactComponent;
-          try {
-            reactComponent = $injector.get(reactComponentName);
-          } catch( e ) { }
-
-          reactComponent = reactComponent || window[reactComponentName];
-
-          if (!reactComponent) {
-            throw Error('Cannot find react component ' + reactComponentName);
-          }
+        link: function(scope, elem, attrs) {
+          var reactComponent = getReactComponent(reactComponentName, $injector);
 
           // if propNames is not defined, fall back to use the React component's propTypes if present
           propNames = propNames || Object.keys(reactComponent.propTypes || {});
 
           // for each of the properties, get their scope value and set it to scope.props
-          var updateProps = function() {
+          var renderMyComponent = function() {
             var props = {};
             propNames.forEach(function(propName) {
               props[propName] = scope.$eval(attrs[propName]);
             });
-
-            scope.props = props;
+            renderComponent(reactComponent, applyFunctions(props, scope), $timeout, elem);
           };
 
           // watch each property name and trigger an update whenever something changes,
           // to update scope.props with new values
           propNames.forEach(function(k) {
-            scope.$watch(attrs[k], updateProps, true);
+            scope.$watch(attrs[k], renderMyComponent, true);
           });
 
-          updateProps();
-        },
-        template: '<react-component name="' + reactComponentName + '" props="props"></react-component>'
+          renderMyComponent();
+
+          // cleanup when scope is destroyed
+          scope.$on('$destroy', function() {
+            React.unmountComponentAtNode(elem[0]);
+          });
+        }
       };
     };
   };
@@ -161,6 +179,6 @@
   // create the end module without any dependencies, including reactComponent and reactDirective
   angular.module('react', [])
     .directive('reactComponent', ['$timeout', '$injector', reactComponent])
-    .factory('reactDirective', ['$injector', reactDirective]);
+    .factory('reactDirective', ['$timeout','$injector', reactDirective]);
 
 })(window.React, window.angular);
