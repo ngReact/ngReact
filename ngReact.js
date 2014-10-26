@@ -11,23 +11,26 @@
   // get a react component from name (components can be an angular injectable e.g. value, factory or
   // available on window
   function getReactComponent( name, $injector ) {
-    var reactComponentName = name;
+    // name already is a component return it
+    if (React.isValidClass(name)) {
+      return name;
+    }
 
     // a React component name must be specified
-    if (!reactComponentName) {
+    if (!name) {
       throw new Error('ReactComponent name attribute must be specified');
     }
 
     // ensure the specified React component is accessible, and fail fast if it's not
     var reactComponent;
     try {
-      reactComponent = $injector.get(reactComponentName);
-    } catch( e ) { }
+      reactComponent = $injector.get(name);
+    } catch(e) { }
 
     reactComponent = reactComponent || window[name];
 
     if (!reactComponent) {
-      throw Error('Cannot find react component ' + reactComponentName);
+      throw Error('Cannot find react component ' + name);
     }
 
     return reactComponent;
@@ -35,7 +38,7 @@
 
   // wraps a function with scope.$apply, if already applied just return
   function applied(fn, scope) {
-    if ( fn.applied ) {
+    if (fn.applied) {
       return fn;
     }
     return function() {

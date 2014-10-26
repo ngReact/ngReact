@@ -69,6 +69,14 @@
         expect(elm.text().trim()).toEqual('Hello');
       });
 
+      it('should create with component', function() {
+        compileProvider.directive('helloFromComponent', function(reactDirective){
+          return reactDirective(Hello);
+        });
+        var elm = compileElement('<hello-from-component/>');
+        expect(elm.text().trim()).toEqual('Hello');
+      });
+
       it('should create injectable component with name', function() {
         compileProvider.directive('injectedHello', function(reactDirective){
           return reactDirective('InjectedHello');

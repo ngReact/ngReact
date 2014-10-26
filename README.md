@@ -71,7 +71,7 @@ And a React Component like this
 
 ```javascript
 /** @jsx React.DOM */
-app.value('HelloComponent', React.createClass({
+var HelloComponent = React.createClass({
   propTypes: {
     fname : React.PropTypes.string.isRequired,
     lname : React.PropTypes.string.isRequired
@@ -79,7 +79,8 @@ app.value('HelloComponent', React.createClass({
   render: function() {
     return <span>Hello {this.props.fname} {this.props.lname}</span>;
   }
-}));
+})
+app.value('HelloComponent', HelloComponent);
 ```
 
 The component can be used in an Angular view using the react-component directive like so, where:
@@ -101,7 +102,15 @@ The reactDirective factory, in contrast to the reactComponent directive, is mean
 
 If, for example, you wanted to use the same React component in multiple places, you'd have to specify &lt;react-component name="yourComponent" props="props" /&gt; repeatedly, but if you used reactDirective factory, you could create a yourComponent directive and simply use that everywhere.
 
-The service takes the name of the React component as the argument.
+The service takes the React component as the argument.
+
+```javascript
+app.directive('hello', function(reactDirective) {
+  return reactDirective(HelloComponent);
+} );
+```
+
+Alternatively you can provide the name of the component
 
 ```javascript
 app.directive('hello', function(reactDirective) {
