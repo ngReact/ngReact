@@ -105,7 +105,7 @@ The service takes the name of the React component as the argument.
 
 ```javascript
 app.directive('hello', function(reactDirective) {
-  return reactDirective('Hello');
+  return reactDirective('HelloComponent');
 } );
 ```
 
