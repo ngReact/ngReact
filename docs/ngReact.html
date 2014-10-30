@@ -150,17 +150,17 @@ available on window</p>
               <p>wraps all functions on obj in scope.$apply</p>
 
             </div>
-
+            
             <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">applyFunctions</span><span class="hljs-params">(obj, scope)</span> </span>{
     <span class="hljs-keyword">return</span> <span class="hljs-built_in">Object</span>.keys(obj || {}).reduce(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(prev,key)</span> </span>{
       <span class="hljs-keyword">var</span> value = obj[key];</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-8">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-8">&#182;</a>
               </div>
@@ -174,32 +174,32 @@ the Angular digest cycle is run</p>
       <span class="hljs-keyword">return</span> prev;
     }, {});
   }</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-9">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-9">&#182;</a>
               </div>
               <p>render React component, with scope[attrs.props] being passed in as the component props</p>
 
             </div>
-
+            
             <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">renderComponent</span><span class="hljs-params">(component, props, $timeout, elem)</span> </span>{
     $timeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
       React.renderComponent(component(props), elem[<span class="hljs-number">0</span>]);
     });
   }</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-10">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-10">&#182;</a>
               </div>
@@ -219,7 +219,7 @@ The ‘props’ attribute is optional and is passed to the component.</p>
 }));
 </code></pre>
             </div>
-
+            
             <div class="content"><div class='highlight'><pre>  <span class="hljs-keyword">var</span> reactComponent = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">($timeout, $injector)</span> </span>{
     <span class="hljs-keyword">return</span> {
       restrict: <span class="hljs-string">'E'</span>,
@@ -365,20 +365,20 @@ to update scope.props with new values</p>
           });
 
           renderMyComponent();</pre></div></div>
-
+            
         </li>
-
-
+        
+        
         <li id="section-17">
             <div class="annotation">
-
+              
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-17">&#182;</a>
               </div>
               <p>cleanup when scope is destroyed</p>
 
             </div>
-
+            
             <div class="content"><div class='highlight'><pre>          scope.$on(<span class="hljs-string">'$destroy'</span>, <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
             React.unmountComponentAtNode(elem[<span class="hljs-number">0</span>]);
           });

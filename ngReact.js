@@ -11,8 +11,8 @@
   // get a react component from name (components can be an angular injectable e.g. value, factory or
   // available on window
   function getReactComponent( name, $injector ) {
-    // name already is a component return it
-    if (React.isValidClass(name)) {
+    // if name is a function assume it is component and return it
+    if (angular.isFunction(name)) {
       return name;
     }
 
@@ -65,7 +65,7 @@
   // render React component, with scope[attrs.props] being passed in as the component props
   function renderComponent(component, props, $timeout, elem) {
     $timeout(function() {
-      React.renderComponent(component(props), elem[0]);
+      React.render(React.createElement(component, props), elem[0]);
     });
   }
 

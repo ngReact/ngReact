@@ -61,7 +61,7 @@
         window.GlobalHello = undefined;
       });
 
-      it('should create global component with name', function() {
+      iit('should create global component with name', function() {
         compileProvider.directive('globalHello', function(reactDirective){
           return reactDirective('GlobalHello');
         });
