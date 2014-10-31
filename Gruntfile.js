@@ -43,10 +43,7 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-docco');
-  grunt.loadNpmTasks('grunt-karma');
+  require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['uglify', 'karma:single', 'docco']);
 };
