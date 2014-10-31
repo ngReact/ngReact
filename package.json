@@ -3,15 +3,18 @@
   "repository": "https://github.com/davidchang/ngReact.git",
   "version": "0.1.0",
   "dependencies": {
-    "angular": "~1.2.20",
+    "angular": "^1.2.23",
     "react": "~0.11.2"
   },
   "devDependencies": {
     "grunt": "~0.4.1",
     "grunt-contrib-uglify": "~0.2.0",
     "grunt-contrib-watch": "~0.5.3",
-    "load-grunt-tasks": "~0.1.0",
-    "grunt-docco": "^0.3.3"
+    "grunt-docco": "^0.3.3",
+    "grunt-karma": "~0.9.0",
+    "karma-jasmine": "~0.1.5",
+    "karma-phantomjs-launcher": "^0.1.4",
+    "load-grunt-tasks": "~0.1.0"
   },
   "engines": {
     "node": ">=0.8.0"

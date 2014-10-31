@@ -65,7 +65,7 @@ The ‘props’ attribute is optional and is passed to the component.</p>
     <span class="hljs-keyword">return</span> {
       restrict: <span class="hljs-string">'E'</span>,
       replace: <span class="hljs-literal">true</span>,
-      link: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( scope, elem, attrs )</span> </span>{
+      link: <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(scope, elem, attrs)</span> </span>{
         <span class="hljs-keyword">var</span> reactComponentName = attrs.name;</pre></div></div>
             
         </li>
@@ -98,10 +98,12 @@ The ‘props’ attribute is optional and is passed to the component.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> reactComponent = $injector.get(reactComponentName) || <span class="hljs-built_in">window</span>[reactComponentName];
-        <span class="hljs-keyword">if</span> (!reactComponent) {
-          <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Cannot find react component '</span> + reactComponentName);
-        }</pre></div></div>
+            <div class="content"><div class='highlight'><pre>        <span class="hljs-keyword">var</span> reactComponent;
+        <span class="hljs-keyword">try</span> {
+          reactComponent = $injector.get(reactComponentName);
+        } <span class="hljs-keyword">catch</span>( e ) { }
+
+        reactComponent = reactComponent || <span class="hljs-built_in">window</span>[reactComponentName];</pre></div></div>
             
         </li>
         
@@ -254,7 +256,13 @@ as props.</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> reactComponent = $injector.get(reactComponentName) || <span class="hljs-built_in">window</span>[reactComponentName];
+            <div class="content"><div class='highlight'><pre>          <span class="hljs-keyword">var</span> reactComponent;
+          <span class="hljs-keyword">try</span> {
+            reactComponent = $injector.get(reactComponentName);
+          } <span class="hljs-keyword">catch</span>( e ) { }
+
+          reactComponent = reactComponent || <span class="hljs-built_in">window</span>[reactComponentName];
+
           <span class="hljs-keyword">if</span> (!reactComponent) {
             <span class="hljs-keyword">throw</span> <span class="hljs-built_in">Error</span>(<span class="hljs-string">'Cannot find react component '</span> + reactComponentName);
           }</pre></div></div>

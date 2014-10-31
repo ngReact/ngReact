@@ -154,6 +154,26 @@ app.factory('HelloComponent', function($filter) {
 </body>
 ```
 
+## Developing
+Before starting development run
+
+```bash
+npm install
+bower install
+```
+
+Build minified version, documentation and run tests with
+
+```bash
+grunt
+```
+
+Continually run test during development with
+
+```bash
+grunt karma:background watch
+```
+
 # Community
 
 ## Maintainers

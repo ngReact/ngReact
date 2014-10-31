@@ -8,5 +8,9 @@
   },
   "main": [
     "ngReact.js"
-  ]
+  ],
+  "devDependencies": {
+    "angular-mocks": "~1.2.20",
+    "es5-shim": "~4.0.3"
+  }
 }
