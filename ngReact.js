@@ -38,13 +38,13 @@
 
   // wraps a function with scope.$apply, if already applied just return
   function applied(fn, scope) {
-    if (fn.applied) {
+    if (fn.wrappedInApply) {
       return fn;
     }
     return function() {
       var args = arguments;
       scope.$apply(function() {
-        fn.applied = true;
+        fn.wrappedInApply = true;
         fn.apply( null, args );
       });
     };
