@@ -63,9 +63,9 @@
   }
 
   // render React component, with scope[attrs.props] being passed in as the component props
-  function renderComponent(component, props, $timeout, elem) {
+  function render(component, props, $timeout, elem) {
     $timeout(function() {
-      React.renderComponent(component(props), elem[0]);
+      React.render(component(props), elem[0]);
     });
   }
 
@@ -99,7 +99,7 @@
           var scopeProps = scope[attrs.props];
           var props = applyFunctions(scopeProps, scope);
 
-          renderComponent(reactComponent, props, $timeout, elem);
+          render(reactComponent, props, $timeout, elem);
         };
 
         // If there are props, re-render when they change
@@ -159,7 +159,7 @@
             propNames.forEach(function(propName) {
               props[propName] = scope.$eval(attrs[propName]);
             });
-            renderComponent(reactComponent, applyFunctions(props, scope), $timeout, elem);
+            render(reactComponent, applyFunctions(props, scope), $timeout, elem);
           };
 
           // watch each property name and trigger an update whenever something changes,
