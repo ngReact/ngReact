@@ -12,7 +12,7 @@
   // available on window
   function getReactComponent( name, $injector ) {
     // name already is a component return it
-    if (React.isValidClass(name)) {
+    if (typeof name === 'function') {
       return name;
     }
 
