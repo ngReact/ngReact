@@ -60,11 +60,11 @@ available on window</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-3">&#182;</a>
               </div>
-              <p>name already is a component return it</p>
+              <p>if name is a function assume it is component and return it</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (React.isValidClass(name)) {
+            <div class="content"><div class='highlight'><pre>    <span class="hljs-keyword">if</span> (angular.isFunction(name)) {
       <span class="hljs-keyword">return</span> name;
     }</pre></div></div>
             
@@ -190,7 +190,7 @@ the Angular digest cycle is run</p>
             
             <div class="content"><div class='highlight'><pre>  <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">renderComponent</span><span class="hljs-params">(component, props, $timeout, elem)</span> </span>{
     $timeout(<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">()</span> </span>{
-      React.renderComponent(component(props), elem[<span class="hljs-number">0</span>]);
+      React.render(React.createElement(component, props), elem[<span class="hljs-number">0</span>]);
     });
   }</pre></div></div>
             
