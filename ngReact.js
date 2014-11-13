@@ -5,6 +5,16 @@
 // - reactComponent (generic directive for delegating off to React Components)
 // - reactDirective (factory for creating specific directives that correspond to reactComponent directives)
 
+var React, angular;
+
+if (typeof module !== 'undefined' && module.exports) {
+  React = require('react');
+  angular = require('angular');
+} else {
+  React = window.React;
+  angular = window.angular;
+}
+
 (function(React, angular) {
   'use strict';
 
@@ -184,4 +194,4 @@
     .directive('reactComponent', ['$timeout', '$injector', reactComponent])
     .factory('reactDirective', ['$timeout','$injector', reactDirective]);
 
-})(window.React, window.angular);
+})(React, angular);
