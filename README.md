@@ -193,3 +193,4 @@ grunt karma:background watch
 ## Contributors
 
 - Tihomir Kit (@pootzko)
+- Alexander Beletsky (@alexanderbeletsky)
