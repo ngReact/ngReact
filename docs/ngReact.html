@@ -32,6 +32,16 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>
+<span class="hljs-keyword">var</span> React, angular;
+
+<span class="hljs-keyword">if</span> (<span class="hljs-keyword">typeof</span> <span class="hljs-built_in">module</span> !== <span class="hljs-string">'undefined'</span> &amp;&amp; <span class="hljs-built_in">module</span>.exports) {
+  React = <span class="hljs-built_in">require</span>(<span class="hljs-string">'react'</span>);
+  angular = <span class="hljs-built_in">require</span>(<span class="hljs-string">'angular'</span>);
+} <span class="hljs-keyword">else</span> {
+  React = <span class="hljs-built_in">window</span>.React;
+  angular = <span class="hljs-built_in">window</span>.angular;
+}
+
 (<span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(React, angular)</span> </span>{
 <span class="hljs-pi">  'use strict'</span>;</pre></div></div>
             
@@ -404,7 +414,7 @@ to update scope.props with new values</p>
     .directive(<span class="hljs-string">'reactComponent'</span>, [<span class="hljs-string">'$timeout'</span>, <span class="hljs-string">'$injector'</span>, reactComponent])
     .factory(<span class="hljs-string">'reactDirective'</span>, [<span class="hljs-string">'$timeout'</span>,<span class="hljs-string">'$injector'</span>, reactDirective]);
 
-})(<span class="hljs-built_in">window</span>.React, <span class="hljs-built_in">window</span>.angular);</pre></div></div>
+})(React, angular);</pre></div></div>
             
         </li>
         
