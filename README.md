@@ -171,7 +171,7 @@ npm install
 bower install
 ```
 
-Build minified version, documentation and run tests with
+Build minified version and run tests with
 
 ```bash
 grunt
