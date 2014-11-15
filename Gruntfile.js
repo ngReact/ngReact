@@ -2,8 +2,8 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     watch : {
-      files: ['ngReact.js'],
-      tasks: ['uglify'],
+      files: ['ngReact.js', 'tests/*.js'],
+      tasks: ['uglify', 'karma:background:run'],
     },
     uglify: {
       build : {
@@ -19,6 +19,20 @@ module.exports = function(grunt) {
         }
       }
     },
+    karma: {
+      options: {
+        configFile: 'karma.config.js'
+      },
+      background: {
+        autoWatch: false,
+        background: true,
+        singleRun: false
+      },
+      single: {
+        autoWatch: false,
+        singleRun: true
+      }
+    },
     docco: {
       build : {
         src: ['ngReact.js'],
@@ -29,9 +43,11 @@ module.exports = function(grunt) {
     }
   });
 
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-docco');
+  require('load-grunt-tasks')(grunt);
 
-  grunt.registerTask('default', ['uglify', 'docco']);
+  grunt.registerTask('default', ['uglify', 'karma:single']);
+
+  grunt.registerTask('build', ['uglify']);
+  grunt.registerTask('test', ['karma:single']);
+  grunt.registerTask('docs', ['docco']);
 };

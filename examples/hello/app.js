@@ -4,7 +4,7 @@ app.controller( 'mainCtrl', function( $scope ) {
   $scope.person = { fname: 'Clark', lname: 'Kent' };
 } );
 
-app.value( "Hello", React.createClass( {
+var Hello = React.createClass( {
   propTypes: {
     fname: React.PropTypes.string.isRequired,
     lname: React.PropTypes.string.isRequired
@@ -15,8 +15,10 @@ app.value( "Hello", React.createClass( {
       'Hello ' + this.props.fname + ' ' + this.props.lname
     );
   }
-} ) );
+} );
+
+app.value( "Hello", Hello );
 
 app.directive( 'hello', function( reactDirective ) {
-  return reactDirective( 'Hello' );
+  return reactDirective( Hello );
 } );

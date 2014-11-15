@@ -71,7 +71,6 @@ And a React Component like this
 
 ```javascript
 /** @jsx React.DOM */
-app.value('HelloComponent', React.createClass({
   propTypes: {
     fname : React.PropTypes.string.isRequired,
     lname : React.PropTypes.string.isRequired
@@ -79,7 +78,8 @@ app.value('HelloComponent', React.createClass({
   render: function() {
     return <span>Hello {this.props.fname} {this.props.lname}</span>;
   }
-}));
+})
+app.value('HelloComponent', HelloComponent);
 ```
 
 The component can be used in an Angular view using the react-component directive like so, where:
@@ -101,11 +101,19 @@ The reactDirective factory, in contrast to the reactComponent directive, is mean
 
 If, for example, you wanted to use the same React component in multiple places, you'd have to specify &lt;react-component name="yourComponent" props="props" /&gt; repeatedly, but if you used reactDirective factory, you could create a yourComponent directive and simply use that everywhere.
 
-The service takes the name of the React component as the argument.
+The service takes the React component as the argument.
 
 ```javascript
 app.directive('hello', function(reactDirective) {
-  return reactDirective('Hello');
+  return reactDirective(HelloComponent);
+} );
+```
+
+Alternatively you can provide the name of the component
+
+```javascript
+app.directive('hello', function(reactDirective) {
+  return reactDirective('HelloComponent');
 } );
 ```
 
@@ -154,6 +162,26 @@ app.factory('HelloComponent', function($filter) {
 </body>
 ```
 
+## Developing
+Before starting development run
+
+```bash
+npm install
+bower install
+```
+
+Build minified version and run tests with
+
+```bash
+grunt
+```
+
+Continually run test during development with
+
+```bash
+grunt karma:background watch
+```
+
 # Community
 
 ## Maintainers
@@ -164,3 +192,4 @@ app.factory('HelloComponent', function($filter) {
 ## Contributors
 
 - Tihomir Kit (@pootzko)
+- Alexander Beletsky (@alexanderbeletsky)
