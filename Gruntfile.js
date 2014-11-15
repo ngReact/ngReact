@@ -46,4 +46,7 @@ module.exports = function(grunt) {
   require('load-grunt-tasks')(grunt);
 
   grunt.registerTask('default', ['uglify', 'karma:single', 'docco']);
+
+  grunt.registerTask('build', ['uglify', 'docco']);
+  grunt.registerTask('test', ['karma:single']);
 };
