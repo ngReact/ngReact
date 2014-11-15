@@ -7,7 +7,7 @@
 
 
 (function (root, factory) {
-  if (typeof exports === 'object') {
+  if (typeof module !== 'undefined' && module.exports) {
     // CommonJS
     module.exports = factory(root, require('react'), require('angular'));
   } else if (typeof define === 'function' && define.amd) {
@@ -17,7 +17,7 @@
     });
   } else {
     // Global Variables
-    root.ngReact = factory(root.react, root.angular);
+    root.ngReact = factory(root.React, root.angular);
   }
 }(this, function (React, angular) {
   return ngReact(React, angular);
