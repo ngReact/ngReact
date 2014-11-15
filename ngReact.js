@@ -5,17 +5,25 @@
 // - reactComponent (generic directive for delegating off to React Components)
 // - reactDirective (factory for creating specific directives that correspond to reactComponent directives)
 
-var React, angular;
 
-if (typeof module !== 'undefined' && module.exports) {
-  React = require('react');
-  angular = require('angular');
-} else {
-  React = window.React;
-  angular = window.angular;
-}
+(function (root, factory) {
+  if (typeof exports === 'object') {
+    // CommonJS
+    module.exports = factory(root, require('react'), require('angular'));
+  } else if (typeof define === 'function' && define.amd) {
+    // AMD
+    define(['react', 'angular'], function (react, angular) {
+      return (root.ngReact = factory(react, angular));
+    });
+  } else {
+    // Global Variables
+    root.ngReact = factory(root.react, root.angular);
+  }
+}(this, function (React, angular) {
+  return ngReact(React, angular);
+}));
 
-(function(React, angular) {
+function ngReact(React, angular) {
   'use strict';
 
   // get a react component from name (components can be an angular injectable e.g. value, factory or
@@ -190,8 +198,7 @@ if (typeof module !== 'undefined' && module.exports) {
   };
 
   // create the end module without any dependencies, including reactComponent and reactDirective
-  angular.module('react', [])
+  return angular.module('react', [])
     .directive('reactComponent', ['$timeout', '$injector', reactComponent])
     .factory('reactDirective', ['$timeout','$injector', reactDirective]);
-
-})(React, angular);
+}
