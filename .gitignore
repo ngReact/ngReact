@@ -1,6 +1,13 @@
-bower_components
-node_modules
+bower_components/*
+!bower_components/angular
+!bower_components/react
 
-docs
+bower_components/angular/*
+!bower_components/angular/angular.js
+
+bower_components/react/*
+!bower_components/react/react.js
+
+node_modules
 
 *.orig
