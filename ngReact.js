@@ -19,9 +19,7 @@
     // Global Variables
     root.ngReact = factory(root.React, root.angular);
   }
-}(this, function (React, angular) {
-  return ngReact(React, angular);
-}));
+}(this, ngReact));
 
 function ngReact(React, angular) {
   'use strict';
