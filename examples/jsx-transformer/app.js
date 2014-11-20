@@ -10,4 +10,4 @@ setTimeout( function() {
   } );
 
   angular.bootstrap(document, ['app']);
-}, 100 );
+}, 1000 );
