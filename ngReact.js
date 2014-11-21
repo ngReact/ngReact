@@ -19,9 +19,7 @@
     // Global Variables
     root.ngReact = factory(root.React, root.angular);
   }
-}(this, ngReact));
-
-function ngReact(React, angular) {
+}(this, function ngReact(React, angular) {
   'use strict';
 
   // get a react component from name (components can be an angular injectable e.g. value, factory or
@@ -199,4 +197,4 @@ function ngReact(React, angular) {
   return angular.module('react', [])
     .directive('reactComponent', ['$timeout', '$injector', reactComponent])
     .factory('reactDirective', ['$timeout','$injector', reactDirective]);
-}
+}));
