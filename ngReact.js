@@ -9,7 +9,7 @@
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) {
     // CommonJS
-    module.exports = factory(root, require('react'), require('angular'));
+    module.exports = factory(require('react'), require('angular'));
   } else if (typeof define === 'function' && define.amd) {
     // AMD
     define(['react', 'angular'], function (react, angular) {
@@ -19,11 +19,7 @@
     // Global Variables
     root.ngReact = factory(root.React, root.angular);
   }
-}(this, function (React, angular) {
-  return ngReact(React, angular);
-}));
-
-function ngReact(React, angular) {
+}(this, function ngReact(React, angular) {
   'use strict';
 
   // get a react component from name (components can be an angular injectable e.g. value, factory or
@@ -201,4 +197,4 @@ function ngReact(React, angular) {
   return angular.module('react', [])
     .directive('reactComponent', ['$timeout', '$injector', reactComponent])
     .factory('reactDirective', ['$timeout','$injector', reactDirective]);
-}
+}));
