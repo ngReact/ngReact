@@ -226,6 +226,13 @@ app.factory('HelloComponent', function($filter) {
         </pre>
       </section>
 
+      <h3>Jsx Transformation in the browser</h3>
+      <section>
+        <p>During testing you may want to run the <code>JSXTransformer</code> in the browser. For this to work with angular you need to make sure that the jsx code has been transformed before the angular application is bootstrapped. To do so you can <a href="https://docs.angularjs.org/guide/bootstrap#manual-initialization">manually bootstrap</a> the angular application. For a working example see the <a href="examples/jsx-transformer">jsx-transformer example</a>.</p>
+
+        <p>NOTE: The workaround for this is hacky as the angular bootstap is postponed in with a <code>setTimeout</code>, so consider <a href="http://facebook.github.io/react/docs/getting-started.html#offline-transform">transforming jsx in a build step</a>.</p>
+      </section>
+
       <h1>Community</h1>
 
       <h3>Maintainers</h3>
