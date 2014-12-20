@@ -98,7 +98,7 @@ The component can be used in an Angular view using the react-component directive
 
 ## The reactDirective service
 
-The reactDirective factory, in contrast to the reactComponent directive, is meant to create specific directives corresponding to React components. In the background, this actually creates and and sets up reactComponent directives specifically bound to the specified React component.
+The reactDirective factory, in contrast to the reactComponent directive, is meant to create specific directives corresponding to React components. In the background, this actually creates and and sets up directives specifically bound to the specified React component.
 
 If, for example, you wanted to use the same React component in multiple places, you'd have to specify &lt;react-component name="yourComponent" props="props" /&gt; repeatedly, but if you used reactDirective factory, you could create a yourComponent directive and simply use that everywhere.
 
@@ -107,7 +107,7 @@ The service takes the React component as the argument.
 ```javascript
 app.directive('hello', function(reactDirective) {
   return reactDirective(HelloComponent);
-} );
+});
 ```
 
 Alternatively you can provide the name of the component
@@ -115,7 +115,7 @@ Alternatively you can provide the name of the component
 ```javascript
 app.directive('hello', function(reactDirective) {
   return reactDirective('HelloComponent');
-} );
+});
 ```
 
 This creates a directive that can be used like this:
@@ -126,6 +126,22 @@ This creates a directive that can be used like this:
     <hello fname="person.fname" lname="person.lname"/>
   </div>
 </body>
+```
+
+The `reactDirective` service will read the React component `propTypes` and watch attributes with these names. If your react component doesn't have `propTypes` defined you can pass in an array of attribute names to watch.
+
+```javascript
+app.directive('hello', function(reactDirective) {
+  return reactDirective(HelloComponent, ['fname', 'lname']);
+});
+```
+
+If you want to change the configuration of the directive created the `reactDirective` service, e.g. change `restrict: 'E'` to `restrict: 'C'`, you can do so by passing in an object literal with the desired configuration.
+
+```javascript
+app.directive('hello', function(reactDirective) {
+  return reactDirective(HelloComponent, undefined, {restrict: 'C'});
+});
 ```
 
 ## Reusing Angular Injectables

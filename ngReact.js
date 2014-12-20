@@ -157,8 +157,8 @@
   //     <hello name="name"/>
   //
   var reactDirective = function($timeout, $injector) {
-    return function(reactComponentName, propNames) {
-      return {
+    return function(reactComponentName, propNames, conf) {
+      var directive = {
         restrict: 'E',
         replace: true,
         link: function(scope, elem, attrs) {
@@ -190,6 +190,7 @@
           });
         }
       };
+      return angular.extend({}, directive, conf);
     };
   };
 
