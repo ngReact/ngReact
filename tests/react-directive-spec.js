@@ -15,37 +15,36 @@ var Hello = React.createClass({
     changeName: React.PropTypes.func
   },
 
-  handleClick: function(){
+  handleClick() {
     this.props.changeName();
   },
 
-  render: function() {
-    return React.DOM.div(
-      { onClick: this.handleClick },
-      'Hello ' + (this.props.fname || '') + ' ' + (this.props.lname || '') +
-        (this.props.undeclared || '')
-    );
+  render() {
+    var name = (this.props.fname || '') + ' ' +
+               (this.props.lname || '') +
+               (this.props.undeclared || '');
+    return <div onClick={this.handleClick}>Hello {name}</div>;
   }
 });
 
-describe('react-directive', function() {
+describe('react-directive', () => {
 
   var provide, compileProvider;
   var compileElement;
 
   beforeEach(angular.mock.module('react'));
 
-  beforeEach(angular.mock.module(function($provide, $compileProvider) {
+  beforeEach(angular.mock.module(($provide, $compileProvider) => {
     compileProvider = $compileProvider;
     provide = $provide;
   }));
 
-  afterEach(function(){
+  afterEach(()=>{
     window.GlobalHello = undefined;
   });
 
-  beforeEach(inject(function($rootScope, $compile, $timeout){
-    compileElement = function( html, scope ){
+  beforeEach(inject(($rootScope, $compile, $timeout) => {
+    compileElement = ( html, scope ) => {
       scope = scope || $rootScope;
       var elm = angular.element(html);
       $compile(elm)(scope);
@@ -55,35 +54,35 @@ describe('react-directive', function() {
     };
   }));
 
-  describe('creation', function() {
+  describe('creation', () => {
 
-    beforeEach( function() {
+    beforeEach( () => {
       window.GlobalHello = Hello;
       provide.value('InjectedHello', Hello);
     });
 
-    afterEach(function(){
+    afterEach(()=>{
       window.GlobalHello = undefined;
     });
 
-    it('should create global component with name', function() {
-      compileProvider.directive('globalHello', function(reactDirective){
+    it('should create global component with name', () => {
+      compileProvider.directive('globalHello', (reactDirective) => {
         return reactDirective('GlobalHello');
       });
       var elm = compileElement('<global-hello/>');
       expect(elm.text().trim()).toEqual('Hello');
     });
 
-    it('should create with component', function() {
-      compileProvider.directive('helloFromComponent', function(reactDirective){
+    it('should create with component', () => {
+      compileProvider.directive('helloFromComponent', (reactDirective) => {
         return reactDirective(Hello);
       });
       var elm = compileElement('<hello-from-component/>');
       expect(elm.text().trim()).toEqual('Hello');
     });
 
-    it('should create injectable component with name', function() {
-      compileProvider.directive('injectedHello', function(reactDirective){
+    it('should create injectable component with name', () => {
+      compileProvider.directive('injectedHello', (reactDirective) => {
         return reactDirective('InjectedHello');
       });
       var elm = compileElement('<injected-hello/>');
@@ -91,11 +90,11 @@ describe('react-directive', function() {
     });
   });
 
-  describe('properties',function(){
+  describe('properties',() => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       provide.value('Hello', Hello);
-      compileProvider.directive('hello', function(reactDirective){
+      compileProvider.directive('hello', (reactDirective) => {
         return reactDirective('Hello');
       });
 
@@ -108,7 +107,7 @@ describe('react-directive', function() {
       });
     });
 
-    it('should bind to properties on scope', inject(function($rootScope) {
+    it('should bind to properties on scope', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.firstName = 'Clark';
       scope.lastName = 'Kent';
@@ -120,7 +119,7 @@ describe('react-directive', function() {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
-    it('should bind to object on scope', inject(function($rootScope) {
+    it('should bind to object on scope', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = { firstName: 'Clark', lastName: 'Kent' };
 
@@ -131,9 +130,7 @@ describe('react-directive', function() {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
-    it('should rerender when scope is updated',
-       inject(function($rootScope, $timeout) {
-
+    it('should rerender when scope is updated', inject(($rootScope, $timeout) => {
       var scope = $rootScope.$new();
       scope.person = { firstName: 'Clark', lastName: 'Kent' };
 
@@ -152,14 +149,12 @@ describe('react-directive', function() {
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should accept callbacks as properties',
-       inject(function($rootScope, $timeout) {
-
+    it('should accept callbacks as properties', inject(($rootScope, $timeout) => {
       var scope = $rootScope.$new();
       scope.person = {
         fname: 'Clark', lname: 'Kent'
       };
-      scope.change = function(){
+      scope.change = () => {
         scope.person.fname = 'Bruce';
         scope.person.lname = 'Banner';
       };
@@ -176,8 +171,8 @@ describe('react-directive', function() {
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should accept undeclared properties when specified', inject(function($rootScope) {
-      compileProvider.directive('helloWithUndeclared', function(reactDirective){
+    it('should accept undeclared properties when specified', inject(($rootScope) => {
+      compileProvider.directive('helloWithUndeclared', (reactDirective) => {
         return reactDirective('Hello', ['undeclared']);
       });
       var scope = $rootScope.$new();
@@ -188,21 +183,18 @@ describe('react-directive', function() {
       );
       expect(elm.text().trim()).toEqual('Hello  Bruce Wayne');
     }));
-
   });
 
-  describe('destruction', function() {
+  describe('destruction', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       provide.value('Hello', Hello);
-      compileProvider.directive('hello', function(reactDirective){
+      compileProvider.directive('hello', (reactDirective) => {
         return reactDirective('Hello');
       });
     });
 
-    it('should unmount component when scope is destroyed',
-       inject(function($rootScope) {
-
+    it('should unmount component when scope is destroyed', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = { firstName: 'Clark', lastName: 'Kent' };
       var elm = compileElement(

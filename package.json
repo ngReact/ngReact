@@ -34,7 +34,8 @@
     "karma-browserify": "^1.0.1",
     "karma-jasmine": "0.1.5",
     "karma-phantomjs-launcher": "0.1.4",
-    "load-grunt-tasks": "0.1.0"
+    "load-grunt-tasks": "0.1.0",
+    "reactify": "^0.17.1"
   },
   "engines": {
     "node": ">=0.8.0"

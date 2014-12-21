@@ -15,30 +15,26 @@ var Hello = React.createClass({
     changeName: React.PropTypes.func
   },
 
-  handleClick: function(){
+  handleClick(){
     this.props.changeName();
   },
 
-  render: function() {
-    return React.DOM.div(
-      { onClick: this.handleClick },
-      'Hello ' + (this.props.fname || '') + ' ' + (this.props.lname || '')
-    );
+  render(){
+    var name = (this.props.fname || '') + ' ' + (this.props.lname || '');
+    return <div onClick={this.handleClick}>Hello {name}</div>;
   }
 });
 
-describe('react-component', function() {
+describe('react-component', () => {
 
   var compileElement, provide;
 
-  beforeEach(angular.mocks.module('react'));
+  beforeEach(angular.mock.module('react'));
 
-  beforeEach(angular.mocks.module(function($provide) {
-    provide = $provide;
-  }));
+  beforeEach(angular.mock.module(($provide) => {provide = $provide;}));
 
-  beforeEach(inject(function($rootScope, $compile, $timeout){
-    compileElement = function( html, scope ){
+  beforeEach(inject(($rootScope, $compile, $timeout) => {
+    compileElement = ( html, scope ) => {
       scope = scope || $rootScope;
       var elm = angular.element(html);
       $compile(elm)(scope);
@@ -48,35 +44,35 @@ describe('react-component', function() {
     };
   }));
 
-  describe('creation', function() {
+  describe('creation', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       window.GlobalHello = Hello;
       provide.value('InjectedHello', Hello);
     });
 
-    afterEach(function(){
+    afterEach(() => {
       window.GlobalHello = undefined;
     });
 
-    it('should create global component with name', function() {
+    it('should create global component with name', () => {
       var elm = compileElement( '<react-component name="GlobalHello"/>');
       expect(elm.text().trim()).toEqual('Hello');
     });
 
-    it('should create injectable component with name', function() {
+    it('should create injectable component with name', () => {
       var elm = compileElement( '<react-component name="InjectedHello"/>' );
       expect(elm.text().trim()).toEqual('Hello');
     });
   });
 
-  describe('properties',function(){
+  describe('properties', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       provide.value('Hello', Hello);
     });
 
-    it('should bind to properties on scope', inject(function($rootScope) {
+    it('should bind to properties on scope', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = { fname: 'Clark', lname: 'Kent' };
 
@@ -87,8 +83,7 @@ describe('react-component', function() {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
-    it('should rerender when scope is updated',
-       inject(function($rootScope, $timeout) {
+    it('should rerender when scope is updated', inject(($rootScope, $timeout) => {
 
       var scope = $rootScope.$new();
       scope.person = { fname: 'Clark', lname: 'Kent' };
@@ -108,13 +103,12 @@ describe('react-component', function() {
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should accept callbacks on scope',
-       inject(function($rootScope, $timeout) {
+    it('should accept callbacks on scope', inject(($rootScope, $timeout) => {
 
       var scope = $rootScope.$new();
       scope.person = {
         fname: 'Clark', lname: 'Kent',
-        changeName: function(){
+        changeName: () => {
           scope.person.fname = 'Bruce';
           scope.person.lname = 'Banner';
         }
@@ -133,14 +127,13 @@ describe('react-component', function() {
     }));
   });
 
-  describe('destruction', function() {
+  describe('destruction', () => {
 
-    beforeEach(function() {
+    beforeEach(() => {
       provide.value('Hello', Hello);
     });
 
-    it('should unmount component when scope is destroyed',
-       inject(function($rootScope) {
+    it('should unmount component when scope is destroyed', inject(($rootScope) => {
 
       var scope = $rootScope.$new();
       var elm = compileElement(

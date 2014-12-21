@@ -18,7 +18,8 @@ module.exports = function(config) {
 
     browserify: {
       debug: true,
-      transform: ['browserify-shim']
+      transform: [['reactify', {'es6': true}], 'browserify-shim'],
+      extensions: ['.js']
     },
 
     // list of files to exclude
