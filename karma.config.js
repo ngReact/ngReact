@@ -3,17 +3,23 @@ module.exports = function(config) {
     // base path, that will be used to resolve files and exclude
     basePath: '.',
 
-    frameworks: ['jasmine'],
+    frameworks: ['jasmine', 'browserify'],
 
     // list of files / patterns to load in the browser
     files: [
-      'bower_components/es5-shim/es5-shim.js',
-      'bower_components/angular/angular.js',
-      'bower_components/angular-mocks/angular-mocks.js',
-      'bower_components/react/react-with-addons.js',
+      'node_modules/angular/angular.js',
       'ngReact.js',
       'tests/*.js'
     ],
+
+    preprocessors: {
+      'tests/*.js': ['browserify']
+    },
+
+    browserify: {
+      debug: true,
+      transform: ['browserify-shim']
+    },
 
     // list of files to exclude
     exclude: [ ],
@@ -68,7 +74,8 @@ module.exports = function(config) {
 
     plugins: [
       'karma-jasmine',
-      'karma-phantomjs-launcher'
+      'karma-phantomjs-launcher',
+      'karma-browserify'
     ]
   });
 };
