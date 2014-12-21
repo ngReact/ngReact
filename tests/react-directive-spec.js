@@ -8,8 +8,6 @@ var React = require( 'react/addons' );
 var angular = require( 'angular' );
 require( 'angular-mocks' );
 
-var module = window.angular.mock.module;
-
 var Hello = React.createClass({
   propTypes: {
     fname : React.PropTypes.string,
@@ -35,9 +33,9 @@ describe('react-directive', function() {
   var provide, compileProvider;
   var compileElement;
 
-  beforeEach(module('react'));
+  beforeEach(angular.mock.module('react'));
 
-  beforeEach(module(function($provide, $compileProvider) {
+  beforeEach(angular.mock.module(function($provide, $compileProvider) {
     compileProvider = $compileProvider;
     provide = $provide;
   }));
