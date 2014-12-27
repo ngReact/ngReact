@@ -84,6 +84,14 @@
         var elm = compileElement('<injected-hello/>');
         expect(elm.text().trim()).toEqual('Hello');
       });
+
+      it('should be possible to provide a custom directive configuration', function() {
+        compileProvider.directive('confHello', function(reactDirective){
+          return reactDirective(Hello, undefined, {restrict: 'C'});
+        });
+        var elm = compileElement('<div class="conf-hello"/>');
+        expect(elm.text().trim()).toEqual('Hello');
+      });
     });
 
     describe('properties',function(){
