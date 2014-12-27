@@ -190,7 +190,7 @@
           });
         }
       };
-      return angular.extend({}, directive, conf);
+      return angular.extend(directive, conf);
     };
   };
 
