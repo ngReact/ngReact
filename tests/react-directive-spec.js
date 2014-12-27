@@ -85,7 +85,7 @@
         expect(elm.text().trim()).toEqual('Hello');
       });
 
-      it('should be poosible to provide a custom directive configuration', function() {
+      it('should be possible to provide a custom directive configuration', function() {
         compileProvider.directive('confHello', function(reactDirective){
           return reactDirective(Hello, undefined, {restrict: 'C'});
         });
