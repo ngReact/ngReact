@@ -20,10 +20,8 @@ var Hello = React.createClass({
   },
 
   render() {
-    var name = (this.props.fname || '') + ' ' +
-               (this.props.lname || '') +
-               (this.props.undeclared || '');
-    return <div onClick={this.handleClick}>Hello {name}</div>;
+    var {fname, lname, undeclared} = this.props;
+    return <div onClick={this.handleClick}>Hello {fname} {lname}{undeclared}</div>;
   }
 });
 
@@ -97,14 +95,14 @@ describe('react-directive', () => {
       compileProvider.directive('hello', (reactDirective) => {
         return reactDirective('Hello');
       });
+    });
 
-      it('should be possible to provide a custom directive configuration', function() {
-        compileProvider.directive('confHello', function(reactDirective){
-          return reactDirective(Hello, undefined, {restrict: 'C'});
-        });
-        var elm = compileElement('<div class="conf-hello"/>');
-        expect(elm.text().trim()).toEqual('Hello');
+    it('should be possible to provide a custom directive configuration', () => {
+      compileProvider.directive('confHello', (reactDirective) => {
+        return reactDirective(Hello, undefined, {restrict: 'C'});
       });
+      var elm = compileElement('<div class="conf-hello"/>');
+      expect(elm.text().trim()).toEqual('Hello');
     });
 
     it('should bind to properties on scope', inject(($rootScope) => {

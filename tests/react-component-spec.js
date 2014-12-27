@@ -20,8 +20,8 @@ var Hello = React.createClass({
   },
 
   render(){
-    var name = (this.props.fname || '') + ' ' + (this.props.lname || '');
-    return <div onClick={this.handleClick}>Hello {name}</div>;
+    var {fname, lname} = this.props;
+    return <div onClick={this.handleClick}>Hello {fname} {lname}</div>;
   }
 });
 
