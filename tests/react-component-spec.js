@@ -48,15 +48,24 @@ describe('react-component', () => {
 
     beforeEach(() => {
       window.GlobalHello = Hello;
+      window.Views = {
+        Hello: Hello
+      };
       provide.value('InjectedHello', Hello);
     });
 
     afterEach(() => {
       window.GlobalHello = undefined;
+      window.Views = undefined;
     });
 
     it('should create global component with name', () => {
       var elm = compileElement( '<react-component name="GlobalHello"/>');
+      expect(elm.text().trim()).toEqual('Hello');
+    });
+
+    it('should create global component with nested name', () => {
+      var elm = compileElement( '<react-component name="Views.Hello"/>');
       expect(elm.text().trim()).toEqual('Hello');
     });
 
