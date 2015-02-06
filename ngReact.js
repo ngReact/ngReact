@@ -41,7 +41,13 @@
       reactComponent = $injector.get(name);
     } catch(e) { }
 
-    reactComponent = reactComponent || window[name];
+    if (!reactComponent) {
+      try {
+        reactComponent = name.split('.').reduce(function(current, namePart) {
+          return current[namePart];
+        }, window);
+      } catch (e) { }
+    }
 
     if (!reactComponent) {
       throw Error('Cannot find react component ' + name);
