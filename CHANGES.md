@@ -1,5 +1,13 @@
 # CHANGES
 
+## 0.1.4
+
+- Fix: Make it work with Browserify (#37)
+- Enhancement: Allow ability to override default configuration for components created via the reactDirective factory (#34)
+- Fix/Enhancement: Allow React components on the window to be namespaced (ex: "Views.Components.ThisReactComponentIsNamespaced")
+- Fix/Enhancement: Allow for "controller as" syntax (had been broken) (#40)
+- Enhancement: Set up Travis CI
+
 ## 0.1.2
 
 - Fix: bug where fallback to use globally exposed React was incorrectly using window.react instead of window.React
