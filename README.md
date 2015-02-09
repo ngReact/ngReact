@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/davidchang/ngReact.svg?branch=master)](https://travis-ci.org/davidchang/ngReact)
 # ngReact
 
 The [React.js](http://facebook.github.io/react/) library can be used as a view component in web applications. ngReact is an Angular module that allows React Components to be used in [AngularJS](https://angularjs.org/) applications.
