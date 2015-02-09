@@ -9,7 +9,7 @@
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) {
     // CommonJS
-    module.exports = factory(root, require('react'), require('angular'));
+    module.exports = factory(require('react'), require('angular'));
   } else if (typeof define === 'function' && define.amd) {
     // AMD
     define(['react', 'angular'], function (react, angular) {
@@ -19,11 +19,7 @@
     // Global Variables
     root.ngReact = factory(root.React, root.angular);
   }
-}(this, function (React, angular) {
-  return ngReact(React, angular);
-}));
-
-function ngReact(React, angular) {
+}(this, function ngReact(React, angular) {
   'use strict';
 
   // get a react component from name (components can be an angular injectable e.g. value, factory or
@@ -45,7 +41,13 @@ function ngReact(React, angular) {
       reactComponent = $injector.get(name);
     } catch(e) { }
 
-    reactComponent = reactComponent || window[name];
+    if (!reactComponent) {
+      try {
+        reactComponent = name.split('.').reduce(function(current, namePart) {
+          return current[namePart];
+        }, window);
+      } catch (e) { }
+    }
 
     if (!reactComponent) {
       throw Error('Cannot find react component ' + name);
@@ -114,7 +116,7 @@ function ngReact(React, angular) {
         var reactComponent = getReactComponent(attrs.name, $injector);
 
         var renderMyComponent = function() {
-          var scopeProps = scope[attrs.props];
+          var scopeProps = scope.$eval(attrs.props);
           var props = applyFunctions(scopeProps, scope);
 
           renderComponent(reactComponent, props, $timeout, elem);
@@ -161,8 +163,8 @@ function ngReact(React, angular) {
   //     <hello name="name"/>
   //
   var reactDirective = function($timeout, $injector) {
-    return function(reactComponentName, propNames) {
-      return {
+    return function(reactComponentName, propNames, conf) {
+      var directive = {
         restrict: 'E',
         replace: true,
         link: function(scope, elem, attrs) {
@@ -194,6 +196,7 @@ function ngReact(React, angular) {
           });
         }
       };
+      return angular.extend(directive, conf);
     };
   };
 
@@ -201,4 +204,4 @@ function ngReact(React, angular) {
   return angular.module('react', [])
     .directive('reactComponent', ['$timeout', '$injector', reactComponent])
     .factory('reactDirective', ['$timeout','$injector', reactDirective]);
-}
+}));

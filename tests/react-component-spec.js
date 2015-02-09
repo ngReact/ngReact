@@ -1,154 +1,160 @@
-(function(angular, react) {
-  'use strict';
+'use strict';
 
-  var module = window.angular.mock.module;
+// phantom doesn't support Function.bind
+require('es5-shim');
+require('../ngReact');
 
-  var Hello = React.createClass({
-    propTypes: {
-      fname : React.PropTypes.string,
-      lname : React.PropTypes.string,
-      changeName: React.PropTypes.func
-    },
+var React = require( 'react/addons' );
+var angular = require( 'angular' );
+require( 'angular-mocks' );
 
-    handleClick: function(){
-      this.props.changeName();
-    },
+var Hello = React.createClass({
+  propTypes: {
+    fname : React.PropTypes.string,
+    lname : React.PropTypes.string,
+    changeName: React.PropTypes.func
+  },
 
-    render: function() {
-      return React.DOM.div(
-        { onClick: this.handleClick },
-        'Hello ' + (this.props.fname || '') + ' ' + (this.props.lname || '')
-      );
-    }
-  });
+  handleClick(){
+    this.props.changeName();
+  },
 
-  describe('react-component', function() {
+  render(){
+    var {fname, lname} = this.props;
+    return <div onClick={this.handleClick}>Hello {fname} {lname}</div>;
+  }
+});
 
-    var compileElement, provide;
+describe('react-component', () => {
 
-    beforeEach(module('react'));
+  var compileElement, provide;
 
-    beforeEach(module(function($provide) {
-      provide = $provide;
-    }));
+  beforeEach(angular.mock.module('react'));
 
-    beforeEach(inject(function($rootScope, $compile, $timeout){
-      compileElement = function( html, scope ){
-        scope = scope || $rootScope;
-        var elm = angular.element(html);
-        $compile(elm)(scope);
-        scope.$digest();
-        $timeout.flush();
-        return elm;
+  beforeEach(angular.mock.module(($provide) => {provide = $provide;}));
+
+  beforeEach(inject(($rootScope, $compile, $timeout) => {
+    compileElement = ( html, scope ) => {
+      scope = scope || $rootScope;
+      var elm = angular.element(html);
+      $compile(elm)(scope);
+      scope.$digest();
+      $timeout.flush();
+      return elm;
+    };
+  }));
+
+  describe('creation', () => {
+
+    beforeEach(() => {
+      window.GlobalHello = Hello;
+      window.Views = {
+        Hello: Hello
       };
-    }));
-
-    describe('creation', function() {
-
-      beforeEach(function() {
-        window.GlobalHello = Hello;
-        provide.value('InjectedHello', Hello);
-      });
-
-      afterEach(function(){
-        window.GlobalHello = undefined;
-      });
-
-      it('should create global component with name', function() {
-        var elm = compileElement( '<react-component name="GlobalHello"/>');
-        expect(elm.text().trim()).toEqual('Hello');
-      });
-
-      it('should create injectable component with name', function() {
-        var elm = compileElement( '<react-component name="InjectedHello"/>' );
-        expect(elm.text().trim()).toEqual('Hello');
-      });
+      provide.value('InjectedHello', Hello);
     });
 
-    describe('properties',function(){
-
-      beforeEach(function() {
-        provide.value('Hello', Hello);
-      });
-
-      it('should bind to properties on scope', inject(function($rootScope) {
-        var scope = $rootScope.$new();
-        scope.person = { fname: 'Clark', lname: 'Kent' };
-
-        var elm = compileElement(
-          '<react-component name="Hello" props="person"/>',
-          scope
-        );
-        expect(elm.text().trim()).toEqual('Hello Clark Kent');
-      }));
-
-      it('should rerender when scope is updated',
-         inject(function($rootScope, $timeout) {
-
-        var scope = $rootScope.$new();
-        scope.person = { fname: 'Clark', lname: 'Kent' };
-
-        var elm = compileElement(
-          '<react-component name="Hello" props="person"/>',
-          scope
-        );
-
-        expect(elm.text().trim()).toEqual('Hello Clark Kent');
-
-        scope.person.fname = 'Bruce';
-        scope.person.lname = 'Banner';
-        scope.$apply();
-        $timeout.flush();
-
-        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
-      }));
-
-      it('should accept callbacks on scope',
-         inject(function($rootScope, $timeout) {
-
-        var scope = $rootScope.$new();
-        scope.person = {
-          fname: 'Clark', lname: 'Kent',
-          changeName: function(){
-            scope.person.fname = 'Bruce';
-            scope.person.lname = 'Banner';
-          }
-        };
-
-        var elm = compileElement(
-          '<react-component name="Hello" props="person"/>',
-          scope
-        );
-        expect(elm.text().trim()).toEqual('Hello Clark Kent');
-
-        React.addons.TestUtils.Simulate.click( elm[0].firstChild );
-        $timeout.flush();
-
-        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
-      }));
+    afterEach(() => {
+      window.GlobalHello = undefined;
+      window.Views = undefined;
     });
 
-    describe('destruction', function() {
+    it('should create global component with name', () => {
+      var elm = compileElement( '<react-component name="GlobalHello"/>');
+      expect(elm.text().trim()).toEqual('Hello');
+    });
 
-      beforeEach(function() {
-        provide.value('Hello', Hello);
-      });
+    it('should create global component with nested name', () => {
+      var elm = compileElement( '<react-component name="Views.Hello"/>');
+      expect(elm.text().trim()).toEqual('Hello');
+    });
 
-      it('should unmount component when scope is destroyed',
-         inject(function($rootScope) {
-
-        var scope = $rootScope.$new();
-        var elm = compileElement(
-          '<react-component name="Hello" props="person"/>',
-          scope
-        );
-        scope.$destroy();
-
-        //unmountComponentAtNode returns:
-        // * true if a component was unmounted and
-        // * false if there was no component to unmount.
-        expect( React.unmountComponentAtNode(elm[0])).toEqual(false);
-      }));
+    it('should create injectable component with name', () => {
+      var elm = compileElement( '<react-component name="InjectedHello"/>' );
+      expect(elm.text().trim()).toEqual('Hello');
     });
   });
-})(window.angular, window.react);
+
+  describe('properties', () => {
+
+    beforeEach(() => {
+      provide.value('Hello', Hello);
+    });
+
+    it('should bind to properties on scope', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = { fname: 'Clark', lname: 'Kent' };
+
+      var elm = compileElement(
+        '<react-component name="Hello" props="person"/>',
+        scope
+      );
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+    }));
+
+    it('should rerender when scope is updated', inject(($rootScope, $timeout) => {
+
+      var scope = $rootScope.$new();
+      scope.person = { fname: 'Clark', lname: 'Kent' };
+
+      var elm = compileElement(
+        '<react-component name="Hello" props="person"/>',
+        scope
+      );
+
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+      scope.person.fname = 'Bruce';
+      scope.person.lname = 'Banner';
+      scope.$apply();
+      $timeout.flush();
+
+      expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+    }));
+
+    it('should accept callbacks on scope', inject(($rootScope, $timeout) => {
+
+      var scope = $rootScope.$new();
+      scope.person = {
+        fname: 'Clark', lname: 'Kent',
+        changeName: () => {
+          scope.person.fname = 'Bruce';
+          scope.person.lname = 'Banner';
+        }
+      };
+
+      var elm = compileElement(
+        '<react-component name="Hello" props="person"/>',
+        scope
+      );
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+      React.addons.TestUtils.Simulate.click( elm[0].firstChild );
+      $timeout.flush();
+
+      expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+    }));
+  });
+
+  describe('destruction', () => {
+
+    beforeEach(() => {
+      provide.value('Hello', Hello);
+    });
+
+    it('should unmount component when scope is destroyed', inject(($rootScope) => {
+
+      var scope = $rootScope.$new();
+      var elm = compileElement(
+        '<react-component name="Hello" props="person"/>',
+        scope
+      );
+      scope.$destroy();
+
+      //unmountComponentAtNode returns:
+      // * true if a component was unmounted and
+      // * false if there was no component to unmount.
+      expect( React.unmountComponentAtNode(elm[0])).toEqual(false);
+    }));
+  });
+});
