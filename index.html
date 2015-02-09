@@ -103,6 +103,7 @@ angular.module('app', ['react']);</pre>
       <section>
         <ul>
           <li><a href="examples/hello">Simple "Hello World"</a></li>
+          <li><a href="examples/hello-controller-as">Simple "Hello World" using Angular's "controller as" syntax</a></li>
           <li><a href="examples/table">Intermediate Large Table</a></li>
           <li><a href="examples/use-filter">Using injectables like filters inside of React components</a></li>
           <li><a href="examples/jsx-transformer">Jsx transformation in the browser</a></li>
@@ -158,7 +159,7 @@ app.value('HelloComponent', HelloComponent);
 
       <h3>reactDirective Factory</h3>
       <section>
-        <p>The reactDirective factory, in contrast to the reactComponent directive, is meant to create specific directives corresponding to React components. In the background, this actually creates and and sets up reactComponent directives specifically bound to the specified React component.</p>
+        <p>The reactDirective factory, in contrast to the reactComponent directive, is meant to create specific directives corresponding to React components. In the background, this actually creates and sets up directives specifically bound to the specified React component.</p>
 
         <p>If, for example, you wanted to use the same React component in multiple places, you'd have to specify &lt;react-component name="yourComponent" props="props" /&gt; repeatedly, but if you used reactDirective factory, you could create a yourComponent directive and simply use that everywhere.</p>
 
@@ -167,7 +168,7 @@ app.value('HelloComponent', HelloComponent);
         <pre>
 app.directive('hello', function(reactDirective) {
   return reactDirective(HelloComponent);
-} );
+});
         </pre>
 
         <p>Alternatively you can provide the name of the component</p>
@@ -175,10 +176,10 @@ app.directive('hello', function(reactDirective) {
         <pre>
 app.directive('hello', function(reactDirective) {
   return reactDirective('HelloComponent');
-} );
+});
         </pre>
 
-This creates a directive that can be used like this:
+<p>This creates a directive that can be used like this:</p>
 
         <pre>
 &lt;body ng-app="app"&gt;
@@ -186,6 +187,26 @@ This creates a directive that can be used like this:
     &lt;hello fname="person.fname" lname="person.lname"/&gt;
   &lt;/div&gt;
 &lt;/body&gt;
+        </pre>
+
+        <p>
+          The <code>reactDirective</code> service will read the React component <code>propTypes</code> and watch attributes with these names. If your react component doesn't have <code>propTypes</code> defined you can pass in an array of attribute names to watch.
+        </p>
+
+        <pre>
+app.directive('hello', function(reactDirective) {
+  return reactDirective(HelloComponent, ['fname', 'lname']);
+});
+        </pre>
+
+        <p>
+          If you want to change the configuration of the directive created the <code>reactDirective</code> service, e.g. change <code>restrict: 'E'</code> to <code>restrict: 'C'</code>, you can do so by passing in an object literal with the desired configuration.
+        </p>
+
+        <pre>
+app.directive('hello', function(reactDirective) {
+  return reactDirective(HelloComponent, undefined, {restrict: 'C'});
+});
         </pre>
 
       </section>
@@ -246,6 +267,7 @@ app.factory('HelloComponent', function($filter) {
       <ul>
         <li>Tihomir Kit (<a href="https://github.com/pootzko">@pootzko</a>)</li>
         <li>Alexander Beletsky (<a href="https://github.com/alexanderbeletsky">@alexanderbeletsky</a>)</li>
+        <li><a href="https://github.com/matthieu-ravey">@matthieu-ravey</a></li>
       </ul>
 
     </div>
