@@ -82,6 +82,33 @@
     }, {});
   }
 
+  /**
+   *
+   * @param watchDepth (value of HTML watch-depth attribute)
+   * @param scope (angular scope)
+   *
+   * Uses the watchDepth attribute to determine how to watch props on scope.
+   * If watchDepth attribute is NOT reference, collection, or group, watchDepth defaults to deep watching by value
+   */
+  function watchProps (watchDepth, scope){
+    var args = Array.prototype.slice.call(arguments, 2);
+    var watchFn;
+
+    //default watchDepth to value if not reference, collection, or group
+    if (watchDepth === 'collection') {
+      watchFn = '$watchCollection';
+    } else if (watchDepth === 'group') {
+      watchFn = '$watchGroup';
+    } else {
+      watchFn = '$watch';
+      if (watchDepth !== 'reference') {
+        args.push(true);
+      }
+    }
+
+    scope[watchFn].apply(scope, args);
+  }
+
   // render React component, with scope[attrs.props] being passed in as the component props
   function renderComponent(component, props, $timeout, elem) {
     $timeout(function() {
@@ -124,7 +151,7 @@
 
         // If there are props, re-render when they change
         attrs.props ?
-          scope.$watch(attrs.props, renderMyComponent, true) :
+            watchProps(attrs.watchDepth, scope, attrs.props, renderMyComponent) :
           renderMyComponent();
 
         // cleanup when scope is destroyed
@@ -185,7 +212,7 @@
           // watch each property name and trigger an update whenever something changes,
           // to update scope.props with new values
           propNames.forEach(function(k) {
-            scope.$watch(attrs[k], renderMyComponent, true);
+            watchProps(attrs.watchDepth, scope, attrs[k], renderMyComponent);
           });
 
           renderMyComponent();
