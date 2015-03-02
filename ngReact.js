@@ -22,6 +22,37 @@
 }(this, function ngReact(React, angular) {
   'use strict';
 
+  var ngVersion = angular.version.full;
+  var isWatchCollectionAvailable = isFeatureAvailable('1.1.4', ngVersion);
+
+  /**
+   *
+   * @param minVersion : minimum angular version feature is supported
+   * @param ngVersion : current angular version
+   * @returns {boolean}
+   *
+   * First check to see which version number has the most digits so we know how many digits to compare
+   * Next compare each digit (if undefined default to 0) and return result if different.  If versions are equal, return true.
+   */
+  function isFeatureAvailable (minVersion, ngVersion) {
+    var minVersionParts = minVersion.split('.');
+    var ngVersionParts = ngVersion.split('.');
+    var largestLength = Math.max(minVersionParts.length, ngVersionParts.length);
+    var minVersionDigit, ngVersionDigit, i;
+
+    for (i = 0; i < largestLength; i++) {
+      ngVersionDigit = parseInt(ngVersionParts[i]) || 0;
+      minVersionDigit = parseInt(minVersionParts[i]) || 0;
+
+      //digits are different, compare
+      if (ngVersionDigit !== minVersionDigit) {
+        return ngVersionDigit > minVersionDigit;
+      }
+    }
+    //versions are equal
+    return true;
+  }
+
   // get a react component from name (components can be an angular injectable e.g. value, factory or
   // available on window
   function getReactComponent( name, $injector ) {
@@ -88,17 +119,15 @@
    * @param scope (angular scope)
    *
    * Uses the watchDepth attribute to determine how to watch props on scope.
-   * If watchDepth attribute is NOT reference, collection, or group, watchDepth defaults to deep watching by value
+   * If watchDepth attribute is NOT reference or collection, watchDepth defaults to deep watching by value
    */
   function watchProps (watchDepth, scope){
     var args = Array.prototype.slice.call(arguments, 2);
     var watchFn;
 
-    //default watchDepth to value if not reference, collection, or group
-    if (watchDepth === 'collection') {
+    //default watchDepth to value if not reference or collection
+    if (isWatchCollectionAvailable && watchDepth === 'collection') {
       watchFn = '$watchCollection';
-    } else if (watchDepth === 'group') {
-      watchFn = '$watchGroup';
     } else {
       watchFn = '$watch';
       if (watchDepth !== 'reference') {
