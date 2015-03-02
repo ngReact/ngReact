@@ -25,6 +25,22 @@ var Hello = React.createClass({
   }
 });
 
+var People = React.createClass({
+  propTypes: {
+    items : React.PropTypes.array
+  },
+
+  render(){
+    var people = this.props.items;
+    var names = people.map(function(person, index) {
+      var name = person.fname + ' ' + person.lname;
+      return (++index === people.length) ? name : name + ', ';
+    });
+
+    return <div>Hello {names}</div>;
+  }
+});
+
 describe('react-directive', () => {
 
   var provide, compileProvider;
@@ -181,6 +197,122 @@ describe('react-directive', () => {
       );
       expect(elm.text().trim()).toEqual('Hello  Bruce Wayne');
     }));
+  });
+
+
+  describe('watch-depth', () => {
+
+    describe('value', () => {
+      var elm, scope;
+
+      beforeEach(inject(($rootScope) => {
+        provide.value('Hello', Hello);
+        compileProvider.directive('hello', (reactDirective) => {
+          return reactDirective('Hello');
+        });
+
+        scope = $rootScope.$new();
+        scope.person = { fname: 'Clark', lname: 'Kent' };
+
+        elm = compileElement(
+            '<hello fname="person.fname" lname="person.lname" watch-depth="value"/>',
+            scope);
+      }));
+
+      it('should rerender when a property of scope object is updated', () => inject(($rootScope, $timeout) => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+
+        scope.$apply();
+        $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+    });
+
+    describe('reference', () => {
+      var elm, scope;
+
+      beforeEach(inject(($rootScope) => {
+        provide.value('Hello', Hello);
+        compileProvider.directive('hello', (reactDirective) => {
+          return reactDirective('Hello');
+        });
+
+        scope = $rootScope.$new();
+        scope.person = { fname: 'Clark', lname: 'Kent' };
+
+        elm = compileElement(
+            '<hello fname="person.fname" lname="person.lname" watch-depth="reference"/>',
+            scope);
+      }));
+
+      it('should rerender when scope object is updated', () => inject(($timeout) => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person = { fname: 'Bruce', lname: 'Banner' };
+        scope.$apply();
+        $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+
+      it('should NOT rerender when a property of scope object is updated', () => inject(() => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+        scope.$apply();
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+      }));
+    });
+
+    describe('collection', () => {
+      var elm, scope;
+
+      beforeEach(inject(($rootScope) => {
+        provide.value('People', People);
+        compileProvider.directive('people', (reactDirective) => {
+          return reactDirective('People');
+        });
+        scope = $rootScope.$new();
+        scope.people = [{ fname: 'Clark', lname: 'Kent' }];
+
+        elm = compileElement(
+            '<people items="people" watch-depth="collection"/>',
+            scope);
+      }));
+
+      it('should rerender when an item is added to array in scope', () => inject(($timeout) => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.people.push({ fname: 'Bruce', lname: 'Banner'});
+        scope.$apply();
+        $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Banner');
+      }));
+
+      it('should NOT rerender when an item in the array gets modified', () => inject(() => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        var person = scope.people[0];
+        person.fname = 'Bruce';
+        person.lname = 'Banner';
+        scope.$apply();
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+      }));
+    });
+
   });
 
   describe('destruction', () => {

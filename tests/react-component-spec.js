@@ -136,6 +136,89 @@ describe('react-component', () => {
     }));
   });
 
+  describe('watch-depth', () => {
+
+    describe('value', () => {
+      var elm, scope;
+
+      beforeEach(inject(($rootScope) => {
+        provide.value('Hello', Hello);
+        scope = $rootScope.$new();
+        scope.person = { fname: 'Clark', lname: 'Kent' };
+      }));
+
+      it('should rerender when a property of scope object is updated', () => inject(($timeout) => {
+
+        elm = compileElement(
+            '<react-component name="Hello" props="person" watch-depth="value"/>',
+            scope);
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+        scope.$apply();
+        $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+
+      it('should rerender when a property of scope object is updated', () => inject(($timeout) => {
+
+        //watch-depth will default to value
+        elm = compileElement(
+            '<react-component name="Hello" props="person" watch-depth="blahblah"/>',
+            scope);
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+        scope.$apply();
+        $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+    });
+
+    describe('reference', () => {
+      var elm, scope;
+
+      beforeEach(inject(($rootScope) => {
+        provide.value('Hello', Hello);
+        scope = $rootScope.$new();
+        scope.person = { fname: 'Clark', lname: 'Kent' };
+
+        elm = compileElement(
+            '<react-component name="Hello" props="person" watch-depth="reference"/>',
+            scope);
+      }));
+
+      it('should rerender when scope object is updated', () => inject(($timeout) => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person = { fname: 'Bruce', lname: 'Banner' };
+        scope.$apply();
+        $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+
+      it('should NOT rerender when a property of scope object is updated', () => inject(() => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+        scope.$apply();
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+      }));
+    });
+
+  });
+
   describe('destruction', () => {
 
     beforeEach(() => {
