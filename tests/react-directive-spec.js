@@ -30,11 +30,8 @@ var People = React.createClass({
     items : React.PropTypes.array
   },
 
-  render(){
-    var names = this.props.items.map(function(person){
-      return person.fname + ' ' + person.lname;
-    }).join(', ');
-
+  render () {
+    var names = this.props.items.map(person => person.fname + ' ' + person.lname).join(', ');
     return <div>Hello {names}</div>;
   }
 });

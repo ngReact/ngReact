@@ -95,7 +95,7 @@
     var watchFn;
 
     //default watchDepth to value if not reference or collection
-    if (watchDepth === 'collection' && angular.isFunction(scope.$watchCollections)) {
+    if (watchDepth === 'collection' && angular.isFunction(scope.$watchCollection)) {
       watchFn = '$watchCollection';
     } else {
       watchFn = '$watch';
