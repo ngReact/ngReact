@@ -31,11 +31,9 @@ var People = React.createClass({
   },
 
   render(){
-    var people = this.props.items;
-    var names = people.map(function(person, index) {
-      var name = person.fname + ' ' + person.lname;
-      return (++index === people.length) ? name : name + ', ';
-    });
+    var names = this.props.items.map(function(person){
+      return person.fname + ' ' + person.lname;
+    }).join(", ");
 
     return <div>Hello {names}</div>;
   }
