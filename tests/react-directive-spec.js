@@ -33,7 +33,7 @@ var People = React.createClass({
   render(){
     var names = this.props.items.map(function(person){
       return person.fname + ' ' + person.lname;
-    }).join(", ");
+    }).join(', ');
 
     return <div>Hello {names}</div>;
   }
