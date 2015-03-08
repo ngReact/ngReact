@@ -88,11 +88,12 @@ The component can be used in an Angular view using the react-component directive
 
 - the name attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name, and
 - the props attribute indicates what scope properties should be exposed to the React component
+- the watch-depth attribute indicates what watch strategy to use to detect changes on scope properties.  The possible values for react-component are `reference` and `value` (default)
 
 ```html
 <body ng-app="app">
   <div ng-controller="helloController">
-    <react-component name="HelloComponent" props="person" />
+    <react-component name="HelloComponent" props="person" watch-depth="reference"/>
   </div>
 </body>
 ```
@@ -124,12 +125,12 @@ This creates a directive that can be used like this:
 ```html
 <body ng-app="app">
   <div ng-controller="helloController">
-    <hello fname="person.fname" lname="person.lname"/>
+    <hello fname="person.fname" lname="person.lname" watch-depth="reference"/>
   </div>
 </body>
 ```
 
-The `reactDirective` service will read the React component `propTypes` and watch attributes with these names. If your react component doesn't have `propTypes` defined you can pass in an array of attribute names to watch.
+The `reactDirective` service will read the React component `propTypes` and watch attributes with these names. If your react component doesn't have `propTypes` defined you can pass in an array of attribute names to watch.  By default, attributes will be watched by value however you can also choose to watch by reference or collection by supplying the watch-depth attribute.  Possible values are `reference`, `collection` and `value` (default).
 
 ```javascript
 app.directive('hello', function(reactDirective) {
