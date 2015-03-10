@@ -150,7 +150,7 @@ app.directive('hello', function(reactDirective) {
 
 In an existing Angular application, you'll often have existing services or filters that you wish to access from your React component. These can be retrieved using Angular's dependency injection. The React component will still be render-able as aforementioned, using the react-component directive.
 
-Be aware thought that you can not inject Angular directives into JSX.
+Be aware that you can not inject Angular directives into JSX.
 
 ```javascript
 app.filter('hero', function() {
