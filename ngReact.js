@@ -108,10 +108,16 @@
   }
 
   // render React component, with scope[attrs.props] being passed in as the component props
-  function renderComponent(component, props, $timeout, elem) {
-    $timeout(function() {
-      React.render(React.createElement(component, props), elem[0]);
+  function renderComponent(component, props, $timeout, elem, key, cache) {
+    $timeout.cancel(cache.get(key));
+
+    var promise = $timeout(function() {
+      React.render(React.createElement(component, props), elem[0], function(){
+        cache.remove(key);
+      });
     });
+
+    cache.put(key, promise);
   }
 
   // # reactComponent
@@ -133,7 +139,7 @@
   //         }
   //     }));
   //
-  var reactComponent = function($timeout, $injector) {
+  var reactComponent = function($timeout, $injector, reactDebounceCache) {
     return {
       restrict: 'E',
       replace: true,
@@ -144,7 +150,7 @@
           var scopeProps = scope.$eval(attrs.props);
           var props = applyFunctions(scopeProps, scope);
 
-          renderComponent(reactComponent, props, $timeout, elem);
+          renderComponent(reactComponent, props, $timeout, elem, scope.$id, reactDebounceCache);
         };
 
         // If there are props, re-render when they change
@@ -155,6 +161,7 @@
         // cleanup when scope is destroyed
         scope.$on('$destroy', function() {
           React.unmountComponentAtNode(elem[0]);
+          reactDebounceCache.remove(scope.$id);
         });
       }
     };
@@ -187,7 +194,7 @@
   //
   //     <hello name="name"/>
   //
-  var reactDirective = function($timeout, $injector) {
+  var reactDirective = function($timeout, $injector, reactDebounceCache) {
     return function(reactComponentName, propNames, conf) {
       var directive = {
         restrict: 'E',
@@ -204,7 +211,7 @@
             propNames.forEach(function(propName) {
               props[propName] = scope.$eval(attrs[propName]);
             });
-            renderComponent(reactComponent, applyFunctions(props, scope), $timeout, elem);
+            renderComponent(reactComponent, applyFunctions(props, scope), $timeout, elem, scope.$id, reactDebounceCache);
           };
 
           // watch each property name and trigger an update whenever something changes,
@@ -218,6 +225,7 @@
           // cleanup when scope is destroyed
           scope.$on('$destroy', function() {
             React.unmountComponentAtNode(elem[0]);
+            reactDebounceCache.remove(scope.$id);
           });
         }
       };
@@ -225,8 +233,14 @@
     };
   };
 
+  var reactDebounceCache = function($cacheFactory) {
+    return $cacheFactory('react-debounce-cache');
+  };
+
+
   // create the end module without any dependencies, including reactComponent and reactDirective
   return angular.module('react', [])
-    .directive('reactComponent', ['$timeout', '$injector', reactComponent])
-    .factory('reactDirective', ['$timeout','$injector', reactDirective]);
+    .directive('reactComponent', ['$timeout', '$injector', 'reactDebounceCache', reactComponent])
+    .factory('reactDirective', ['$timeout','$injector', 'reactDebounceCache', reactDirective])
+    .factory('reactDebounceCache', ['$cacheFactory', reactDebounceCache]);
 }));
