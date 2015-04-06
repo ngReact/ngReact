@@ -20,6 +20,7 @@ var Hello = React.createClass({
   },
 
   render(){
+    window.GlobalHelloRenderCount++;
     var {fname, lname} = this.props;
     return <div onClick={this.handleClick}>Hello {fname} {lname}</div>;
   }
@@ -48,6 +49,7 @@ describe('react-component', () => {
 
     beforeEach(() => {
       window.GlobalHello = Hello;
+      window.GlobalHelloRenderCount = 0;
       window.Views = {
         Hello: Hello
       };
@@ -72,6 +74,11 @@ describe('react-component', () => {
     it('should create injectable component with name', () => {
       var elm = compileElement( '<react-component name="InjectedHello"/>' );
       expect(elm.text().trim()).toEqual('Hello');
+    });
+
+    it('should invoke render once', () => {
+      var elm = compileElement( '<react-component name="InjectedHello"/>' );
+      expect(window.GlobalHelloRenderCount).toEqual(1);
     });
   });
 
