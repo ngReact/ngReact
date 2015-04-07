@@ -9,6 +9,8 @@ var angular = require( 'angular' );
 require( 'angular-mocks' );
 
 var Hello = React.createClass({
+  renderCount: 0,
+
   propTypes: {
     fname : React.PropTypes.string,
     lname : React.PropTypes.string,
@@ -20,6 +22,7 @@ var Hello = React.createClass({
   },
 
   render() {
+    window.GlobalHelloRenderCount++;
     var {fname, lname, undeclared} = this.props;
     return <div onClick={this.handleClick}>Hello {fname} {lname}{undeclared}</div>;
   }
@@ -67,6 +70,7 @@ describe('react-directive', () => {
 
     beforeEach( () => {
       window.GlobalHello = Hello;
+      window.GlobalHelloRenderCount = 0;
       provide.value('InjectedHello', Hello);
     });
 
@@ -96,6 +100,14 @@ describe('react-directive', () => {
       });
       var elm = compileElement('<injected-hello/>');
       expect(elm.text().trim()).toEqual('Hello');
+    });
+
+    it('should invoke render once', () => {
+      compileProvider.directive('globalHello', (reactDirective) => {
+        return reactDirective('GlobalHello');
+      });
+      compileElement('<global-hello/>');
+      expect(window.GlobalHelloRenderCount).toEqual(1);
     });
   });
 
