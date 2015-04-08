@@ -148,15 +148,9 @@
         };
 
         // If there are props, re-render when they change
-        if (attrs.props) {
-          watchProps(attrs.watchDepth, scope, attrs.props, function(newVal, oldVal) {
-            if (newVal !== oldVal) {
-              renderMyComponent();
-            }
-          });
-        }
-
-        renderMyComponent();
+        attrs.props ?
+            watchProps(attrs.watchDepth, scope, attrs.props, renderMyComponent) :
+          renderMyComponent();
 
         // cleanup when scope is destroyed
         scope.$on('$destroy', function() {
@@ -216,11 +210,7 @@
           // watch each property name and trigger an update whenever something changes,
           // to update scope.props with new values
           propNames.forEach(function(k) {
-            watchProps(attrs.watchDepth, scope, attrs[k], function(newVal, oldVal){
-              if (newVal !== oldVal) {
-                renderMyComponent();
-              }
-            });
+            watchProps(attrs.watchDepth, scope, attrs[k], renderMyComponent);
           });
 
           renderMyComponent();
