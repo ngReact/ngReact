@@ -221,3 +221,6 @@ grunt karma:background watch
 - Tihomir Kit (@pootzko)
 - Alexander Beletsky (@alexanderbeletsky)
 - @matthieu-ravey
+- @ethul
+- Devin Jett (@djett41)
+- Marek Kalnik (@marekkalnik)
