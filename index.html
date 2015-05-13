@@ -146,12 +146,13 @@ app.value('HelloComponent', HelloComponent);
         <ul>
           <li>the name attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name, and</li>
           <li>the props attribute indicates what scope properties should be exposed to the React component</li>
+          <li>the watch-depth attribute indicates what watch strategy to use to detect changes on scope properties.  The possible values for react-component are <code>reference</code> and <code>value</code> (default)</li>
         </ul>
 
         <pre>
 &lt;body ng-app="app"&gt;
   &lt;div ng-controller="helloController"&gt;
-    &lt;react-component name="HelloComponent" props="person" /&gt;
+    &lt;react-component name="HelloComponent" props="person" watch-depth="reference" /&gt;
   &lt;/div&gt;
 &lt;/body&gt;
         </pre>
@@ -184,13 +185,13 @@ app.directive('hello', function(reactDirective) {
         <pre>
 &lt;body ng-app="app"&gt;
   &lt;div ng-controller="helloController"&gt;
-    &lt;hello fname="person.fname" lname="person.lname"/&gt;
+    &lt;hello fname="person.fname" lname="person.lname" watch-depth="reference" /&gt;
   &lt;/div&gt;
 &lt;/body&gt;
         </pre>
 
         <p>
-          The <code>reactDirective</code> service will read the React component <code>propTypes</code> and watch attributes with these names. If your react component doesn't have <code>propTypes</code> defined you can pass in an array of attribute names to watch.
+          The <code>reactDirective</code> service will read the React component <code>propTypes</code> and watch attributes with these names. If your react component doesn't have <code>propTypes</code> defined you can pass in an array of attribute names to watch. By default, attributes will be watched by value however you can also choose to watch by reference or collection by supplying the watch-depth attribute.  Possible values are <code>reference</code>, <code>collection</code> and <code>value</code> (default).
         </p>
 
         <pre>
@@ -214,6 +215,8 @@ app.directive('hello', function(reactDirective) {
       <h3>Reusing Angular Injectables</h3>
       <section>
         <p>In an existing Angular application, you'll often have existing services or filters that you wish to access from your React component. These can be retrieved using Angular's dependency injection. The React component will still be render-able as aforementioned, using the react-component directive.</p>
+
+        <p>Be aware that you can not inject Angular directives into JSX.</p>
 
         <pre>
 app.filter('hero', function() {
@@ -268,19 +271,22 @@ app.factory('HelloComponent', function($filter) {
         <li>Tihomir Kit (<a href="https://github.com/pootzko">@pootzko</a>)</li>
         <li>Alexander Beletsky (<a href="https://github.com/alexanderbeletsky">@alexanderbeletsky</a>)</li>
         <li><a href="https://github.com/matthieu-ravey">@matthieu-ravey</a></li>
+        <li><a href="https://github.com/ethul">@ethul</a></li>
+        <li>Devin Jett (<a href="https://github.com/djett41">@djett41</a>)</li>
+        <li>Marek Kalnik (<a href="https://github.com/marekkalnik">@marekkalnik</a>)</li>
       </ul>
 
     </div>
-    
+
     <script>
       (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
       (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
       m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
       })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
-    
+
       ga('create', 'UA-60358013-1', 'auto');
       ga('send', 'pageview');
-    
+
     </script>
 
 </body>
