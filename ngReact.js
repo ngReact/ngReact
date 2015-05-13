@@ -90,21 +90,28 @@
    * Uses the watchDepth attribute to determine how to watch props on scope.
    * If watchDepth attribute is NOT reference or collection, watchDepth defaults to deep watching by value
    */
-  function watchProps (watchDepth, scope){
-    var args = Array.prototype.slice.call(arguments, 2);
-    var watchFn;
-
-    //default watchDepth to value if not reference or collection
+  function watchProps (watchDepth, scope, watchExpressions, listener){
     if (watchDepth === 'collection' && angular.isFunction(scope.$watchCollection)) {
-      watchFn = '$watchCollection';
-    } else {
-      watchFn = '$watch';
-      if (watchDepth !== 'reference') {
-        args.push(true);
+      watchExpressions.forEach(function(expr){
+        scope.$watchCollection(expr, listener);
+      });
+    }
+    else if (watchDepth === 'reference') {
+      if (angular.isFunction(scope.$watchGroup)) {
+        scope.$watchGroup(watchExpressions, listener);
+      }
+      else {
+        watchExpressions.forEach(function(expr){
+          scope.$watch(expr, listener);
+        });
       }
     }
-
-    scope[watchFn].apply(scope, args);
+    else {
+      //default watchDepth to value if not reference or collection
+      watchExpressions.forEach(function(expr){
+        scope.$watch(expr, listener, true);
+      });
+    }
   }
 
   // render React component, with scope[attrs.props] being passed in as the component props
@@ -149,7 +156,7 @@
 
         // If there are props, re-render when they change
         attrs.props ?
-            watchProps(attrs.watchDepth, scope, attrs.props, renderMyComponent) :
+            watchProps(attrs.watchDepth, scope, [attrs.props], renderMyComponent) :
           renderMyComponent();
 
         // cleanup when scope is destroyed
@@ -209,9 +216,11 @@
 
           // watch each property name and trigger an update whenever something changes,
           // to update scope.props with new values
-          propNames.forEach(function(k) {
-            watchProps(attrs.watchDepth, scope, attrs[k], renderMyComponent);
+          var propExpressions = propNames.map(function(k){
+            return attrs[k];
           });
+
+          watchProps(attrs.watchDepth, scope, propExpressions, renderMyComponent);
 
           renderMyComponent();
 
