@@ -10,8 +10,12 @@ var Hello = React.createClass( {
     lname: React.PropTypes.string.isRequired
   },
 
+  handleClick: function() {
+    alert( this.getDOMNode( this.refs.test ).tagName );
+  },
+
   render: function() {
-    return React.DOM.span( null,
+    return React.DOM.span( { ref: 'test', onClick: this.handleClick },
       'Hello ' + this.props.fname + ' ' + this.props.lname
     );
   }
