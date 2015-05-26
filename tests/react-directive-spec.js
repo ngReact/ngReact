@@ -21,6 +21,9 @@ var Hello = React.createClass({
 
   render() {
     var {fname, lname, undeclared} = this.props;
+
+    window.GlobalHelloRenderCount++;
+
     return <div onClick={this.handleClick}>Hello {fname} {lname}{undeclared}</div>;
   }
 });
@@ -252,6 +255,21 @@ describe('react-directive', () => {
         scope.person = { fname: 'Bruce', lname: 'Banner' };
         scope.$apply();
         $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+
+      it('should invoke React.render once when both props change', () => inject(($timeout) => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        window.GlobalHelloRenderCount = 0;
+
+        scope.person = { fname: 'Bruce', lname: 'Banner' };
+        scope.$apply();
+        $timeout.flush();
+
+        expect(window.GlobalHelloRenderCount).toEqual(1);
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
