@@ -146,6 +146,21 @@ app.directive('hello', function(reactDirective) {
 });
 ```
 
+### Minification
+A lot of automatic annotation libraries including ng-annotate skip implicit annotations of directives. Because of that you might get the following error when using directive in minified code:
+```
+Unknown provider: eProvider <- e <- helloDirective
+```
+To fix it add explicit annotation of dependency 
+```javascript
+var helloDirective = function(reactDirective) {
+  return reactDirective('HelloComponent');
+};
+helloDirective.$inject = ['reactDirective'];
+app.directive('hello', helloDirective);
+```
+
+
 ## Reusing Angular Injectables
 
 In an existing Angular application, you'll often have existing services or filters that you wish to access from your React component. These can be retrieved using Angular's dependency injection. The React component will still be render-able as aforementioned, using the react-component directive.
