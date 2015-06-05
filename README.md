@@ -17,20 +17,20 @@ Motivation for this could be any of the following:
 
 Install via Bower:
 
-```
+```bash
 bower install ngReact
 ```
 
 or via npm:
 
-```
+```bash
 npm install ngreact
 ```
 
 # Usage
 
 Then, just make sure Angular, React, and ngReact are on the page,
-```
+```html
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/react/react.js"></script>
 <script src="bower_components/ngReact/ngReact.min.js"></script>
@@ -38,7 +38,7 @@ Then, just make sure Angular, React, and ngReact are on the page,
 
 and include the 'react' Angular module as a dependency for your new app
 
-```
+```html
 <script>
     angular.module('app', ['react']);
 </script>
