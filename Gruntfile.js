@@ -10,9 +10,7 @@ module.exports = function(grunt) {
         options: {
           mangle: {
             except: ['angular', 'React']
-          },
-          compress: true,
-          wrap: true
+          }
         },
         files: {
           'ngReact.min.js' : 'ngReact.js'
