@@ -183,6 +183,46 @@ describe('react-directive', () => {
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
+    it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope, $timeout) => {
+      var scope = $rootScope.$new();
+      scope.changeCount = 0;
+      scope.person = {
+        fname: 'Clark', lname: 'Kent'
+      };
+      scope.change = () => {
+        scope.changeCount += 1;
+      };
+
+      var template =
+      `<div>
+        <p>{{changeCount}}</p>
+        <hello fname="person.fname" lname="person.lname" change-name="change"/>
+      </div>`;
+
+      var elm = compileElement(template, scope);
+
+      expect(elm.children().eq(0).text().trim()).toEqual('0');
+
+      // first callback invocation
+      React.addons.TestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+      $timeout.flush(100);
+
+      expect(elm.children().eq(0).text().trim()).toEqual('1');
+
+      // change props directly
+      scope.person.fname = 'Peter';
+      scope.$apply();
+      $timeout.flush();
+
+      expect(elm.children().eq(0).text().trim()).toEqual('1');
+
+      // second callback invocation
+      React.addons.TestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+      $timeout.flush(100);
+
+      expect(elm.children().eq(0).text().trim()).toEqual('2');
+    }));
+
     it('should accept undeclared properties when specified', inject(($rootScope) => {
       compileProvider.directive('helloWithUndeclared', (reactDirective) => {
         return reactDirective('Hello', ['undeclared']);
