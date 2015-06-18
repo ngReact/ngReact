@@ -61,18 +61,19 @@
     if (fn.wrappedInApply) {
       return fn;
     }
-    return function() {
+    var wrapped = function() {
       var args = arguments;
       scope.$apply(function() {
-        fn.wrappedInApply = true;
         fn.apply( null, args );
       });
     };
+    wrapped.wrappedInApply = true;
+    return wrapped;
   }
 
   // wraps all functions on obj in scope.$apply
   function applyFunctions(obj, scope) {
-    return Object.keys(obj || {}).reduce(function(prev,key) {
+    return Object.keys(obj || {}).reduce(function(prev, key) {
       var value = obj[key];
       // wrap functions in a function that ensures they are scope.$applied
       // ensures that when function is called from a React component
