@@ -84,11 +84,7 @@ var HelloComponent = React.createClass({
 app.value('HelloComponent', HelloComponent);
 ```
 
-The component can be used in an Angular view using the react-component directive like so, where:
-
-- the name attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name, and
-- the props attribute indicates what scope properties should be exposed to the React component
-- the watch-depth attribute indicates what watch strategy to use to detect changes on scope properties.  The possible values for react-component are `reference` and `value` (default)
+The component can be used in an Angular view using the react-component directive like so: 
 
 ```html
 <body ng-app="app">
@@ -97,6 +93,12 @@ The component can be used in an Angular view using the react-component directive
   </div>
 </body>
 ```
+
+Here:
+
+- `name` attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name, and
+- `props` attribute indicates what scope properties should be exposed to the React component
+- `watch-depth` attribute indicates what watch strategy to use to detect changes on scope properties.  The possible values for react-component are `reference` and `value` (default)
 
 ## The reactDirective service
 
