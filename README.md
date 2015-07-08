@@ -104,12 +104,12 @@ Here:
 
 The reactDirective factory, in contrast to the reactComponent directive, is meant to create specific directives corresponding to React components. In the background, this actually creates and sets up directives specifically bound to the specified React component.
 
-If, for example, you wanted to use the same React component in multiple places, you'd have to specify &lt;react-component name="yourComponent" props="props" /&gt; repeatedly, but if you used reactDirective factory, you could create a yourComponent directive and simply use that everywhere.
+If, for example, you wanted to use the same React component in multiple places, you'd have to specify `<react-component name="yourComponent" props="props"></react-component>` repeatedly, but if you used reactDirective factory, you could create a `<your-component></your-component>` directive and simply use that everywhere.
 
 The service takes the React component as the argument.
 
 ```javascript
-app.directive('hello', function(reactDirective) {
+app.directive('helloComponent', function(reactDirective) {
   return reactDirective(HelloComponent);
 });
 ```
@@ -117,7 +117,7 @@ app.directive('hello', function(reactDirective) {
 Alternatively you can provide the name of the component
 
 ```javascript
-app.directive('hello', function(reactDirective) {
+app.directive('helloComponent', function(reactDirective) {
   return reactDirective('HelloComponent');
 });
 ```
@@ -127,7 +127,7 @@ This creates a directive that can be used like this:
 ```html
 <body ng-app="app">
   <div ng-controller="helloController">
-    <hello fname="person.fname" lname="person.lname" watch-depth="reference"/>
+    <hello-component fname="person.fname" lname="person.lname" watch-depth="reference"></hello-component>
   </div>
 </body>
 ```
