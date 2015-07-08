@@ -84,7 +84,7 @@ var HelloComponent = React.createClass({
 app.value('HelloComponent', HelloComponent);
 ```
 
-The component can be used in an Angular view using the react-component directive like so: 
+The component can be used in an Angular view using the react-component directive like so:
 
 ```html
 <body ng-app="app">
@@ -153,7 +153,7 @@ A lot of automatic annotation libraries including ng-annotate skip implicit anno
 ```
 Unknown provider: eProvider <- e <- helloDirective
 ```
-To fix it add explicit annotation of dependency 
+To fix it add explicit annotation of dependency
 ```javascript
 var helloDirective = function(reactDirective) {
   return reactDirective('HelloComponent');
@@ -241,3 +241,5 @@ grunt karma:background watch
 - @ethul
 - Devin Jett (@djett41)
 - Marek Kalnik (@marekkalnik)
+- @oriweingart
+- Basarat Ali Syed (@basarat)

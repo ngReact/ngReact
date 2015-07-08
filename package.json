@@ -5,7 +5,7 @@
     "build": "grunt build",
     "test": "grunt test"
   },
-  "version": "0.1.6",
+  "version": "0.1.7",
   "main": "ngReact.js",
   "description": "Use React Components in Angular",
   "homepage": "http://davidchang.github.io/ngReact/",

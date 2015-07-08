@@ -1,5 +1,19 @@
 # CHANGES
 
+## 0.1.7
+
+- Fix/Enhancement: Return the value from Angular functions invoked within a $scope.$apply, if you require that value (#85). There was mixed discussion on this, and a sufficiently compelling use case was not provided, but I am more so of the opinion that returning is trivial and a generally accepted practice. Using it should not be necessary and could be considered an antipattern, but in the case that a valid use case arises down the road, I'd rather ngReact not be in the way.
+
+## 0.1.6
+
+- Fix: Address bug where a changing prop causes a function to no longer be wrapped within scope.apply (#78)
+- Enhancement: Utilize $watchGroup in Angular if it exists to avoid superfluous renders (#69)
+
+## 0.1.5
+
+- Feature: Add the watchDepth attribute to be able to control the type of scope watcher utilized by Angular ('collection' to use *watchCollection*, 'reference' to use *watch* and reference comparison, and defaulting to *watch* and value comparison (#47)
+- Enhancement: Docs state you cannot use Angular directives from within React components (#50)
+
 ## 0.1.4
 
 - Fix: Make it work with Browserify (#37)
