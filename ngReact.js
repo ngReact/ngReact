@@ -63,8 +63,8 @@
     }
     var wrapped = function() {
       var args = arguments;
-      scope.$apply(function() {
-        fn.apply( null, args );
+      return scope.$apply(function() {
+        return fn.apply( null, args );
       });
     };
     wrapped.wrappedInApply = true;
