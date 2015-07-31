@@ -16,7 +16,10 @@ var Hello = React.createClass({
   },
 
   handleClick() {
-    this.props.changeName();
+    var value = this.props.changeName();
+    if (value){
+      window.GlobalChangeNameValue = value;
+    }  
   },
 
   render() {
@@ -181,6 +184,39 @@ describe('react-directive', () => {
       $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+    }));
+
+    it('should return callbacks value', inject(($rootScope, $timeout) => {
+      var scope = $rootScope.$new();
+      scope.person = {
+        fname: 'Clark', lname: 'Kent'
+      };
+      scope.change = () => {
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+        return scope.person.fname + ' ' + scope.person.lname;
+      };
+
+      window.GlobalChangeNameValue = 'Clark Kent';
+
+      expect(window.GlobalChangeNameValue).toEqual('Clark Kent');
+
+      var elm = compileElement(
+        '<hello fname="person.fname" lname="person.lname" change-name="change"/>',
+        scope
+      );
+
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+      expect(window.GlobalChangeNameValue).toEqual('Clark Kent');
+
+      React.addons.TestUtils.Simulate.click( elm[0].firstChild );
+      $timeout.flush();
+
+      expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+
+      expect(window.GlobalChangeNameValue).toEqual('Bruce Banner');
+
     }));
 
     it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope, $timeout) => {
