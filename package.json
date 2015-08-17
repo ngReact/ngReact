@@ -14,7 +14,7 @@
     "url": "https://github.com/davidchang/ngReact.git"
   },
   "license": "MIT",
-  "dependencies": {
+  "peerDependencies": {
     "angular": "<2.0.0",
     "react": ">=0.12.0"
   },
