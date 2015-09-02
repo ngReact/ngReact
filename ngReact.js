@@ -63,9 +63,14 @@
     }
     var wrapped = function() {
       var args = arguments;
-      return scope.$apply(function() {
-        return fn.apply( null, args );
-      });
+      var phase = scope.$root.$$phase;
+        if (phase === "$apply" || phase === "$digest") {
+          return fn.apply(null, args);
+        } else {
+          return scope.$apply(function() {
+            return fn.apply( null, args );
+          });
+        }
     };
     wrapped.wrappedInApply = true;
     return wrapped;
