@@ -87,32 +87,39 @@
    *
    * @param watchDepth (value of HTML watch-depth attribute)
    * @param scope (angular scope)
+   * @returns function (deregistration function for all registered listeners)
    *
    * Uses the watchDepth attribute to determine how to watch props on scope.
    * If watchDepth attribute is NOT reference or collection, watchDepth defaults to deep watching by value
    */
   function watchProps (watchDepth, scope, watchExpressions, listener){
+    var deregistrators = [];
     if (watchDepth === 'collection' && angular.isFunction(scope.$watchCollection)) {
       watchExpressions.forEach(function(expr){
-        scope.$watchCollection(expr, listener);
+        deregistrators.push(scope.$watchCollection(expr, listener));
       });
     }
     else if (watchDepth === 'reference') {
       if (angular.isFunction(scope.$watchGroup)) {
-        scope.$watchGroup(watchExpressions, listener);
+        deregistrators.push(scope.$watchGroup(watchExpressions, listener));
       }
       else {
         watchExpressions.forEach(function(expr){
-          scope.$watch(expr, listener);
+          deregistrators.push(scope.$watch(expr, listener));
         });
       }
     }
     else {
       //default watchDepth to value if not reference or collection
       watchExpressions.forEach(function(expr){
-        scope.$watch(expr, listener, true);
+        deregistrators.push(scope.$watch(expr, listener, true));
       });
     }
+    return function() {
+      angular.forEach(deregistrators, function(deregistrator) {
+        deregistrator();
+      });
+    };
   }
 
   // render React component, with scope[attrs.props] being passed in as the component props
@@ -156,13 +163,15 @@
         };
 
         // If there are props, re-render when they change
-        attrs.props ?
+        var onWatchProps = attrs.props ?
             watchProps(attrs.watchDepth, scope, [attrs.props], renderMyComponent) :
           renderMyComponent();
 
         // cleanup when scope is destroyed
-        scope.$on('$destroy', function() {
+        var onDestroy = scope.$on('$destroy', function() {
           React.unmountComponentAtNode(elem[0]);
+          if(angular.isFunction(onWatchProps)) onWatchProps();
+          onDestroy();
         });
       }
     };
@@ -221,13 +230,15 @@
             return attrs[k];
           });
 
-          watchProps(attrs.watchDepth, scope, propExpressions, renderMyComponent);
+          var onWatchProps = watchProps(attrs.watchDepth, scope, propExpressions, renderMyComponent);
 
           renderMyComponent();
 
           // cleanup when scope is destroyed
-          scope.$on('$destroy', function() {
+          var onDestroy = scope.$on('$destroy', function() {
             React.unmountComponentAtNode(elem[0]);
+            onWatchProps();
+            onDestroy();
           });
         }
       };
