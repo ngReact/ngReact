@@ -40,7 +40,7 @@
     "reactify": "0.17.1"
   },
   "engines": {
-    "node": ">=0.10.0"
+    "node": ">0.10.0"
   },
   "keywords": [
     "angularjs",
