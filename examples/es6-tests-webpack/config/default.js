@@ -1,5 +1,4 @@
 module.exports = {
-    ci: false,
     scripts: {
         production: [
             'lib/app.js'
