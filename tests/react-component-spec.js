@@ -5,6 +5,7 @@ require('es5-shim');
 require('../ngReact');
 
 var React = require( 'react/addons' );
+var ReactDOM = require('react-dom');
 var angular = require( 'angular' );
 require( 'angular-mocks' );
 
@@ -277,7 +278,7 @@ describe('react-component', () => {
       //unmountComponentAtNode returns:
       // * true if a component was unmounted and
       // * false if there was no component to unmount.
-      expect( React.unmountComponentAtNode(elm[0])).toEqual(false);
+      expect( ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
     }));
   });
 });
