@@ -19,7 +19,7 @@ var Hello = React.createClass({
     var value = this.props.changeName();
     if (value){
       window.GlobalChangeNameValue = value;
-    }  
+    }
   },
 
   render() {
@@ -184,6 +184,29 @@ describe('react-directive', () => {
       $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+
+    }));
+
+    it(': callback should not fail when executed inside a scope apply', inject(($rootScope, $timeout) => {
+      var scope = $rootScope.$new();
+      scope.person = {
+        fname: 'Clark', lname: 'Kent'
+      };
+      scope.change = () => {
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+      };
+
+      var elm = compileElement(
+        '<hello fname="person.fname" lname="person.lname" change-name="change"/>',
+        scope
+      );
+
+      scope.$apply(() => {
+        expect(function() {
+            React.addons.TestUtils.Simulate.click( elm[0].firstChild )
+        }).not.toThrow();
+      });
     }));
 
     it('should return callbacks value', inject(($rootScope, $timeout) => {
