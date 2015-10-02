@@ -1,72 +1,72 @@
 var config = require('config');
 
 function getTestFiles() {
-    var files = [];
+  var files = [];
 
-    ['thirdParty', 'tests', 'production'].forEach(function (testDependency) {
-        config.scripts[testDependency].forEach(function (script) {
-            files.push(script);
-        });
+  ['thirdParty', 'tests', 'production'].forEach(function (testDependency) {
+    config.scripts[testDependency].forEach(function (script) {
+      files.push(script);
     });
+  });
 
-    return files;
+  return files;
 }
 
 function getPreprocessors() {
-    var preprocessors = {};
+  var preprocessors = {};
 
-    ['production', 'tests'].forEach(function (testDependency) {
-        config.scripts[testDependency].forEach(function (script) {
-            preprocessors[script] = ['webpack', 'sourcemap'];
-        });
+  ['production', 'tests'].forEach(function (testDependency) {
+    config.scripts[testDependency].forEach(function (script) {
+      preprocessors[script] = ['webpack', 'sourcemap'];
     });
+  });
 
-    return preprocessors;
+  return preprocessors;
 }
 
 module.exports = function (karmaConfig) {
-    var files = getTestFiles(),
-        preprocessors = getPreprocessors(files);
+  var files = getTestFiles(),
+    preprocessors = getPreprocessors(files);
 
-    karmaConfig.set({
-        basePath: '',
+  karmaConfig.set({
+    basePath: '',
 
-        frameworks: ['mocha', 'chai', 'sinon'],
+    frameworks: ['mocha', 'chai', 'sinon'],
 
-        files: files,
+    files: files,
 
-        exclude: [],
+    exclude: [],
 
-        preprocessors: preprocessors,
+    preprocessors: preprocessors,
 
-        webpack: {
-            devtool: 'inline-source-map',
-            module: {
-                loaders: [
-                    {
-                        test: /\.js$/, loader: 'babel-loader',
-                        exclude: /node_modules/
-                    }
-                ]
-            }
-        },
+    webpack: {
+      devtool: 'inline-source-map',
+      module: {
+        loaders: [
+          {
+            test: /\.js$/, loader: 'babel-loader',
+            exclude: /node_modules/
+          }
+        ]
+      }
+    },
 
-        webpackServer: {
-            noInfo: true
-        },
+    webpackServer: {
+      noInfo: true
+    },
 
-        reporters: ['dots'],
+    reporters: ['dots'],
 
-        port: 9876,
+    port: 9876,
 
-        colors: true,
+    colors: true,
 
-        logLevel: karmaConfig.LOG_INFO,
+    logLevel: karmaConfig.LOG_INFO,
 
-        autoWatch: false,
+    autoWatch: false,
 
-        browsers: ['PhantomJS2'],
+    browsers: ['PhantomJS2'],
 
-        singleRun: config.ci
-    });
+    singleRun: config.ci
+  });
 };

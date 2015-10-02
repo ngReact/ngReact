@@ -7,15 +7,15 @@ import WatchListComponent from './watch-list-component';
 import 'ngreact';
 
 angular
-    .module('app', ['react'])
-    .service('ActivityService', ActivityService)
-    .controller('ActivityCtrl', ActivityController)
-    .factory('WatchListComponent', WatchListComponent)
-    .directive('watchList', WatchListDirective)
+  .module('app', ['react'])
+  .service('ActivityService', ActivityService)
+  .controller('ActivityCtrl', ActivityController)
+  .factory('WatchListComponent', WatchListComponent)
+  .directive('watchList', WatchListDirective)
 
 
-    .value('targetUser', 'zpratt');
+  .value('targetUser', 'zpratt');
 
 angular.element(document).ready(function () {
-    angular.bootstrap(document, ['app']);
+  angular.bootstrap(document, ['app']);
 });

@@ -1,50 +1,50 @@
 let expect = window.expect,
-    inject = window.inject,
-    module = window.module;
+  inject = window.inject,
+  module = window.module;
 
 describe('Service: Activity', function () {
-    const SOME_USER_ID = 'some-user';
+  const SOME_USER_ID = 'some-user';
 
-    let activityService,
-        httpBackend,
-        requestHandler,
+  let activityService,
+    httpBackend,
+    requestHandler,
 
-        someWatchedRepos,
+    someWatchedRepos,
 
-        GITHUB_ENDPOINT = `https://api.github.com/users/${SOME_USER_ID}/subscriptions`;
+    GITHUB_ENDPOINT = `https://api.github.com/users/${SOME_USER_ID}/subscriptions`;
 
-    beforeEach(function () {
-        someWatchedRepos  = [
-            {
-                id: 0,
-                name: 'some-name'
-            },
-            {
-                id: 1,
-                name: 'another name'
-            }
-        ];
+  beforeEach(function () {
+    someWatchedRepos = [
+      {
+        id: 0,
+        name: 'some-name'
+      },
+      {
+        id: 1,
+        name: 'another name'
+      }
+    ];
 
-        module('app');
+    module('app');
 
-        inject(function (_ActivityService_, $httpBackend) {
-            activityService = _ActivityService_;
-            httpBackend = $httpBackend;
-        });
-
-        requestHandler = httpBackend.whenGET(GITHUB_ENDPOINT);
+    inject(function (_ActivityService_, $httpBackend) {
+      activityService = _ActivityService_;
+      httpBackend = $httpBackend;
     });
 
-    afterEach(function () {
-        httpBackend.verifyNoOutstandingRequest();
-    });
+    requestHandler = httpBackend.whenGET(GITHUB_ENDPOINT);
+  });
 
-    it('should get a list of watched repos', function () {
-        requestHandler.respond(someWatchedRepos);
+  afterEach(function () {
+    httpBackend.verifyNoOutstandingRequest();
+  });
 
-        activityService.findAllWatchedRepos(SOME_USER_ID).then(function (watchedRepos) {
-            expect(watchedRepos).to.eql(someWatchedRepos);
-        });
-        httpBackend.flush();
+  it('should get a list of watched repos', function () {
+    requestHandler.respond(someWatchedRepos);
+
+    activityService.findAllWatchedRepos(SOME_USER_ID).then(function (watchedRepos) {
+      expect(watchedRepos).to.eql(someWatchedRepos);
     });
+    httpBackend.flush();
+  });
 });
