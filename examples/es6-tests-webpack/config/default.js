@@ -7,7 +7,8 @@ module.exports = {
       'node_modules/react/dist/react-with-addons.js',
       'node_modules/angular/angular.js',
       'node_modules/angular-mocks/angular-mocks.js',
-      'node_modules/ngreact/ngReact.js'
+      'node_modules/ngreact/ngReact.js',
+      'node_modules/react-dom/dist/react-dom.js'
     ],
     tests: [
       'test/*-service.spec.js',

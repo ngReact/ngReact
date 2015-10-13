@@ -4,6 +4,7 @@ let expect = window.expect,
 
   angular = window.angular,
   React = window.React,
+  ReactDOM = window.ReactDOM,
   ReactTestUtils = React.addons.TestUtils;
 
 describe('Factory: <WatchList />', function () {
@@ -36,7 +37,7 @@ describe('Factory: <WatchList />', function () {
     );
     renderedElement = ReactTestUtils.renderIntoDocument(watchListElement);
 
-    listDomEl = React.findDOMNode(renderedElement);
+    listDomEl = ReactDOM.findDOMNode(renderedElement);
   });
 
   afterEach(function () {
