@@ -4,7 +4,9 @@
 require('es5-shim');
 require('../ngReact');
 
-var React = require( 'react/addons' );
+var React = require( 'react' );
+var ReactTestUtils = require( 'react-addons-test-utils' );
+var ReactDOM = require( 'react-dom' );
 var angular = require( 'angular' );
 require( 'angular-mocks' );
 
@@ -180,7 +182,7 @@ describe('react-directive', () => {
       );
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
-      React.addons.TestUtils.Simulate.click( elm[0].firstChild );
+      ReactTestUtils.Simulate.click( elm[0].firstChild );
       $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
@@ -204,7 +206,7 @@ describe('react-directive', () => {
 
       scope.$apply(() => {
         expect(function() {
-            React.addons.TestUtils.Simulate.click( elm[0].firstChild )
+            ReactTestUtils.Simulate.click( elm[0].firstChild )
         }).not.toThrow();
       });
     }));
@@ -233,7 +235,7 @@ describe('react-directive', () => {
 
       expect(window.GlobalChangeNameValue).toEqual('Clark Kent');
 
-      React.addons.TestUtils.Simulate.click( elm[0].firstChild );
+      ReactTestUtils.Simulate.click( elm[0].firstChild );
       $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
@@ -263,7 +265,7 @@ describe('react-directive', () => {
       expect(elm.children().eq(0).text().trim()).toEqual('0');
 
       // first callback invocation
-      React.addons.TestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+      ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
       $timeout.flush(100);
 
       expect(elm.children().eq(0).text().trim()).toEqual('1');
@@ -276,7 +278,7 @@ describe('react-directive', () => {
       expect(elm.children().eq(0).text().trim()).toEqual('1');
 
       // second callback invocation
-      React.addons.TestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+      ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
       $timeout.flush(100);
 
       expect(elm.children().eq(0).text().trim()).toEqual('2');
@@ -448,7 +450,7 @@ describe('react-directive', () => {
       //unmountComponentAtNode returns:
       // * true if a component was unmounted and
       // * false if there was no component to unmount.
-      expect( React.unmountComponentAtNode(elm[0])).toEqual(false);
+      expect( ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
     }));
   });
 });

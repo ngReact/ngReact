@@ -9,17 +9,17 @@
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) {
     // CommonJS
-    module.exports = factory(require('react'), require('angular'));
+    module.exports = factory(require('react'), require('react-dom'), require('angular'));
   } else if (typeof define === 'function' && define.amd) {
     // AMD
-    define(['react', 'angular'], function (react, angular) {
-      return (root.ngReact = factory(react, angular));
+    define(['react', 'react-dom', 'angular'], function (react, reactDOM, angular) {
+      return (root.ngReact = factory(react, reactDOM, angular));
     });
   } else {
     // Global Variables
-    root.ngReact = factory(root.React, root.angular);
+    root.ngReact = factory(root.React, root.ReactDOM, root.angular);
   }
-}(this, function ngReact(React, angular) {
+}(this, function ngReact(React, ReactDOM, angular) {
   'use strict';
 
   // get a react component from name (components can be an angular injectable e.g. value, factory or
@@ -123,7 +123,7 @@
   // render React component, with scope[attrs.props] being passed in as the component props
   function renderComponent(component, props, $timeout, elem) {
     $timeout(function() {
-      React.render(React.createElement(component, props), elem[0]);
+      ReactDOM.render(React.createElement(component, props), elem[0]);
     });
   }
 
@@ -167,7 +167,7 @@
 
         // cleanup when scope is destroyed
         scope.$on('$destroy', function() {
-          React.unmountComponentAtNode(elem[0]);
+          ReactDOM.unmountComponentAtNode(elem[0]);
         });
       }
     };
@@ -232,7 +232,7 @@
 
           // cleanup when scope is destroyed
           scope.$on('$destroy', function() {
-            React.unmountComponentAtNode(elem[0]);
+            ReactDOM.unmountComponentAtNode(elem[0]);
           });
         }
       };
