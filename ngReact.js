@@ -9,7 +9,7 @@
 (function (root, factory) {
   if (typeof module !== 'undefined' && module.exports) {
     // CommonJS
-    module.exports = factory(require('react'), require('react-dom'), require('angular'));
+    module.exports = factory(require('react'), require('react-dom'), angular || require('angular'));
   } else if (typeof define === 'function' && define.amd) {
     // AMD
     define(['react', 'react-dom', 'angular'], function (react, reactDOM, angular) {
