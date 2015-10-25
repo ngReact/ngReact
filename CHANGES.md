@@ -1,5 +1,11 @@
 # CHANGES
 
+## 0.2.0
+
+- Upgrade to React 0.14 (Many thanks to @aabenoja) (#109)
+- Bug fix to avoid calling $scope.$apply when you're already in an $apply or $digest (which would cause a bug) (#99)
+- Improvements to docs, tests, and code styles
+
 ## 0.1.7
 
 - Fix/Enhancement: Return the value from Angular functions invoked within a $scope.$apply, if you require that value (#85). There was mixed discussion on this, and a sufficiently compelling use case was not provided, but I am more so of the opinion that returning is trivial and a generally accepted practice. Using it should not be necessary and could be considered an antipattern, but in the case that a valid use case arises down the road, I'd rather ngReact not be in the way.

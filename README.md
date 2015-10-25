@@ -243,3 +243,6 @@ grunt karma:background watch
 - Marek Kalnik (@marekkalnik)
 - @oriweingart
 - Basarat Ali Syed (@basarat)
+- Rene Bischoff (@Fjandin)
+- Zach Pratt (@zpratt)
+- Alex Abenoja (@aabenoja)
