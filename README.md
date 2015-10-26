@@ -205,6 +205,22 @@ During testing you may want to run the `JSXTransformer` in the browser. For this
 
 NOTE: The workaround for this is hacky as the angular bootstap is postponed in with a `setTimeout`, so consider [transforming jsx in a build step](http://facebook.github.io/react/docs/getting-started.html#offline-transform).
 
+## Usage with [webpack](https://webpack.github.io/) and AngularJS < 1.3.14
+
+CommonJS support was [added to AngularJS in version 1.3.14](https://github.com/angular/angular.js/blob/master/CHANGELOG.md#1314-instantaneous-browserification-2015-02-24). If you use webpack and need to support AngularJS < 1.3.14, you should use webpack's [exports-loader](https://github.com/webpack/exports-loader) so that `require('angular')` returns the correct value. Your webpack configuration should include the following loader config:
+
+```js
+...
+module: {
+  loaders: [
+    {
+      test: path.resolve(__dirname, 'node_modules/angular/angular.js'),
+      loader: 'exports?window.angular'
+    }
+  ]
+},
+...
+```
 
 ## Developing
 Before starting development run
