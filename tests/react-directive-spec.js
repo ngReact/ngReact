@@ -33,6 +33,17 @@ var Hello = React.createClass({
   }
 });
 
+var Transcluder = React.createClass({
+  propTypes: {
+    children : React.PropTypes.string,
+  },
+
+  render() {
+    var {children} = this.props;
+    return <div dangerouslySetInnerHTML={ {__html: children} }/>;
+  }
+});
+
 var People = React.createClass({
   propTypes: {
     items : React.PropTypes.array
@@ -298,6 +309,69 @@ describe('react-directive', () => {
     }));
   });
 
+  describe('transclusion', () => {
+
+    it('should do nothing by default', () => {
+      compileProvider.directive('transcluder', (reactDirective) => {
+        return reactDirective(Transcluder);
+      });
+
+      var elm = compileElement('<transcluder>This is a test.</transcluder>');
+      expect(elm.children().html()).toEqual('');
+    });
+
+    it('should transfer the directive body.', () => {
+      compileProvider.directive('transcluder', (reactDirective) => {
+        return reactDirective(Transcluder, undefined, { transclude: true });
+      });
+
+      var elm = compileElement('<transcluder>This is a test.</transcluder>');
+      expect(elm.children().html())
+      .toEqual('<span class="ng-scope">This is a test.</span>');
+    });
+
+    it('should transfer a multi-element body.', () => {
+      compileProvider.directive('transcluder', (reactDirective) => {
+        return reactDirective(Transcluder, undefined, { transclude: true });
+      });
+
+      var elm = compileElement('<transcluder><span><h1>This</h1> is a test.</span></transcluder>');
+      expect(elm.children().html())
+      .toEqual('<span class="ng-scope"><h1>This</h1> is a test.</span>');
+    });
+
+    it('should transfer a binding value once', () => inject($rootScope => {
+      compileProvider.directive('transcluder', (reactDirective) => {
+        return reactDirective(Transcluder, undefined, { transclude: true });
+      });
+
+      var scope = $rootScope.$new();
+      scope.test = 'hello';
+
+      var elm = compileElement('<transcluder><span><h1>This</h1> is a {{ test }}.</span></transcluder>', scope);
+      expect(elm.children().html())
+      .toEqual('<span class="ng-binding ng-scope"><h1>This</h1> is a hello.</span>');
+    }));
+
+    it('should render a regular directive at least once.', () => inject($rootScope => {
+      compileProvider.directive('transcluder', (reactDirective) => {
+        return reactDirective(Transcluder, undefined, { transclude: true });
+      });
+
+      // Create the test angular directive.
+      compileProvider.directive('test', () => { 
+        return {
+          restrict: 'E',
+          replace: true,
+          template: '<div>Hello</div>'
+        }
+      });
+
+      var elm = compileElement('<transcluder><test></test></transcluder>', $rootScope.$new());
+      expect(elm.children().html()).toEqual('<div class="ng-scope">Hello</div>');
+    }));
+
+  });
 
   describe('watch-depth', () => {
 

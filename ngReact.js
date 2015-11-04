@@ -199,25 +199,55 @@
   // This directive can then be used like this:
   //
   //     <hello name="name"/>
+  // Or, if you set transclude to true:
+  //     <hello>some body text</hello>
   //
-  var reactDirective = function($timeout, $injector) {
+  var reactDirective = function($timeout, $injector, $compile) {
     return function(reactComponentName, propNames, conf) {
       var directive = {
         restrict: 'E',
         replace: true,
-        link: function(scope, elem, attrs) {
+        link: function(scope, elem, attrs, ctrl, transclude) {
           var reactComponent = getReactComponent(reactComponentName, $injector);
 
           // if propNames is not defined, fall back to use the React component's propTypes if present
           propNames = propNames || Object.keys(reactComponent.propTypes || {});
 
+          // Takes angular element and converts it to raw html.
+          function convertToHtml(compiledBody) {
+            var html = '';
+            angular.forEach(compiledBody, function(childElement) {
+              html += childElement.outerHTML;
+            });
+            return html;
+          }
+
           // for each of the properties, get their scope value and set it to scope.props
           var renderMyComponent = function() {
-            var props = {};
+            var scopeProps = {};
+            var props;
+            var temporaryScope;
+            var compiledElement;
+
             propNames.forEach(function(propName) {
-              props[propName] = scope.$eval(attrs[propName]);
+              scopeProps[propName] = scope.$eval(attrs[propName]);
             });
-            renderComponent(reactComponent, applyFunctions(props, scope), $timeout, elem);
+
+            props = applyFunctions(scopeProps, scope);
+
+            if (transclude) {
+              temporaryScope = scope.$new();
+              compiledElement = $compile(transclude())(temporaryScope);
+            }
+
+            // we use a $timeout to allow trancluded content to be compiled.
+            $timeout(function() {
+              if (transclude) {
+                props.children = convertToHtml(compiledElement);
+                temporaryScope.$destroy();
+              }
+              renderComponent(reactComponent, props, $timeout, elem);
+            });
           };
 
           // watch each property name and trigger an update whenever something changes,
@@ -243,5 +273,5 @@
   // create the end module without any dependencies, including reactComponent and reactDirective
   return angular.module('react', [])
     .directive('reactComponent', ['$timeout', '$injector', reactComponent])
-    .factory('reactDirective', ['$timeout','$injector', reactDirective]);
+    .factory('reactDirective', ['$timeout','$injector', '$compile', reactDirective]);
 }));
