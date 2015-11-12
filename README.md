@@ -33,6 +33,7 @@ Then, just make sure Angular, React, and ngReact are on the page,
 ```html
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/react/react.js"></script>
+<script src="bower_components/react/react-dom.js"></script>
 <script src="bower_components/ngReact/ngReact.min.js"></script>
 ```
 
