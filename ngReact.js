@@ -123,7 +123,7 @@
   // render React component, with scope[attrs.props] being passed in as the component props
   function renderComponent(component, props, $timeout, elem) {
     $timeout(function() {
-      ReactDOM.render(React.createElement(component, props), elem[0]);
+      ReactDOM.render(React.createElement(component, props, elem[0].children), elem[0]);
     });
   }
 
