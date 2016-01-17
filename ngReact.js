@@ -167,7 +167,13 @@
 
         // cleanup when scope is destroyed
         scope.$on('$destroy', function() {
-          ReactDOM.unmountComponentAtNode(elem[0]);
+          if (!attrs.onScopeDestroy) {
+            ReactDOM.unmountComponentAtNode(elem[0]);
+          } else {
+            scope.$eval(attrs.onScopeDestroy, {
+              unmountComponent: ReactDOM.unmountComponentAtNode.bind(this, elem[0])
+            });
+          }
         });
       }
     };
@@ -232,7 +238,13 @@
 
           // cleanup when scope is destroyed
           scope.$on('$destroy', function() {
-            ReactDOM.unmountComponentAtNode(elem[0]);
+            if (!attrs.onScopeDestroy) {
+              ReactDOM.unmountComponentAtNode(elem[0]);
+            } else {
+              scope.$eval(attrs.onScopeDestroy, {
+                unmountComponent: ReactDOM.unmountComponentAtNode.bind(this, elem[0])
+              });
+            }
           });
         }
       };
