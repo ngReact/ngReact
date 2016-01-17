@@ -27,9 +27,21 @@ var Hello = React.createClass({
   render() {
     var {fname, lname, undeclared} = this.props;
 
-    window.GlobalHelloRenderCount++;
-
     return <div onClick={this.handleClick}>Hello {fname} {lname}{undeclared}</div>;
+  }
+});
+
+var DeepHello = React.createClass({
+  propTypes: {
+    person : React.PropTypes.object
+  },
+
+  render() {
+    var {fname, lname, undeclared} = this.props.person;
+
+    window.GlobalDeepHelloRenderCount++;
+
+    return <div>Hello {fname} {lname}{undeclared}</div>;
   }
 });
 
@@ -43,6 +55,7 @@ var People = React.createClass({
     return <div>Hello {names}</div>;
   }
 });
+
 
 describe('react-directive', () => {
 
@@ -60,13 +73,12 @@ describe('react-directive', () => {
     window.GlobalHello = undefined;
   });
 
-  beforeEach(inject(($rootScope, $compile, $timeout) => {
+  beforeEach(inject(($rootScope, $compile) => {
     compileElement = ( html, scope ) => {
       scope = scope || $rootScope;
       var elm = angular.element(html);
       $compile(elm)(scope);
       scope.$digest();
-      $timeout.flush();
       return elm;
     };
   }));
@@ -147,7 +159,7 @@ describe('react-directive', () => {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
-    it('should rerender when scope is updated', inject(($rootScope, $timeout) => {
+    it('should rerender when scope is updated', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = { firstName: 'Clark', lastName: 'Kent' };
 
@@ -161,12 +173,11 @@ describe('react-directive', () => {
       scope.person.firstName = 'Bruce';
       scope.person.lastName = 'Banner';
       scope.$apply();
-      $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should accept callbacks as properties', inject(($rootScope, $timeout) => {
+    it('should accept callbacks as properties', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = {
         fname: 'Clark', lname: 'Kent'
@@ -183,13 +194,12 @@ describe('react-directive', () => {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
       ReactTestUtils.Simulate.click( elm[0].firstChild );
-      $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
 
     }));
 
-    it(': callback should not fail when executed inside a scope apply', inject(($rootScope, $timeout) => {
+    it(': callback should not fail when executed inside a scope apply', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = {
         fname: 'Clark', lname: 'Kent'
@@ -211,7 +221,7 @@ describe('react-directive', () => {
       });
     }));
 
-    it('should return callbacks value', inject(($rootScope, $timeout) => {
+    it('should return callbacks value', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = {
         fname: 'Clark', lname: 'Kent'
@@ -236,7 +246,6 @@ describe('react-directive', () => {
       expect(window.GlobalChangeNameValue).toEqual('Clark Kent');
 
       ReactTestUtils.Simulate.click( elm[0].firstChild );
-      $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
 
@@ -244,7 +253,7 @@ describe('react-directive', () => {
 
     }));
 
-    it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope, $timeout) => {
+    it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.changeCount = 0;
       scope.person = {
@@ -266,20 +275,17 @@ describe('react-directive', () => {
 
       // first callback invocation
       ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
-      $timeout.flush(100);
 
       expect(elm.children().eq(0).text().trim()).toEqual('1');
 
       // change props directly
       scope.person.fname = 'Peter';
       scope.$apply();
-      $timeout.flush();
 
       expect(elm.children().eq(0).text().trim()).toEqual('1');
 
       // second callback invocation
       ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
-      $timeout.flush(100);
 
       expect(elm.children().eq(0).text().trim()).toEqual('2');
     }));
@@ -318,7 +324,7 @@ describe('react-directive', () => {
             scope);
       }));
 
-      it('should rerender when a property of scope object is updated', () => inject(($rootScope, $timeout) => {
+      it('should rerender when a property of scope object is updated', () => inject(($rootScope) => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
@@ -326,7 +332,6 @@ describe('react-directive', () => {
         scope.person.lname = 'Banner';
 
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
@@ -336,41 +341,39 @@ describe('react-directive', () => {
       var elm, scope;
 
       beforeEach(inject(($rootScope) => {
-        provide.value('Hello', Hello);
-        compileProvider.directive('hello', (reactDirective) => {
-          return reactDirective('Hello');
+        provide.value('DeepHello', DeepHello);
+        compileProvider.directive('deepHello', (reactDirective) => {
+          return reactDirective('DeepHello');
         });
 
         scope = $rootScope.$new();
         scope.person = { fname: 'Clark', lname: 'Kent' };
 
         elm = compileElement(
-            '<hello fname="person.fname" lname="person.lname" watch-depth="reference"/>',
+            '<deep-hello person="person" watch-depth="reference"/>',
             scope);
       }));
 
-      it('should rerender when scope object is updated', () => inject(($timeout) => {
+      it('should rerender when scope object is updated', () => inject(() => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
         scope.person = { fname: 'Bruce', lname: 'Banner' };
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
 
-      it('should invoke React.render once when both props change', () => inject(($timeout) => {
+      it('should invoke React.render once when both props change', () => inject(() => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
-        window.GlobalHelloRenderCount = 0;
+        window.GlobalDeepHelloRenderCount = 0;
 
         scope.person = { fname: 'Bruce', lname: 'Banner' };
         scope.$apply();
-        $timeout.flush();
 
-        expect(window.GlobalHelloRenderCount).toEqual(1);
+        expect(window.GlobalDeepHelloRenderCount).toEqual(1);
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
@@ -403,13 +406,12 @@ describe('react-directive', () => {
             scope);
       }));
 
-      it('should rerender when an item is added to array in scope', () => inject(($timeout) => {
+      it('should rerender when an item is added to array in scope', () => inject(() => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
         scope.people.push({ fname: 'Bruce', lname: 'Banner'});
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Banner');
       }));

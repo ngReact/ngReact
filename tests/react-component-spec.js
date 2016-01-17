@@ -35,13 +35,12 @@ describe('react-component', () => {
 
   beforeEach(angular.mock.module(($provide) => {provide = $provide;}));
 
-  beforeEach(inject(($rootScope, $compile, $timeout) => {
+  beforeEach(inject(($rootScope, $compile) => {
     compileElement = ( html, scope ) => {
       scope = scope || $rootScope;
       var elm = angular.element(html);
       $compile(elm)(scope);
       scope.$digest();
-      $timeout.flush();
       return elm;
     };
   }));
@@ -94,7 +93,7 @@ describe('react-component', () => {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
-    it('should rerender when scope is updated', inject(($rootScope, $timeout) => {
+    it('should rerender when scope is updated', inject(($rootScope) => {
 
       var scope = $rootScope.$new();
       scope.person = { fname: 'Clark', lname: 'Kent' };
@@ -109,12 +108,11 @@ describe('react-component', () => {
       scope.person.fname = 'Bruce';
       scope.person.lname = 'Banner';
       scope.$apply();
-      $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should accept callbacks on scope', inject(($rootScope, $timeout) => {
+    it('should accept callbacks on scope', inject(($rootScope) => {
 
       var scope = $rootScope.$new();
       scope.person = {
@@ -132,12 +130,11 @@ describe('react-component', () => {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
       ReactTestUtils.Simulate.click( elm[0].firstChild );
-      $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope, $timeout) => {
+    it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.changeCount = 0;
       scope.person = {
@@ -159,20 +156,17 @@ describe('react-component', () => {
 
       // first callback invocation
       ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
-      $timeout.flush(100);
 
       expect(elm.children().eq(0).text().trim()).toEqual('1');
 
       // change props directly
       scope.person.fname = 'Peter';
       scope.$apply();
-      $timeout.flush();
 
       expect(elm.children().eq(0).text().trim()).toEqual('1');
 
       // second callback invocation
       ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
-      $timeout.flush(100);
 
       expect(elm.children().eq(0).text().trim()).toEqual('2');
     }));
@@ -189,7 +183,7 @@ describe('react-component', () => {
         scope.person = { fname: 'Clark', lname: 'Kent' };
       }));
 
-      it('should rerender when a property of scope object is updated', () => inject(($timeout) => {
+      it('should rerender when a property of scope object is updated', () => inject(() => {
 
         elm = compileElement(
             '<react-component name="Hello" props="person" watch-depth="value"/>',
@@ -200,12 +194,11 @@ describe('react-component', () => {
         scope.person.fname = 'Bruce';
         scope.person.lname = 'Banner';
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
 
-      it('should rerender when a property of scope object is updated', () => inject(($timeout) => {
+      it('should rerender when a property of scope object is updated', () => inject(() => {
 
         //watch-depth will default to value
         elm = compileElement(
@@ -217,7 +210,6 @@ describe('react-component', () => {
         scope.person.fname = 'Bruce';
         scope.person.lname = 'Banner';
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
@@ -236,13 +228,12 @@ describe('react-component', () => {
             scope);
       }));
 
-      it('should rerender when scope object is updated', () => inject(($timeout) => {
+      it('should rerender when scope object is updated', () => inject(() => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
         scope.person = { fname: 'Bruce', lname: 'Banner' };
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
