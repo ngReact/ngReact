@@ -141,7 +141,7 @@ app.directive('hello', function(reactDirective) {
 });
 ```
 
-If you want to change the configuration of the directive created the `reactDirective` service, e.g. change `restrict: 'E'` to `restrict: 'C'`, you can do so by passing in an object literal with the desired configuration.
+If you want to change the configuration of the directive created the `reactDirective` service, e.g. change `restrict: 'E'` to `restrict: 'C'`, you can do so by passing in an object literal with the desired configuration. In addition, setting `transclude: true` in the configuation will pass the directive element body to the react component as `this.props.children` and displayed using aptly named `dangerouslySetInnerHTML` attribute. Any angular bindings or directives in the element body will be compiled once; and then have their watchers destroyed.
 
 ```javascript
 app.directive('hello', function(reactDirective) {
