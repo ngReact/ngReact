@@ -450,7 +450,59 @@ describe('react-directive', () => {
       //unmountComponentAtNode returns:
       // * true if a component was unmounted and
       // * false if there was no component to unmount.
-      expect( ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
+    }));
+
+  });
+
+  describe('deferred destruction', function() {
+
+    beforeEach(() => {
+      provide.value('Hello', Hello);
+      compileProvider.directive('hello', (reactDirective) => {
+        return reactDirective('Hello');
+      });
+    });
+
+    it('should not unmount component when scope is destroyed', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = { firstName: 'Clark', lastName: 'Kent' };
+      scope.callback = jasmine.createSpy('callback');
+
+      var elm = compileElement(
+        '<hello fname="person.firstName" lname="person.lastName" on-scope-destroy="callback()"/>',
+        scope
+      );
+      scope.$destroy();
+
+      //unmountComponentAtNode returns:
+      // * true if a component was unmounted and
+      // * false if there was no component to unmount.
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(true);
+
+      expect(scope.callback.calls.count()).toEqual(1);
+    }));
+
+    it('should pass unmount function as a "unmountComponent" parameter to callback', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = { firstName: 'Clark', lastName: 'Kent' };
+      scope.callback = function(unmountFn) {
+        unmountFn();
+      };
+      
+      spyOn(scope, 'callback').and.callThrough();
+
+      var elm = compileElement(
+        '<hello fname="person.firstName" lname="person.lastName" on-scope-destroy="callback(unmountComponent)"/>',
+        scope
+      );
+      scope.$destroy();
+      //unmountComponentAtNode returns:
+      // * true if a component was unmounted and
+      // * false if there was no component to unmount.
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
+
+      expect(scope.callback.calls.count()).toEqual(1);
     }));
   });
 });
