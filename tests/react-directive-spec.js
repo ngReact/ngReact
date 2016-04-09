@@ -136,6 +136,22 @@ describe('react-directive', () => {
       expect(elm.text().trim()).toEqual('Hello');
     });
 
+    it('should be possible to provide properties from directive to the reactDirective', inject(($rootScope) => {
+      compileProvider.directive('helloComponent', (reactDirective) => {
+        return reactDirective(Hello, undefined, undefined, {fname: 'Clark', lname: 'Kent'});
+      });
+      var elm = compileElement('<hello-component />', $rootScope.$new());
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+    }));
+
+    it('properties passed to reactDirective should override colliding properties passed as param', inject(($rootScope) => {
+      compileProvider.directive('helloComponent', (reactDirective) => {
+        return reactDirective(Hello, undefined, undefined, {fname: 'Clark', lname: 'Kent'});
+      });
+      var elm = compileElement('<hello-component fname="\'toBeOverridden\'"/>', $rootScope.$new());
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+    }));
+
     it('should bind to properties on scope', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.firstName = 'Clark';
@@ -491,7 +507,7 @@ describe('react-directive', () => {
       scope.callback = function(unmountFn) {
         unmountFn();
       };
-      
+
       spyOn(scope, 'callback').and.callThrough();
 
       var elm = compileElement(
