@@ -40,9 +40,9 @@
     "karma-phantomjs-launcher": "0.2.0",
     "load-grunt-tasks": "0.1.0",
     "phantomjs": "1.9.17",
-    "react": "^0.14.2",
-    "react-addons-test-utils": "^0.14.2",
-    "react-dom": "^0.14.2",
+    "react": "^15.0.0",
+    "react-addons-test-utils": "^15.0.0",
+    "react-dom": "^15.0.0",
     "reactify": "0.17.1"
   },
   "engines": {
