@@ -1,5 +1,11 @@
 # CHANGES
 
+## 0.3.0
+Pass injectables and other variables straight to the reactDirective - #149 - thanks @villesau
+Upgrade to React 14 - #148 - thanks @bdwain
+Add deferred unmounting - #134 - @onumossn
+Switched to peerDependencies #118, thanks @aabenoja
+
 ## 0.2.0
 
 - Upgrade to React 0.14 (Many thanks to @aabenoja) (#109)
