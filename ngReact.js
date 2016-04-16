@@ -207,7 +207,7 @@
   //     <hello name="name"/>
   //
   var reactDirective = function($injector) {
-    return function(reactComponentName, propNames, conf) {
+    return function(reactComponentName, propNames, conf, injectableProps) {
       var directive = {
         restrict: 'E',
         replace: true,
@@ -223,7 +223,9 @@
             propNames.forEach(function(propName) {
               props[propName] = scope.$eval(attrs[propName]);
             });
-            renderComponent(reactComponent, applyFunctions(props, scope), scope, elem);
+            props = applyFunctions(props, scope);
+            props = angular.extend({}, props, injectableProps);
+            renderComponent(reactComponent, props, scope, elem);
           };
 
           // watch each property name and trigger an update whenever something changes,

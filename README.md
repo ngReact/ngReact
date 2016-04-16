@@ -168,6 +168,14 @@ app.directive('hello', helloDirective);
 
 In an existing Angular application, you'll often have existing services or filters that you wish to access from your React component. These can be retrieved using Angular's dependency injection. The React component will still be render-able as aforementioned, using the react-component directive.
 
+It's also possible to pass Angular injectables and other variables as fourth parameter straight to the reactDirective, which will then attach them to the props
+
+```javascript
+app.directive('helloComponent', function(reactDirective, $ngRedux) {
+  return reactDirective(HelloComponent, undefined, {}, {store: $ngRedux});
+});
+```
+
 Be aware that you can not inject Angular directives into JSX.
 
 ```javascript
