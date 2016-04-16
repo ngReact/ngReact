@@ -4,7 +4,9 @@
 require('es5-shim');
 require('../ngReact');
 
-var React = require( 'react/addons' );
+var React = require( 'react' );
+var ReactTestUtils = require( 'react-addons-test-utils' );
+var ReactDOM = require( 'react-dom' );
 var angular = require( 'angular' );
 require( 'angular-mocks' );
 
@@ -33,13 +35,12 @@ describe('react-component', () => {
 
   beforeEach(angular.mock.module(($provide) => {provide = $provide;}));
 
-  beforeEach(inject(($rootScope, $compile, $timeout) => {
+  beforeEach(inject(($rootScope, $compile) => {
     compileElement = ( html, scope ) => {
       scope = scope || $rootScope;
       var elm = angular.element(html);
       $compile(elm)(scope);
       scope.$digest();
-      $timeout.flush();
       return elm;
     };
   }));
@@ -92,7 +93,7 @@ describe('react-component', () => {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
-    it('should rerender when scope is updated', inject(($rootScope, $timeout) => {
+    it('should rerender when scope is updated', inject(($rootScope) => {
 
       var scope = $rootScope.$new();
       scope.person = { fname: 'Clark', lname: 'Kent' };
@@ -107,12 +108,11 @@ describe('react-component', () => {
       scope.person.fname = 'Bruce';
       scope.person.lname = 'Banner';
       scope.$apply();
-      $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should accept callbacks on scope', inject(($rootScope, $timeout) => {
+    it('should accept callbacks on scope', inject(($rootScope) => {
 
       var scope = $rootScope.$new();
       scope.person = {
@@ -129,10 +129,46 @@ describe('react-component', () => {
       );
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
-      React.addons.TestUtils.Simulate.click( elm[0].firstChild );
-      $timeout.flush();
+      ReactTestUtils.Simulate.click( elm[0].firstChild );
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+    }));
+
+    it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.changeCount = 0;
+      scope.person = {
+        fname: 'Clark', lname: 'Kent',
+        changeName: () => {
+          scope.changeCount += 1;
+        }
+      };
+
+      var template =
+        `<div>
+          <p>{{changeCount}}</p>
+          <react-component name="Hello" props="person"/>
+        </div>`;
+
+      var elm = compileElement(template, scope);
+
+      expect(elm.children().eq(0).text().trim()).toEqual('0');
+
+      // first callback invocation
+      ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+
+      expect(elm.children().eq(0).text().trim()).toEqual('1');
+
+      // change props directly
+      scope.person.fname = 'Peter';
+      scope.$apply();
+
+      expect(elm.children().eq(0).text().trim()).toEqual('1');
+
+      // second callback invocation
+      ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+
+      expect(elm.children().eq(0).text().trim()).toEqual('2');
     }));
   });
 
@@ -147,7 +183,7 @@ describe('react-component', () => {
         scope.person = { fname: 'Clark', lname: 'Kent' };
       }));
 
-      it('should rerender when a property of scope object is updated', () => inject(($timeout) => {
+      it('should rerender when a property of scope object is updated', () => inject(() => {
 
         elm = compileElement(
             '<react-component name="Hello" props="person" watch-depth="value"/>',
@@ -158,12 +194,11 @@ describe('react-component', () => {
         scope.person.fname = 'Bruce';
         scope.person.lname = 'Banner';
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
 
-      it('should rerender when a property of scope object is updated', () => inject(($timeout) => {
+      it('should rerender when a property of scope object is updated', () => inject(() => {
 
         //watch-depth will default to value
         elm = compileElement(
@@ -175,7 +210,6 @@ describe('react-component', () => {
         scope.person.fname = 'Bruce';
         scope.person.lname = 'Banner';
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
@@ -194,13 +228,12 @@ describe('react-component', () => {
             scope);
       }));
 
-      it('should rerender when scope object is updated', () => inject(($timeout) => {
+      it('should rerender when scope object is updated', () => inject(() => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
         scope.person = { fname: 'Bruce', lname: 'Banner' };
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
@@ -237,7 +270,55 @@ describe('react-component', () => {
       //unmountComponentAtNode returns:
       // * true if a component was unmounted and
       // * false if there was no component to unmount.
-      expect( React.unmountComponentAtNode(elm[0])).toEqual(false);
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
+    }));
+  });
+
+  describe('deferred destruction', function() {
+
+    beforeEach(() => {
+      provide.value('Hello', Hello);
+    });
+
+    it('should not unmount component when scope is destroyed', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = { firstName: 'Clark', lastName: 'Kent' };
+      scope.callback = jasmine.createSpy('callback');
+
+      var elm = compileElement(
+        '<react-component name="Hello" props="person" on-scope-destroy="callback()"/>',
+        scope
+      );
+      scope.$destroy();
+
+      //unmountComponentAtNode returns:
+      // * true if a component was unmounted and
+      // * false if there was no component to unmount.
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(true);
+
+      expect(scope.callback.calls.count()).toEqual(1);
+    }));
+
+    it('should pass unmount function as a "unmountComponent" parameter to callback', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = { firstName: 'Clark', lastName: 'Kent' };
+      scope.callback = function(unmountFn) {
+        unmountFn();
+      };
+      
+      spyOn(scope, 'callback').and.callThrough();
+
+      var elm = compileElement(
+        '<react-component name="Hello" props="person" on-scope-destroy="callback(unmountComponent)"/>',
+        scope
+      );
+      scope.$destroy();
+      //unmountComponentAtNode returns:
+      // * true if a component was unmounted and
+      // * false if there was no component to unmount.
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
+
+      expect(scope.callback.calls.count()).toEqual(1);
     }));
   });
 });

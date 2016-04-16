@@ -4,7 +4,9 @@
 require('es5-shim');
 require('../ngReact');
 
-var React = require( 'react/addons' );
+var React = require( 'react' );
+var ReactTestUtils = require( 'react-addons-test-utils' );
+var ReactDOM = require( 'react-dom' );
 var angular = require( 'angular' );
 require( 'angular-mocks' );
 
@@ -16,12 +18,30 @@ var Hello = React.createClass({
   },
 
   handleClick() {
-    this.props.changeName();
+    var value = this.props.changeName();
+    if (value){
+      window.GlobalChangeNameValue = value;
+    }
   },
 
   render() {
     var {fname, lname, undeclared} = this.props;
+
     return <div onClick={this.handleClick}>Hello {fname} {lname}{undeclared}</div>;
+  }
+});
+
+var DeepHello = React.createClass({
+  propTypes: {
+    person : React.PropTypes.object
+  },
+
+  render() {
+    var {fname, lname, undeclared} = this.props.person;
+
+    window.GlobalDeepHelloRenderCount++;
+
+    return <div>Hello {fname} {lname}{undeclared}</div>;
   }
 });
 
@@ -35,6 +55,7 @@ var People = React.createClass({
     return <div>Hello {names}</div>;
   }
 });
+
 
 describe('react-directive', () => {
 
@@ -52,13 +73,12 @@ describe('react-directive', () => {
     window.GlobalHello = undefined;
   });
 
-  beforeEach(inject(($rootScope, $compile, $timeout) => {
+  beforeEach(inject(($rootScope, $compile) => {
     compileElement = ( html, scope ) => {
       scope = scope || $rootScope;
       var elm = angular.element(html);
       $compile(elm)(scope);
       scope.$digest();
-      $timeout.flush();
       return elm;
     };
   }));
@@ -116,6 +136,22 @@ describe('react-directive', () => {
       expect(elm.text().trim()).toEqual('Hello');
     });
 
+    it('should be possible to provide properties from directive to the reactDirective', inject(($rootScope) => {
+      compileProvider.directive('helloComponent', (reactDirective) => {
+        return reactDirective(Hello, undefined, undefined, {fname: 'Clark', lname: 'Kent'});
+      });
+      var elm = compileElement('<hello-component />', $rootScope.$new());
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+    }));
+
+    it('properties passed to reactDirective should override colliding properties passed as param', inject(($rootScope) => {
+      compileProvider.directive('helloComponent', (reactDirective) => {
+        return reactDirective(Hello, undefined, undefined, {fname: 'Clark', lname: 'Kent'});
+      });
+      var elm = compileElement('<hello-component fname="\'toBeOverridden\'"/>', $rootScope.$new());
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+    }));
+
     it('should bind to properties on scope', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.firstName = 'Clark';
@@ -139,7 +175,7 @@ describe('react-directive', () => {
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
-    it('should rerender when scope is updated', inject(($rootScope, $timeout) => {
+    it('should rerender when scope is updated', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = { firstName: 'Clark', lastName: 'Kent' };
 
@@ -153,12 +189,11 @@ describe('react-directive', () => {
       scope.person.firstName = 'Bruce';
       scope.person.lastName = 'Banner';
       scope.$apply();
-      $timeout.flush();
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
     }));
 
-    it('should accept callbacks as properties', inject(($rootScope, $timeout) => {
+    it('should accept callbacks as properties', inject(($rootScope) => {
       var scope = $rootScope.$new();
       scope.person = {
         fname: 'Clark', lname: 'Kent'
@@ -174,10 +209,101 @@ describe('react-directive', () => {
       );
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
-      React.addons.TestUtils.Simulate.click( elm[0].firstChild );
-      $timeout.flush();
+      ReactTestUtils.Simulate.click( elm[0].firstChild );
 
       expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+
+    }));
+
+    it(': callback should not fail when executed inside a scope apply', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = {
+        fname: 'Clark', lname: 'Kent'
+      };
+      scope.change = () => {
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+      };
+
+      var elm = compileElement(
+        '<hello fname="person.fname" lname="person.lname" change-name="change"/>',
+        scope
+      );
+
+      scope.$apply(() => {
+        expect(function() {
+            ReactTestUtils.Simulate.click( elm[0].firstChild )
+        }).not.toThrow();
+      });
+    }));
+
+    it('should return callbacks value', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = {
+        fname: 'Clark', lname: 'Kent'
+      };
+      scope.change = () => {
+        scope.person.fname = 'Bruce';
+        scope.person.lname = 'Banner';
+        return scope.person.fname + ' ' + scope.person.lname;
+      };
+
+      window.GlobalChangeNameValue = 'Clark Kent';
+
+      expect(window.GlobalChangeNameValue).toEqual('Clark Kent');
+
+      var elm = compileElement(
+        '<hello fname="person.fname" lname="person.lname" change-name="change"/>',
+        scope
+      );
+
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+      expect(window.GlobalChangeNameValue).toEqual('Clark Kent');
+
+      ReactTestUtils.Simulate.click( elm[0].firstChild );
+
+      expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+
+      expect(window.GlobalChangeNameValue).toEqual('Bruce Banner');
+
+    }));
+
+    it('should scope.$apply() callback invocations made after changing props directly', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.changeCount = 0;
+      scope.person = {
+        fname: 'Clark', lname: 'Kent'
+      };
+      scope.change = () => {
+        scope.changeCount += 1;
+      };
+
+      var template =
+      `<div>
+        <p>{{changeCount}}</p>
+        <hello fname="person.fname" lname="person.lname" change-name="change"/>
+      </div>`;
+
+      var elm = compileElement(template, scope);
+
+      expect(elm.children().eq(0).text().trim()).toEqual('0');
+
+      // first callback invocation
+      ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+
+      expect(elm.children().eq(0).text().trim()).toEqual('1');
+
+      // change props directly
+      scope.person.fname = 'Peter';
+      scope.$apply();
+
+      expect(elm.children().eq(0).text().trim()).toEqual('1');
+
+      // second callback invocation
+      ReactTestUtils.Simulate.click( elm[0].children.item(1).lastChild );
+
+      expect(elm.children().eq(0).text().trim()).toEqual('2');
     }));
 
     it('should accept undeclared properties when specified', inject(($rootScope) => {
@@ -214,7 +340,7 @@ describe('react-directive', () => {
             scope);
       }));
 
-      it('should rerender when a property of scope object is updated', () => inject(($rootScope, $timeout) => {
+      it('should rerender when a property of scope object is updated', () => inject(($rootScope) => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
@@ -222,7 +348,6 @@ describe('react-directive', () => {
         scope.person.lname = 'Banner';
 
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
@@ -232,26 +357,39 @@ describe('react-directive', () => {
       var elm, scope;
 
       beforeEach(inject(($rootScope) => {
-        provide.value('Hello', Hello);
-        compileProvider.directive('hello', (reactDirective) => {
-          return reactDirective('Hello');
+        provide.value('DeepHello', DeepHello);
+        compileProvider.directive('deepHello', (reactDirective) => {
+          return reactDirective('DeepHello');
         });
 
         scope = $rootScope.$new();
         scope.person = { fname: 'Clark', lname: 'Kent' };
 
         elm = compileElement(
-            '<hello fname="person.fname" lname="person.lname" watch-depth="reference"/>',
+            '<deep-hello person="person" watch-depth="reference"/>',
             scope);
       }));
 
-      it('should rerender when scope object is updated', () => inject(($timeout) => {
+      it('should rerender when scope object is updated', () => inject(() => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
         scope.person = { fname: 'Bruce', lname: 'Banner' };
         scope.$apply();
-        $timeout.flush();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+
+      it('should invoke React.render once when both props change', () => inject(() => {
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        window.GlobalDeepHelloRenderCount = 0;
+
+        scope.person = { fname: 'Bruce', lname: 'Banner' };
+        scope.$apply();
+
+        expect(window.GlobalDeepHelloRenderCount).toEqual(1);
 
         expect(elm.text().trim()).toEqual('Hello Bruce Banner');
       }));
@@ -284,13 +422,12 @@ describe('react-directive', () => {
             scope);
       }));
 
-      it('should rerender when an item is added to array in scope', () => inject(($timeout) => {
+      it('should rerender when an item is added to array in scope', () => inject(() => {
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent');
 
         scope.people.push({ fname: 'Bruce', lname: 'Banner'});
         scope.$apply();
-        $timeout.flush();
 
         expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Banner');
       }));
@@ -331,7 +468,59 @@ describe('react-directive', () => {
       //unmountComponentAtNode returns:
       // * true if a component was unmounted and
       // * false if there was no component to unmount.
-      expect( React.unmountComponentAtNode(elm[0])).toEqual(false);
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
+    }));
+
+  });
+
+  describe('deferred destruction', function() {
+
+    beforeEach(() => {
+      provide.value('Hello', Hello);
+      compileProvider.directive('hello', (reactDirective) => {
+        return reactDirective('Hello');
+      });
+    });
+
+    it('should not unmount component when scope is destroyed', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = { firstName: 'Clark', lastName: 'Kent' };
+      scope.callback = jasmine.createSpy('callback');
+
+      var elm = compileElement(
+        '<hello fname="person.firstName" lname="person.lastName" on-scope-destroy="callback()"/>',
+        scope
+      );
+      scope.$destroy();
+
+      //unmountComponentAtNode returns:
+      // * true if a component was unmounted and
+      // * false if there was no component to unmount.
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(true);
+
+      expect(scope.callback.calls.count()).toEqual(1);
+    }));
+
+    it('should pass unmount function as a "unmountComponent" parameter to callback', inject(($rootScope) => {
+      var scope = $rootScope.$new();
+      scope.person = { firstName: 'Clark', lastName: 'Kent' };
+      scope.callback = function(unmountFn) {
+        unmountFn();
+      };
+
+      spyOn(scope, 'callback').and.callThrough();
+
+      var elm = compileElement(
+        '<hello fname="person.firstName" lname="person.lastName" on-scope-destroy="callback(unmountComponent)"/>',
+        scope
+      );
+      scope.$destroy();
+      //unmountComponentAtNode returns:
+      // * true if a component was unmounted and
+      // * false if there was no component to unmount.
+      expect(ReactDOM.unmountComponentAtNode(elm[0])).toEqual(false);
+
+      expect(scope.callback.calls.count()).toEqual(1);
     }));
   });
 });
