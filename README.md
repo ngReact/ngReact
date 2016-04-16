@@ -270,3 +270,6 @@ grunt karma:background watch
 - Rene Bischoff (@Fjandin)
 - Zach Pratt (@zpratt)
 - Alex Abenoja (@aabenoja)
+- @villesau
+- @bdwain
+- @onumossn
