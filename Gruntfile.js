@@ -13,7 +13,7 @@ module.exports = function(grunt) {
           }
         },
         files: {
-          'ngReact.min.js' : 'ngReact.js'
+          'ngReact.min.js': ['ngReact.js', 'events.js', 'flux.js']
         }
       }
     },

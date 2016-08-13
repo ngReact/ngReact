@@ -122,6 +122,16 @@
 
   // render React component, with scope[attrs.props] being passed in as the component props
   function renderComponent(component, props, scope, elem) {
+    /* Monkey Patch Dispatcher instance to apply $digest on dispatch */
+    if (props && props.Dispatcher && !props.Dispatcher.overwritten) {
+      var fluxDispatcher = props.Dispatcher.dispatch;
+      props.Dispatcher.dispatch = function() {
+        fluxDispatcher.apply(this, arguments);
+        scope.$digest();
+      }
+      props.Dispatcher.overwritten = true;
+    }
+
     scope.$evalAsync(function() {
       ReactDOM.render(React.createElement(component, props), elem[0]);
     });
