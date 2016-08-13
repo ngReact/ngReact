@@ -341,3 +341,4 @@ grunt karma:background watch
 - @villesau
 - @bdwain
 - @onumossn
+- Jimmy Rousseau (@LifeOfCoding)
