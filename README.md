@@ -231,6 +231,73 @@ module: {
 ...
 ```
 
+## Flux Dispatcher & Event Emitter
+Want to take things a step further? You can dispatch events from your components, that your Angular controllers & modules can subscribe to, to maintain your UI, helping you maintain a more unidirectional data flow, without having to call `$scope.$apply()`, or `$digest` each time yourself. Truly, the best of both world, keeping the benefits of Angular, with more of the performance of React.
+
+Simply, inject the bundled Dispatcher as the fourth parameter:
+
+```
+app.directive('helloComponent', function(reactDirective, Dispatcher) {
+  return reactDirective(HelloComponent, undefined, {}, {Dispatcher: Dispatcher});
+});
+```
+
+Then create a Store to use:
+
+```
+app.factory('helloStore', function(Dispatcher) {
+    var event = new EventEmitter(), dispatchToken, items = [];
+    //mutate state API
+    dispatchToken = Dispatcher.register(function(action) {
+        switch (action.type) {
+            case 'add:item':
+                items.push(action.data);
+
+                //notify change
+                event.emit('change');
+                break;
+        }
+    });
+
+    //Read only API
+    return {
+        getItems: getItems,
+        event: event,
+        dispatchToken: dispatchToken
+    };
+
+    function getItems() {
+        return items;
+    }
+});
+```
+
+... and subscribe to your new store's events in your code:
+
+```
+app.controller('HelloController', function($scope, helloStore) {
+    helloStore.event.on('change', changeHandler);
+
+    $scope.$on('$destroy', function() {
+        helloStore.event.removeListener('change', changeHandler);
+    });
+    
+    var _this = this;
+    function changeHandler() {
+        _this.items = helloStore.getItems();
+    }
+});
+```
+
+Finally, in your reactDirective component, trigger your event when an action is made:
+
+```
+Dispatcher.dispatch({
+    type: 'add:item',
+    data: items[i]
+});
+```
+
 ## Developing
 Before starting development run
 
