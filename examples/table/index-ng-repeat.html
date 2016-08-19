@@ -56,8 +56,8 @@
             </th>
           </tr>
         </thead>
-        <tbody ng-repeat="row in table.rows">
-          <tr>
+        <tbody>
+          <tr ng-repeat="row in table.rows">
             <td ng-repeat="cell in row">{{cell}}</td>
           </tr>
         </tbody>
