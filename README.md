@@ -58,7 +58,7 @@ Specifically, ngReact is composed of:
 
 ## The react-component directive
 
-The reactComponent directive is a generic wrapper for embedding your React components.
+The `react-component` directive is a generic wrapper for embedding your React components.
 
 With an Angular app and controller declaration like this:
 
@@ -72,7 +72,6 @@ angular.module('app', ['react'])
 And a React Component like this
 
 ```javascript
-/** @jsx React.DOM */
 var HelloComponent = React.createClass({
   propTypes: {
     fname : React.PropTypes.string.isRequired,
