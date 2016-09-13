@@ -99,6 +99,7 @@ Here:
 - `name` attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name
 - `props` attribute indicates what scope properties should be exposed to the React component
 - `watch-depth` attribute indicates what watch strategy to use to detect changes on scope properties.  The possible values for react-component are `reference`, `collection` and `value` (default)
+- `prevent-events` attribute that prevent all events in react to bubble up in the angular application
 
 ## The reactDirective service
 

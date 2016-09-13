@@ -152,6 +152,15 @@
       replace: true,
       link: function(scope, elem, attrs) {
         var reactComponent = getReactComponent(attrs.name, $injector);
+        
+        if( attrs['preventEvents'] === 'true' ){
+          Object.keys(Event.prototype).forEach(function(ev) {
+            elem[0].addEventListener(ev.toLowerCase(), function(event) {
+             event.preventDefault()
+            })
+          });
+        }
+
 
         var renderMyComponent = function() {
           var scopeProps = scope.$eval(attrs.props);
