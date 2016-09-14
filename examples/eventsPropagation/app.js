@@ -1,6 +1,7 @@
 var app = angular.module('app', ['react']);
 
-app.controller('mainCtrl', function () {
+app.controller('mainCtrl', function ($scope) {
+	$scope.eventPrevented = ['click'];
 });
 
 var Hello = React.createClass({
