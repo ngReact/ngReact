@@ -138,7 +138,6 @@
   //
   // The following would would create and register the component:
   //
-  //     /** @jsx React.DOM */
   //     var module = angular.module('ace.react.components');
   //     module.value('Hello', React.createClass({
   //         render: function() {
@@ -184,7 +183,6 @@
   //
   // With a component like this:
   //
-  //     /** @jsx React.DOM */
   //     var module = angular.module('ace.react.components');
   //     module.value('Hello', React.createClass({
   //         render: function() {
