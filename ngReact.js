@@ -97,26 +97,25 @@
    * If watchDepth attribute is NOT reference or collection, watchDepth defaults to deep watching by value
    */
   function watchProps (watchDepth, scope, watchExpressions, listener){
-    if (watchDepth === 'collection' && angular.isFunction(scope.$watchCollection)) {
-      watchExpressions.forEach(function(expr){
-        scope.$watchCollection(expr, listener);
-      });
-    }
-    else if (watchDepth === 'reference') {
-      if (angular.isFunction(scope.$watchGroup)) {
-        scope.$watchGroup(watchExpressions, listener);
+    var supportsWatchCollection = angular.isFunction(scope.$watchCollection);
+    var supportsWatchGroup = angular.isFunction(scope.$watchGroup);
+
+    var watchGroupExpressions = [];
+    watchExpressions.forEach(function(expr){
+      var actualExpr = getPropExpression(expr);
+      var exprWatchDepth = getPropWatchDepth(watchDepth, expr);
+
+      if (exprWatchDepth === 'collection' && supportsWatchCollection) {
+        scope.$watchCollection(actualExpr, listener);
+      } else if (exprWatchDepth === 'reference' && supportsWatchGroup) {
+        watchGroupExpressions.push(actualExpr);
+      } else {
+        scope.$watch(actualExpr, listener, (exprWatchDepth !== 'reference'));
       }
-      else {
-        watchExpressions.forEach(function(expr){
-          scope.$watch(expr, listener);
-        });
-      }
-    }
-    else {
-      //default watchDepth to value if not reference or collection
-      watchExpressions.forEach(function(expr){
-        scope.$watch(expr, listener, true);
-      });
+    });
+
+    if (watchGroupExpressions.length) {
+      scope.$watchGroup(watchGroupExpressions, listener);
     }
   }
 
@@ -125,6 +124,26 @@
     scope.$evalAsync(function() {
       ReactDOM.render(React.createElement(component, props), elem[0]);
     });
+  }
+
+  // get prop name from prop (string or array)
+  function getPropName(prop) {
+    return (Array.isArray(prop)) ? prop[0] : prop;
+  }
+
+  // get prop expression from prop (string or array)
+  function getPropExpression(prop) {
+    return (Array.isArray(prop)) ? prop[0] : prop;
+  }
+
+  // get watch depth of prop (string or array)
+  function getPropWatchDepth(defaultWatch, prop) {
+    var customWatchDepth = (
+      Array.isArray(prop) &&
+      angular.isObject(prop[1]) &&
+      prop[1].watchDepth
+    );
+    return customWatchDepth || defaultWatch;
   }
 
   // # reactComponent
@@ -205,15 +224,17 @@
   //     <hello name="name"/>
   //
   var reactDirective = function($injector) {
-    return function(reactComponentName, propNames, conf, injectableProps) {
+    return function(reactComponentName, props, conf, injectableProps) {
       var directive = {
         restrict: 'E',
         replace: true,
         link: function(scope, elem, attrs) {
           var reactComponent = getReactComponent(reactComponentName, $injector);
 
-          // if propNames is not defined, fall back to use the React component's propTypes if present
-          propNames = propNames || Object.keys(reactComponent.propTypes || {});
+          // if props is not defined, fall back to use the React component's propTypes if present
+          props = props || Object.keys(reactComponent.propTypes || {});
+
+          var propNames = props.map(getPropName);
 
           // for each of the properties, get their scope value and set it to scope.props
           var renderMyComponent = function() {
@@ -228,8 +249,10 @@
 
           // watch each property name and trigger an update whenever something changes,
           // to update scope.props with new values
-          var propExpressions = propNames.map(function(k){
-            return attrs[k];
+          var propExpressions = props.map(function(prop){
+            return (Array.isArray(prop)) ?
+              [attrs[prop[0]], prop[1]] :
+              attrs[prop];
           });
 
           watchProps(attrs.watchDepth, scope, propExpressions, renderMyComponent);

@@ -140,6 +140,19 @@ app.directive('hello', function(reactDirective) {
 });
 ```
 
+You may also customize the watch depth per prop/attribute by wrapping the name and an options object in an array inside the props array:
+
+```javascript
+app.directive('hello', function(reactDirective) {
+  return reactDirective(HelloComponent, [
+    'person', // takes on the watch-depth of the entire directive
+    ['place', {watchDepth: 'reference'}],
+    ['things', {watchDepth: 'collection'}],
+    ['ideas', {watchDepth: 'value'}]
+  ]);
+});
+```
+
 If you want to change the configuration of the directive created the `reactDirective` service, e.g. change `restrict: 'E'` to `restrict: 'C'`, you can do so by passing in an object literal with the desired configuration.
 
 ```javascript
