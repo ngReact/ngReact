@@ -1,10 +1,15 @@
 # CHANGES
 
+## 0.4.0
+- Fix in table example - #163 - thanks @thorsten
+- Remove jsx comments - #182 - thanks @katgeorgeek
+- Enable watchDepth for individual properties - #185 - thanks @rosston
+
 ## 0.3.0
-Pass injectables and other variables straight to the reactDirective - #149 - thanks @villesau
-Upgrade to React 14 - #148 - thanks @bdwain
-Add deferred unmounting - #134 - @onumossn
-Switched to peerDependencies #118, thanks @aabenoja
+- Pass injectables and other variables straight to the reactDirective - #149 - thanks @villesau
+- Upgrade to React 14 - #148 - thanks @bdwain
+- Add deferred unmounting - #134 - @onumossn
+- Switched to peerDependencies #118, thanks @aabenoja
 
 ## 0.2.0
 

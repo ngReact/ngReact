@@ -275,6 +275,9 @@ grunt karma:background watch
 
 ## Contributors
 
+- @thorsten
+- @katgeorgeek
+- @rosston
 - Tihomir Kit (@pootzko)
 - Alexander Beletsky (@alexanderbeletsky)
 - @matthieu-ravey
