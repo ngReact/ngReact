@@ -318,6 +318,154 @@ describe('react-directive', () => {
       );
       expect(elm.text().trim()).toEqual('Hello  Bruce Wayne');
     }));
+
+    describe('propNames options', () => {
+      it('should accept propNames as array of arrays', inject(($rootScope) => {
+        compileProvider.directive('customHelloComponent', (reactDirective) => {
+          return reactDirective(Hello, [
+            ['fname'],
+            ['lname', {}]
+          ]);
+        });
+
+        var scope = $rootScope.$new();
+        scope.person = { firstName: 'Clark', lastName: 'Kent' };
+
+        var elm = compileElement(
+          '<custom-hello-component fname="person.firstName" lname="person.lastName"/>',
+          scope
+        );
+
+        expect(elm.text().trim()).toEqual('Hello Clark Kent');
+
+        scope.person.firstName = 'Bruce';
+        scope.person.lastName = 'Banner';
+        scope.$apply();
+
+        expect(elm.text().trim()).toEqual('Hello Bruce Banner');
+      }));
+
+      describe('watchDepth', () => {
+        it('should support "reference" as individual watchDepth option', inject(($rootScope) => {
+          compileProvider.directive('customPeople', (reactDirective) => {
+            return reactDirective(People, [
+              ['items', {watchDepth: 'reference'}]
+            ]);
+          });
+
+          var scope = $rootScope.$new();
+          scope.items = [
+            { fname: 'Clark', lname: 'Kent' },
+            { fname: 'Bruce', lname: 'Wayne' }
+          ];
+
+          var elm = compileElement(
+            '<custom-people items="items" />',
+            scope
+          );
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Wayne');
+
+          scope.items[1] = {fname: 'Diana', lname: 'Prince'};
+          scope.$apply();
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Wayne');
+
+          scope.items = scope.items.slice(0);
+          scope.$apply();
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Diana Prince');
+        }));
+
+        it('should support "collection" as individual watchDepth option', inject(($rootScope) => {
+          compileProvider.directive('customPeople', (reactDirective) => {
+            return reactDirective(People, [
+              ['items', {watchDepth: 'collection'}]
+            ]);
+          });
+
+          var scope = $rootScope.$new();
+          scope.items = [
+            { fname: 'Clark', lname: 'Kent' },
+            { fname: 'Bruce', lname: 'Wayne' }
+          ];
+
+          var elm = compileElement(
+            '<custom-people items="items" watch-depth="reference" />',
+            scope
+          );
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Wayne');
+
+          scope.items[1].lname = 'Banner';
+          scope.$apply();
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Wayne');
+
+          scope.items[1] = {fname: 'Bruce', lname: 'Banner'};
+          scope.$apply();
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Banner');
+        }));
+
+        it('should support "value" as individual watchDepth option', inject(($rootScope) => {
+          compileProvider.directive('customPeople', (reactDirective) => {
+            return reactDirective(People, [
+              ['items', {watchDepth: 'value'}]
+            ]);
+          });
+
+          var scope = $rootScope.$new();
+          scope.items = [
+            { fname: 'Clark', lname: 'Kent' },
+            { fname: 'Bruce', lname: 'Wayne' }
+          ];
+
+          var elm = compileElement(
+            '<custom-people items="items" watch-depth="reference" />',
+            scope
+          );
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Wayne');
+
+          scope.items[1].lname = 'Banner';
+          scope.$apply();
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Banner');
+        }));
+
+        it("should fall back to directive's watch depth when no individual watchDepth option is provided", inject(($rootScope) => {
+          compileProvider.directive('customPeople', (reactDirective) => {
+            return reactDirective(People, [
+              ['items', {}]
+            ]);
+          });
+
+          var scope = $rootScope.$new();
+          scope.items = [
+            { fname: 'Clark', lname: 'Kent' },
+            { fname: 'Bruce', lname: 'Wayne' }
+          ];
+
+          var elm = compileElement(
+            '<custom-people items="items" watch-depth="reference" />',
+            scope
+          );
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Wayne');
+
+          scope.items[1] = {fname: 'Diana', lname: 'Prince'};
+          scope.$apply();
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Bruce Wayne');
+
+          scope.items = scope.items.slice(0);
+          scope.$apply();
+
+          expect(elm.text().trim()).toEqual('Hello Clark Kent, Diana Prince');
+        }));
+      });
+    });
   });
 
 
