@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/ngReact/ngReact.svg?branch=master)](https://travis-ci.org/ngReact/ngReact) [![Pair on this](https://tf-assets-staging.s3.amazonaws.com/badges/thinkful_repo_badge.svg)](http://start.thinkful.com/react/?utm_source=github&utm_medium=badge&utm_campaign=ngReact)
 
-> **Note: For a more modern alternative to ngReact, we recommend [react2angular](https://github.com/coatue/react2angular) and [ngimport](https://github.com/bcherny/ngimport).**
+> **Note: For a more modern alternative to ngReact, we recommend [react2angular](https://github.com/coatue/react2angular), [angular2react](https://github.com/coatue/angular2react), and [ngimport](https://github.com/bcherny/ngimport).**
 
 # ngReact
 
