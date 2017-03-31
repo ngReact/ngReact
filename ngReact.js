@@ -171,6 +171,18 @@
       link: function(scope, elem, attrs) {
         var reactComponent = getReactComponent(attrs.name, $injector);
 
+        if( attrs['preventEvents'] !== undefined ){
+			var events = JSON.parse(attrs['preventEvents']);
+			if( Array.isArray(events )){
+				events.forEach(function(ev) {
+					elem[0].addEventListener(ev.toLowerCase(), function(event) {
+						event.preventDefault()
+					})
+				});
+			}
+        }
+
+
         var renderMyComponent = function() {
           var scopeProps = scope.$eval(attrs.props);
           var props = applyFunctions(scopeProps, scope);
