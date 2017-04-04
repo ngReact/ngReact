@@ -240,7 +240,11 @@
           var renderMyComponent = function() {
             var props = {};
             propNames.forEach(function(propName) {
-              props[propName] = scope.$eval(attrs[propName]);
+              // All key values in the 'attrs' object passed here by Angular are *lower case*
+              // So we need to compute the attribute name that Angular would use and look
+              // the attribute up by that name.
+              var attrName = propName.toLowerCase();
+              props[propName] = scope.$eval(attrs[attrName]);
             });
             props = applyFunctions(props, scope);
             props = angular.extend({}, props, injectableProps);
