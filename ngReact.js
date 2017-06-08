@@ -281,7 +281,7 @@
           // to update scope.props with new values
           var propExpressions = props.map(function(prop){
             return (Array.isArray(prop)) ?
-              [attrs[getPropExpression(prop)], getPropConfig(prop)] :
+              [attrs[getPropName(prop)], getPropConfig(prop)] :
               attrs[prop];
           });
 
