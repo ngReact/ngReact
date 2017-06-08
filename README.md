@@ -156,7 +156,7 @@ app.directive('hello', function(reactDirective) {
 });
 ```
 
-If any of your props is a function, ngReact will, by default, wrap it in a `scope.$apply`. You can, however, change this behavior by explicitly add a `wrapApply: false` in the prop config:
+By default, ngReact will wrap any functions you pass as in `scope.$apply`. You may want to override this behavior, for instance, if you are passing a React component as a prop. You can achieve this by explicitly adding a `wrapApply: false` in the prop config:
 
 ```javascript
 app.directive('hello', function(reactDirective) {
