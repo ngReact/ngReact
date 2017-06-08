@@ -56,6 +56,24 @@ var People = React.createClass({
   }
 });
 
+var UppercaseProp = React.createClass({
+  propTypes: { Upper : React.PropTypes.string },
+
+  render () {
+    var names = this.props.Upper;
+    return <div>Hello {names}</div>;
+  }
+});
+
+var Apply = React.createClass({
+  propTypes: { func : React.PropTypes.func },
+
+  render () {
+    var fname = this.props.func.name || 'apply';
+    return <div>{fname}</div>;
+  }
+});
+
 
 describe('react-directive', () => {
 
@@ -170,6 +188,22 @@ describe('react-directive', () => {
 
       var elm = compileElement(
         '<hello fname="person.firstName" lname="person.lastName"/>',
+        scope
+      );
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
+    }));
+
+    it('should bind a capitalized property', inject(($rootScope) => {
+      provide.value('Hello', UppercaseProp);
+      compileProvider.directive('hello', (reactDirective) => {
+        return reactDirective('Hello');
+      });
+
+      var scope = $rootScope.$new();
+      scope.person = { name: 'Clark Kent' };
+
+      var elm = compileElement(
+        '<hello Upper="person.name" />',
         scope
       );
       expect(elm.text().trim()).toEqual('Hello Clark Kent');
@@ -464,6 +498,44 @@ describe('react-directive', () => {
 
           expect(elm.text().trim()).toEqual('Hello Clark Kent, Diana Prince');
         }));
+      });
+
+      describe('wrapApply', () => {
+
+        it('should wrap functions by default', inject(($rootScope) => {
+          compileProvider.directive('apply', (reactDirective) => {
+            return reactDirective(Apply);
+          });
+
+          var scope = $rootScope.$new();
+          scope.func = function func () {};
+
+          var elm = compileElement(
+              '<apply func="func" />',
+              scope
+          );
+
+          expect(elm.text().trim()).toEqual('apply');
+        }));
+
+        it('should not wrap functions if wrapApply is false ', inject(($rootScope) => {
+          compileProvider.directive('apply', (reactDirective) => {
+            return reactDirective(Apply, [
+                ['func', {wrapApply: false}]
+            ]);
+          });
+
+          var scope = $rootScope.$new();
+          scope.func = function func () {};
+
+          var elm = compileElement(
+              '<apply func="func" />',
+              scope
+          );
+
+          expect(elm.text().trim()).toEqual('func');
+        }));
+
       });
     });
   });

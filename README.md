@@ -156,6 +156,19 @@ app.directive('hello', function(reactDirective) {
 });
 ```
 
+If any of your props is a function, ngReact will, by default, wrap it in a `scope.$apply`. You can, however, change this behavior by explicitly add a `wrapApply: false` in the prop config:
+
+```javascript
+app.directive('hello', function(reactDirective) {
+  return reactDirective(HelloComponent, [
+    'person',
+    ['place', {watchDepth: 'reference'}],
+    ['func', {watchDepth: 'reference', wrapApply: false}]
+  ]);
+});
+```
+ 
+
 If you want to change the configuration of the directive created the `reactDirective` service, e.g. change `restrict: 'E'` to `restrict: 'C'`, you can do so by passing in an object literal with the desired configuration.
 
 ```javascript
