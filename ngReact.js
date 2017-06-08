@@ -64,26 +64,43 @@
     var wrapped = function() {
       var args = arguments;
       var phase = scope.$root.$$phase;
-        if (phase === "$apply" || phase === "$digest") {
-          return fn.apply(null, args);
-        } else {
-          return scope.$apply(function() {
-            return fn.apply( null, args );
-          });
-        }
+      if (phase === "$apply" || phase === "$digest") {
+        return fn.apply(null, args);
+      } else {
+        return scope.$apply(function() {
+          return fn.apply( null, args );
+        });
+      }
     };
     wrapped.wrappedInApply = true;
     return wrapped;
   }
 
-  // wraps all functions on obj in scope.$apply
-  function applyFunctions(obj, scope) {
+  /**
+   * wraps functions on obj in scope.$apply
+   *
+   * keeps backwards compatibility, as if propsConfig is not passed, it will
+   * work as before, wrapping all functions and won't wrap only when specified.
+   *
+   * @version 0.4.1
+   * @param obj react component props
+   * @param scope current scope
+   * @param propsConfig configuration object for all properties
+   * @returns {Object} props with the functions wrapped in scope.$apply
+   */
+  function applyFunctions(obj, scope, propsConfig) {
     return Object.keys(obj || {}).reduce(function(prev, key) {
       var value = obj[key];
-      // wrap functions in a function that ensures they are scope.$applied
-      // ensures that when function is called from a React component
-      // the Angular digest cycle is run
-      prev[key] = angular.isFunction(value) ? applied(value, scope) : value;
+      var config = (propsConfig || {})[key] || {};
+      /**
+       * wrap functions in a function that ensures they are scope.$applied
+       * ensures that when function is called from a React component
+       * the Angular digest cycle is run
+       */
+      prev[key] = angular.isFunction(value) && config.wrapApply !== false
+        ? applied(value, scope)
+        : value;
+
       return prev;
     }, {});
   }
@@ -131,9 +148,22 @@
     return (Array.isArray(prop)) ? prop[0] : prop;
   }
 
+  // get prop name from prop (string or array)
+  function getPropConfig(prop) {
+    return (Array.isArray(prop)) ? prop[1] : {};
+  }
+
   // get prop expression from prop (string or array)
   function getPropExpression(prop) {
     return (Array.isArray(prop)) ? prop[0] : prop;
+  }
+
+  // find the normalized attribute knowing that React props accept any type of capitalization
+  function findAttribute(attrs, propName) {
+    var index = Object.keys(attrs).filter(function (attr) {
+      return attr.toLowerCase() === propName.toLowerCase();
+    })[0];
+    return attrs[index];
   }
 
   // get watch depth of prop (string or array)
@@ -180,7 +210,7 @@
 
         // If there are props, re-render when they change
         attrs.props ?
-            watchProps(attrs.watchDepth, scope, [attrs.props], renderMyComponent) :
+          watchProps(attrs.watchDepth, scope, [attrs.props], renderMyComponent) :
           renderMyComponent();
 
         // cleanup when scope is destroyed
@@ -234,24 +264,24 @@
           // if props is not defined, fall back to use the React component's propTypes if present
           props = props || Object.keys(reactComponent.propTypes || {});
 
-          var propNames = props.map(getPropName);
-
           // for each of the properties, get their scope value and set it to scope.props
           var renderMyComponent = function() {
-            var props = {};
-            propNames.forEach(function(propName) {
-              props[propName] = scope.$eval(attrs[propName]);
+            var scopeProps = {}, config = {};
+            props.forEach(function(prop) {
+              var propName = getPropName(prop);
+              scopeProps[propName] = scope.$eval(findAttribute(attrs, propName));
+              config[propName] = getPropConfig(prop);
             });
-            props = applyFunctions(props, scope);
-            props = angular.extend({}, props, injectableProps);
-            renderComponent(reactComponent, props, scope, elem);
+            scopeProps = applyFunctions(scopeProps, scope, config);
+            scopeProps = angular.extend({}, scopeProps, injectableProps);
+            renderComponent(reactComponent, scopeProps, scope, elem);
           };
 
           // watch each property name and trigger an update whenever something changes,
           // to update scope.props with new values
           var propExpressions = props.map(function(prop){
             return (Array.isArray(prop)) ?
-              [attrs[prop[0]], prop[1]] :
+              [attrs[getPropName(prop)], getPropConfig(prop)] :
               attrs[prop];
           });
 
