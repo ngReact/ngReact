@@ -1,5 +1,8 @@
 # CHANGES
 
+## 0.4.1
+- Don't wrap in $apply if configured + allow capitalized props - #191 - thanks @ghermeto
+
 ## 0.4.0
 - Fix in table example - #163 - thanks @thorsten
 - Remove jsx comments - #182 - thanks @katgeorgeek

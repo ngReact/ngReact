@@ -167,7 +167,7 @@ app.directive('hello', function(reactDirective) {
   ]);
 });
 ```
- 
+
 
 If you want to change the configuration of the directive created the `reactDirective` service, e.g. change `restrict: 'E'` to `restrict: 'C'`, you can do so by passing in an object literal with the desired configuration.
 
@@ -288,6 +288,7 @@ grunt karma:background watch
 
 ## Contributors
 
+- Guilherme Hermeto (@ghermeto)
 - @thorsten
 - @katgeorgeek
 - @rosston
