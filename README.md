@@ -279,6 +279,23 @@ Continually run test during development with
 grunt karma:background watch
 ```
 
+### Running the examples
+The examples in the `examples/` folder use `bower_components`. To install these first install bower on your machine
+
+```
+npm install --global bower
+```
+
+Then install the bower components
+
+```
+bower install
+```
+
+The examples need to be run on a local webserver like https://www.npmjs.com/package/http-server.
+
+Run the examples by starting a webserver in the project root folder.
+
 # Community
 
 ## Maintainers
