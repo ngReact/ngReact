@@ -127,14 +127,14 @@
         scope.$watchCollection(actualExpr, listener);
       } else if (exprWatchDepth === 'reference' && supportsWatchGroup) {
         watchGroupExpressions.push(actualExpr);
-      } else if (exprWatchDepth === 'one-way') {
-        //do nothing because we handle our one way bindings after this
+      } else if (exprWatchDepth === 'one-time') {
+        //do nothing because we handle our one time bindings after this
       } else {
         scope.$watch(actualExpr, listener, (exprWatchDepth !== 'reference'));
       }
     });
 
-    if (watchDepth === 'one-way') {
+    if (watchDepth === 'one-time') {
       listener();
     }
 
