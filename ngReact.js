@@ -113,11 +113,12 @@
    * Uses the watchDepth attribute to determine how to watch props on scope.
    * If watchDepth attribute is NOT reference or collection, watchDepth defaults to deep watching by value
    */
-  function watchProps (watchDepth, scope, watchExpressions, listener){
+  function watchProps (watchDepth, scope, watchExpressions, listener) {
     var supportsWatchCollection = angular.isFunction(scope.$watchCollection);
     var supportsWatchGroup = angular.isFunction(scope.$watchGroup);
 
     var watchGroupExpressions = [];
+
     watchExpressions.forEach(function(expr){
       var actualExpr = getPropExpression(expr);
       var exprWatchDepth = getPropWatchDepth(watchDepth, expr);
@@ -126,10 +127,16 @@
         scope.$watchCollection(actualExpr, listener);
       } else if (exprWatchDepth === 'reference' && supportsWatchGroup) {
         watchGroupExpressions.push(actualExpr);
+      } else if (exprWatchDepth === 'one-way') {
+        //do nothing because we handle our one way bindings after this
       } else {
         scope.$watch(actualExpr, listener, (exprWatchDepth !== 'reference'));
       }
     });
+
+    if (watchDepth === 'one-way') {
+      listener();
+    }
 
     if (watchGroupExpressions.length) {
       scope.$watchGroup(watchGroupExpressions, listener);
@@ -267,11 +274,13 @@
           // for each of the properties, get their scope value and set it to scope.props
           var renderMyComponent = function() {
             var scopeProps = {}, config = {};
+
             props.forEach(function(prop) {
               var propName = getPropName(prop);
               scopeProps[propName] = scope.$eval(findAttribute(attrs, propName));
               config[propName] = getPropConfig(prop);
             });
+            
             scopeProps = applyFunctions(scopeProps, scope, config);
             scopeProps = angular.extend({}, scopeProps, injectableProps);
             renderComponent(reactComponent, scopeProps, scope, elem);
@@ -285,9 +294,10 @@
               attrs[prop];
           });
 
-          watchProps(attrs.watchDepth, scope, propExpressions, renderMyComponent);
-
-          renderMyComponent();
+          // If we don't have any props, then our watch statement won't fire.
+          props.length ? 
+            watchProps(attrs.watchDepth, scope, propExpressions, renderMyComponent) :
+            renderMyComponent();
 
           // cleanup when scope is destroyed
           scope.$on('$destroy', function() {
