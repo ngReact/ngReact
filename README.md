@@ -135,7 +135,7 @@ This creates a directive that can be used like this:
 </body>
 ```
 
-The `reactDirective` service will read the React component `propTypes` and watch attributes with these names. If your react component doesn't have `propTypes` defined you can pass in an array of attribute names to watch. If you don't pass any array of attribute names, fall back to use directive attributes as a last resort. By default, attributes will be watched by value however you can also choose to watch by reference or collection by supplying the watch-depth attribute. Possible values are `reference`, `collection` and `value` (default).
+The `reactDirective` service will read the React component `propTypes` and watch attributes with these names. If your react component doesn't have `propTypes` defined you can pass in an array of attribute names to watch.  By default, attributes will be watched by value however you can also choose to watch by reference or collection by supplying the watch-depth attribute.  Possible values are `reference`, `collection` and `value` (default).
 
 ```javascript
 app.directive('hello', function(reactDirective) {
@@ -300,7 +300,7 @@ Run the examples by starting a webserver in the project root folder.
 
 ## Maintainers
 
-- Kasper B?gebjerg Pedersen (@kasperp)
+- Kasper B??gebjerg Pedersen (@kasperp)
 - David Chang (@davidchang)
 
 ## Contributors
