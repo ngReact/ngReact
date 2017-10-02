@@ -264,11 +264,11 @@
           // if props is not defined, fall back to use the React component's propTypes if present
           props = props || Object.keys(reactComponent.propTypes || {});
           if (!props.length) {
-            var noNgAttrNames = [];
+            var ngAttrNames = [];
             angular.forEach(attrs.$attr, function (value, key) {
-              noNgAttrNames.push(key);
+              ngAttrNames.push(key);
             });
-            props = noNgAttrNames;
+            props = ngAttrNames;
           }
 
           // for each of the properties, get their scope value and set it to scope.props

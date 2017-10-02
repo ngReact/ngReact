@@ -300,7 +300,7 @@ Run the examples by starting a webserver in the project root folder.
 
 ## Maintainers
 
-- Kasper B??gebjerg Pedersen (@kasperp)
+- Kasper B?gebjerg Pedersen (@kasperp)
 - David Chang (@davidchang)
 
 ## Contributors
