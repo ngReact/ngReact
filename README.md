@@ -305,6 +305,7 @@ Run the examples by starting a webserver in the project root folder.
 
 ## Contributors
 
+- @Shuki-L
 - Fabien Rassinier (@frassinier)
 - Guilherme Hermeto (@ghermeto)
 - @thorsten
