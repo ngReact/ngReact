@@ -12,13 +12,8 @@
   "license": "MIT",
   "dependencies": {
     "angular": "<2.0.0",
-    "react": "^15.0.0"
+    "react": "~15"
   },
   "devDependencies": {},
-  "keywords": [
-    "angularjs",
-    "angular",
-    "react",
-    "ngReact"
-  ]
+  "keywords": ["angularjs", "angular", "react", "ngReact"]
 }
