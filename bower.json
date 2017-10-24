@@ -1,7 +1,7 @@
 {
   "name": "ngReact",
   "author": "https://github.com/davidchang/ngReact/graphs/contributors",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "main": "ngReact.js",
   "description": "Use React Components in Angular",
   "homepage": "http://davidchang.github.io/ngReact/",
