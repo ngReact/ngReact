@@ -1,5 +1,11 @@
 # CHANGES
 
+## 0.5.1
+- Updates bower version - #201 - thanks @Shuki-L
+
+## 0.5.0
+- Pass all props if no propTypes defined - #194 - thanks @frassinier
+
 ## 0.4.1
 - Don't wrap in $apply if configured + allow capitalized props - #191 - thanks @ghermeto
 
