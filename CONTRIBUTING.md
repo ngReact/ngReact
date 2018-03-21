@@ -1,0 +1,59 @@
+{
+  "name": "ngreact",
+  "author": "https://github.com/davidchang/ngReact/graphs/contributors",
+  "scripts": {
+    "build": "grunt build",
+    "test": "grunt test"
+  },
+  "version": "0.5.1",
+  "main": "ngReact.js",
+  "description": "Use React Components in Angular",
+  "homepage": "http://davidchang.github.io/ngReact/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/davidchang/ngReact.git"
+  },
+  "license": "MIT",
+  "peerDependencies": {
+    "angular": "< 2.0.0",
+    "react": ">=0.14.2",
+    "react-dom": ">=0.14.2"
+  },
+  "browserify-shim": {
+    "angular": "global:angular"
+  },
+  "devDependencies": {
+    "angular": "1.5.3",
+    "angular-mocks": "1.5.3",
+    "browserify": "13.0.0",
+    "browserify-shim": "3.8.12",
+    "es5-shim": "4.5.8",
+    "grunt": "1.0.1",
+    "grunt-cli": "^1.2.0",
+    "grunt-contrib-uglify": "1.0.1",
+    "grunt-contrib-watch": "1.0.0",
+    "grunt-docco": "0.4.0",
+    "grunt-karma": "0.12.2",
+    "jasmine-core": "2.4.1",
+    "karma": "0.13.22",
+    "karma-browserify": "5.0.3",
+    "karma-jasmine": "^0.3.6",
+    "karma-phantomjs-launcher": "1.0.0",
+    "load-grunt-tasks": "3.5.0",
+    "phantomjs-prebuilt": "2.1.7",
+    "react": "^16.2.0",
+    "react-addons-test-utils": "^15.0.0",
+    "react-dom": "^16.2.0",
+    "reactify": "1.1.1",
+    "watchify": "^3.7.0"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "keywords": [
+    "angularjs",
+    "angular",
+    "react",
+    "ngReact"
+  ]
+}
