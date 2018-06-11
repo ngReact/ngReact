@@ -198,12 +198,14 @@
     return {
       restrict: 'E',
       replace: true,
-      link: function(scope, elem, attrs) {
+      transclude: true,
+      link: function(scope, elem, attrs, _ctrl, transcludeFn) {
         var reactComponent = getReactComponent(attrs.name, $injector);
 
         var renderMyComponent = function() {
           var scopeProps = scope.$eval(attrs.props);
           var props = applyFunctions(scopeProps, scope);
+          props.children = transcludeFn();
 
           renderComponent(reactComponent, props, scope, elem);
         };
