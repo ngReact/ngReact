@@ -74,6 +74,20 @@ var Apply = React.createClass({
   }
 });
 
+var HelloNoPropTypes = React.createClass({
+  handleClick() {
+    var value = this.props.changeName();
+    if (value){
+      window.GlobalChangeNameValue = value;
+    }
+  },
+
+  render() {
+    var {fname, lname, undeclared} = this.props;
+
+    return <div onClick={this.handleClick}>Hello {fname} {lname}{undeclared}</div>;
+  }
+});
 
 describe('react-directive', () => {
 
@@ -351,6 +365,21 @@ describe('react-directive', () => {
         scope
       );
       expect(elm.text().trim()).toEqual('Hello  Bruce Wayne');
+    }));
+
+    it('should pass all attributes as props when no PropTypes is provided', inject(($rootScope) => {
+      provide.value('HelloNoPropTypes', HelloNoPropTypes);
+      compileProvider.directive('helloNoPropTypes', reactDirective => reactDirective('HelloNoPropTypes'));
+
+      var scope = $rootScope.$new();
+      scope.firstName = 'Clark';
+      scope.lastName = 'Kent';
+
+      var elm = compileElement(
+        '<hello-no-prop-types fname="firstName" lname="lastName"/>',
+        scope
+      );
+      expect(elm.text().trim()).toEqual('Hello Clark Kent');
     }));
 
     describe('propNames options', () => {
