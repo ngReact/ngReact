@@ -196,7 +196,7 @@
   //
   var reactComponent = function($injector) {
     return {
-      restrict: 'E',
+      restrict: 'AE',
       replace: true,
       link: function(scope, elem, attrs) {
         var reactComponent = getReactComponent(attrs.name, $injector);
@@ -256,7 +256,7 @@
   var reactDirective = function($injector) {
     return function(reactComponentName, props, conf, injectableProps) {
       var directive = {
-        restrict: 'E',
+        restrict: 'AE',
         replace: true,
         link: function(scope, elem, attrs) {
           var reactComponent = getReactComponent(reactComponentName, $injector);
