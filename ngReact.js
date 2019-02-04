@@ -254,7 +254,7 @@
   //     <hello name="name"/>
   //
   var reactDirective = function($injector) {
-    return function(reactComponentName, props, conf, injectableProps) {
+    return function(reactComponentName, staticProps, conf, injectableProps) {
       var directive = {
         restrict: 'E',
         replace: true,
@@ -262,7 +262,7 @@
           var reactComponent = getReactComponent(reactComponentName, $injector);
 
           // if props is not defined, fall back to use the React component's propTypes if present
-          props = props || Object.keys(reactComponent.propTypes || {});
+          var props = staticProps || Object.keys(reactComponent.propTypes || {});
           if (!props.length) {
             var ngAttrNames = [];
             angular.forEach(attrs.$attr, function (value, key) {
