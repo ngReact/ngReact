@@ -375,7 +375,10 @@ describe('react-directive', () => {
       scope.firstName = 'Clark';
       scope.lastName = 'Kent';
 
-      var elm = compileElement(
+      var elm = compileElement('<hello-no-prop-types fname="firstName"/>', scope)
+      expect(elm.text().trim()).toEqual('Hello Clark');
+
+      elm = compileElement(
         '<hello-no-prop-types fname="firstName" lname="lastName"/>',
         scope
       );
