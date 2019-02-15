@@ -1,20 +1,30 @@
 # CHANGES
 
+## 0.5.2
+
+- Re-compute prop names on every compile - #222 - thanks @matthieuprat
+- Updates lodash depedency in examples/es6-tests-webpack
+
 ## 0.5.1
+
 - Updates bower version - #201 - thanks @Shuki-L
 
 ## 0.5.0
+
 - Pass all props if no propTypes defined - #194 - thanks @frassinier
 
 ## 0.4.1
+
 - Don't wrap in $apply if configured + allow capitalized props - #191 - thanks @ghermeto
 
 ## 0.4.0
+
 - Fix in table example - #163 - thanks @thorsten
 - Remove jsx comments - #182 - thanks @katgeorgeek
 - Enable watchDepth for individual properties - #185 - thanks @rosston
 
 ## 0.3.0
+
 - Pass injectables and other variables straight to the reactDirective - #149 - thanks @villesau
 - Upgrade to React 14 - #148 - thanks @bdwain
 - Add deferred unmounting - #134 - @onumossn
@@ -37,7 +47,7 @@
 
 ## 0.1.5
 
-- Feature: Add the watchDepth attribute to be able to control the type of scope watcher utilized by Angular ('collection' to use *watchCollection*, 'reference' to use *watch* and reference comparison, and defaulting to *watch* and value comparison (#47)
+- Feature: Add the watchDepth attribute to be able to control the type of scope watcher utilized by Angular ('collection' to use _watchCollection_, 'reference' to use _watch_ and reference comparison, and defaulting to _watch_ and value comparison (#47)
 - Enhancement: Docs state you cannot use Angular directives from within React components (#50)
 
 ## 0.1.4

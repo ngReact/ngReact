@@ -33,6 +33,7 @@ npm install ngreact
 # Usage
 
 Then, just make sure Angular, React, and ngReact are on the page,
+
 ```html
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/react/react.js"></script>
@@ -66,7 +67,8 @@ The `react-component` directive is a generic wrapper for embedding your React co
 With an Angular app and controller declaration like this:
 
 ```javascript
-angular.module('app', ['react'])
+angular
+  .module('app', ['react'])
   .controller('helloController', function($scope) {
     $scope.person = { fname: 'Clark', lname: 'Kent' };
   });
@@ -77,13 +79,17 @@ And a React Component like this
 ```javascript
 var HelloComponent = React.createClass({
   propTypes: {
-    fname : React.PropTypes.string.isRequired,
-    lname : React.PropTypes.string.isRequired
+    fname: React.PropTypes.string.isRequired,
+    lname: React.PropTypes.string.isRequired
   },
   render: function() {
-    return <span>Hello {this.props.fname} {this.props.lname}</span>;
+    return (
+      <span>
+        Hello {this.props.fname} {this.props.lname}
+      </span>
+    );
   }
-})
+});
 app.value('HelloComponent', HelloComponent);
 ```
 
@@ -101,7 +107,7 @@ Here:
 
 - `name` attribute checks for an Angular injectable of that name and falls back to a globally exposed variable of the same name
 - `props` attribute indicates what scope properties should be exposed to the React component
-- `watch-depth` attribute indicates what watch strategy to use to detect changes on scope properties.  The possible values for react-component are `reference`, `collection` and `value` (default)
+- `watch-depth` attribute indicates what watch strategy to use to detect changes on scope properties. The possible values for react-component are `reference`, `collection` and `value` (default)
 
 ## The reactDirective service
 
@@ -135,7 +141,7 @@ This creates a directive that can be used like this:
 </body>
 ```
 
-The `reactDirective` service will read the React component `propTypes` and watch attributes with these names. If your react component doesn't have `propTypes` defined you can pass in an array of attribute names to watch. If you don't pass any array of attribute names, fall back to use directive attributes as a last resort. By default, attributes will be watched by value however you can also choose to watch by reference or collection by supplying the watch-depth attribute.  Possible values are `reference`, `collection` and `value` (default).
+The `reactDirective` service will read the React component `propTypes` and watch attributes with these names. If your react component doesn't have `propTypes` defined you can pass in an array of attribute names to watch. If you don't pass any array of attribute names, fall back to use directive attributes as a last resort. By default, attributes will be watched by value however you can also choose to watch by reference or collection by supplying the watch-depth attribute. Possible values are `reference`, `collection` and `value` (default).
 
 ```javascript
 app.directive('hello', function(reactDirective) {
@@ -149,9 +155,9 @@ You may also customize the watch depth per prop/attribute by wrapping the name a
 app.directive('hello', function(reactDirective) {
   return reactDirective(HelloComponent, [
     'person', // takes on the watch-depth of the entire directive
-    ['place', {watchDepth: 'reference'}],
-    ['things', {watchDepth: 'collection'}],
-    ['ideas', {watchDepth: 'value'}]
+    ['place', { watchDepth: 'reference' }],
+    ['things', { watchDepth: 'collection' }],
+    ['ideas', { watchDepth: 'value' }]
   ]);
 });
 ```
@@ -162,27 +168,30 @@ By default, ngReact will wrap any functions you pass as in `scope.$apply`. You m
 app.directive('hello', function(reactDirective) {
   return reactDirective(HelloComponent, [
     'person',
-    ['place', {watchDepth: 'reference'}],
-    ['func', {watchDepth: 'reference', wrapApply: false}]
+    ['place', { watchDepth: 'reference' }],
+    ['func', { watchDepth: 'reference', wrapApply: false }]
   ]);
 });
 ```
-
 
 If you want to change the configuration of the directive created the `reactDirective` service, e.g. change `restrict: 'E'` to `restrict: 'C'`, you can do so by passing in an object literal with the desired configuration.
 
 ```javascript
 app.directive('hello', function(reactDirective) {
-  return reactDirective(HelloComponent, undefined, {restrict: 'C'});
+  return reactDirective(HelloComponent, undefined, { restrict: 'C' });
 });
 ```
 
 ### Minification
+
 A lot of automatic annotation libraries including ng-annotate skip implicit annotations of directives. Because of that you might get the following error when using directive in minified code:
+
 ```
 Unknown provider: eProvider <- e <- helloDirective
 ```
+
 To fix it add explicit annotation of dependency
+
 ```javascript
 var helloDirective = function(reactDirective) {
   return reactDirective('HelloComponent');
@@ -190,7 +199,6 @@ var helloDirective = function(reactDirective) {
 helloDirective.$inject = ['reactDirective'];
 app.directive('hello', helloDirective);
 ```
-
 
 ## Reusing Angular Injectables
 
@@ -200,7 +208,7 @@ It's also possible to pass Angular injectables and other variables as fourth par
 
 ```javascript
 app.directive('helloComponent', function(reactDirective, $ngRedux) {
-  return reactDirective(HelloComponent, undefined, {}, {store: $ngRedux});
+  return reactDirective(HelloComponent, undefined, {}, { store: $ngRedux });
 });
 ```
 
@@ -220,7 +228,7 @@ app.filter('hero', function() {
 app.factory('HelloComponent', function($filter) {
   return React.createClass({
     propTypes: {
-      person: React.PropTypes.object.isRequired,
+      person: React.PropTypes.object.isRequired
     },
     render: function() {
       return <span>Hello $filter('hero')(this.props.person)</span>;
@@ -238,6 +246,7 @@ app.factory('HelloComponent', function($filter) {
 ```
 
 ## Jsx Transformation in the browser
+
 During testing you may want to run the `JSXTransformer` in the browser. For this to work with angular you need to make sure that the jsx code has been transformed before the angular application is bootstrapped. To do so you can [manually bootstrap](https://docs.angularjs.org/guide/bootstrap#manual-initialization) the angular application. For a working example see the [jsx-transformer example](https://github.com/davidchang/ngReact/tree/master/examples/jsx-transformer).
 
 NOTE: The workaround for this is hacky as the angular bootstap is postponed in with a `setTimeout`, so consider [transforming jsx in a build step](http://facebook.github.io/react/docs/getting-started.html#offline-transform).
@@ -260,6 +269,7 @@ module: {
 ```
 
 ## Developing
+
 Before starting development run
 
 ```bash
@@ -280,6 +290,7 @@ grunt karma:background watch
 ```
 
 ### Running the examples
+
 The examples in the `examples/` folder use `bower_components`. To install these first install bower on your machine
 
 ```
@@ -305,6 +316,7 @@ Run the examples by starting a webserver in the project root folder.
 
 ## Contributors
 
+- Matthieu Prat (matthieuprat)
 - @Shuki-L
 - Fabien Rassinier (@frassinier)
 - Guilherme Hermeto (@ghermeto)
